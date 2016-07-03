@@ -1,0 +1,25 @@
+Perfect!
+Here is your result
+
+BUTTON - DO YOU WANT TO SAVE YOUR RESULTS
+-> OSATLOGIN->extraattributes
+If you dont save etc.
+
+{ASSESSMENT}
+
+
+
+<br />
+<table class="completed-table">
+    <tr>
+        <td class="completed-text">
+            <br />
+            {COMPLETED}
+            <br />
+            <br />
+            {URL}
+            <br /><br />
+        </td>
+    </tr>
+</table>
+<br />
