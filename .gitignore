@@ -1,8 +1,8 @@
 .settings
 .project
-/upload/surveys/*
-/upload/templates/*
-/upload/labels/*
+/upload/surveys/
+/upload/templates/
+/upload/labels/
 /tmp/runtime/HTML
 /application/controllers/admin/updater.php
 /tmp/*.html
@@ -11,7 +11,7 @@
 /tmp/*.xls
 /tmp/*.lsa
 /tmp/upload/fu*
-/upload/.htaccess
+/upload/
 /nbproject
 /tmp/assets/*
 !/tmp/assets/.gitignore
