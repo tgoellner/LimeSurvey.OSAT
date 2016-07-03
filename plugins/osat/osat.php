@@ -5,7 +5,7 @@ if(!class_exists('OsatTranslator'))
 }
 if(!class_exists('OsatExpressions'))
 {
-	require_once(dirname(__FILE__) . '/osatexpr.php');
+	require_once(dirname(__FILE__) . '/osatexpressions.php');
 }
 
 class Osat extends \ls\pluginmanager\PluginBase
