@@ -379,9 +379,9 @@ class OsatAssessment
             {
                 $id = isset($arguments[0]) ? $arguments[0] : null;
                 $type.='s';
-                if(!empty($id) && isset($this->${type}))
+                if(!empty($id) && isset($this->$type))
                 {
-                    $data = $this->${type};
+                    $data = $this->$type;
                     if(isset($data[$id][$what]))
                     {
                         return $data[$id][$what];
@@ -461,7 +461,7 @@ class OsatAssessment
         $languages = array_unique([$this->sLanguage, $this->surveyLanguage]);
 
         $query = "SELECT
-            name, message
+            id, name, message
         FROM
             {{assessments}}
         WHERE
@@ -475,35 +475,35 @@ class OsatAssessment
         AND
             language IN('" . join("', '", $languages) . "')
         ORDER BY FIELD(language, '" . join("', '", $languages) . "')";
-        
+
         $rows = Yii::app()->db->createCommand($query)->query()->readAll();
         if(count($rows))
         {
             while($row = array_shift($rows))
             {
                 $aid = $row['id'];
-                if(!isset($assessments[$id]))
+                if(!isset($assessments[$aid]))
                 {
-                    $assessments[$id] = [
+                    $assessments[$aid] = [
                         'name' => '',
                         'message' => ''
                     ];
                 }
-                else if(count(array_keys($assessments[$id])) == count(@array_filter(array_values($assessments[$id]))))
+                else if(count(array_keys($assessments[$aid])) == count(@array_filter(array_values($assessments[$aid]))))
                 {
                     // all texts set
                     continue;
                 }
 
                 // search for texts
-                foreach($assessments[$id] as $k => $v)
+                foreach($assessments[$aid] as $k => $v)
                 {
                     if(empty($v) && !empty($row[$k]))
                     {
-                        $assessments[$id][$k] = $row[$k];
+                        $assessments[$aid][$k] = $row[$k];
                     }
                 }
-                unset($k, $v, $id);
+                unset($k, $v, $aid);
             }
             unset($row);
         }
