@@ -1,0 +1,237 @@
+.osatstats {
+    margin-top: @gutter_width;
+    &--chartwapper {
+        box-sizing: content-box;
+        display: block;
+        width: 100%;
+        background: @color_bg_shade;
+        height: 450px;
+        padding-top: @gutter_width;
+        margin-bottom: @gutter_width * 2;
+        position: relative;
+    }
+
+    &--chart {
+        .center-min();
+        height: 500px;
+
+
+        &:before,
+        &:after {
+            content: "";
+            display:block;
+            position: absolute;
+            top: 0;
+            left: @gutter_width;
+            right: @gutter_width;
+            height: 0px;
+            border-top: 1px dotted @color_text;
+        }
+        &:after {
+            top: 50%;
+        }
+
+        &.is--chartist {
+            .ct-chart-bar {
+                margin-top: -15px;
+            }
+            .ct-grid {
+                stroke: @color_text;
+                &:nth-of-type(1) {
+                    position: absolute;
+                    top: 0;
+                }
+            }
+
+            .ct-series-a {
+                .has--averages & {
+                    transform: translateX(-10px);
+
+                }
+                .ct-bar {
+                    stroke: @color_text;
+                    stroke-width: 20px;
+
+                    .no-touchevents & {
+                        &:hover {
+                            cursor: pointer;
+                            stroke: darken(@color_text, 10%);
+                        }
+                    }
+                    .csstransitions & {
+                        .transition(~"stroke, stroke-width");
+                    }
+
+                    @media @minwidth_m {
+                        stroke-width: 40px;
+                    }
+
+                    @media @minwidth_l {
+                        stroke-width: 60px;
+                    }
+
+                    &:nth-of-type(1) {
+                        stroke: @color_extra1;
+                        .no-touchevents &:hover { stroke: darken(@color_extra1, 10%); }
+                    }
+                    &:nth-of-type(2) {
+                        stroke: @color_extra2;
+                        .no-touchevents &:hover { stroke: darken(@color_extra2, 10%); }
+                    }
+                    &:nth-of-type(3) {
+                        stroke: @color_extra3;
+                        .no-touchevents &:hover { stroke: darken(@color_extra3, 10%); }
+                    }
+                    &:nth-of-type(4) {
+                        stroke: @color_extra4;
+                        .no-touchevents &:hover { stroke: darken(@color_extra4, 10%); }
+                    }
+                    &:nth-of-type(5) {
+                        stroke: @color_extra5;
+                        .no-touchevents &:hover { stroke: darken(@color_extra5, 10%); }
+                    }
+                    &:nth-of-type(6) {
+                        stroke: @color_extra6;
+                        .no-touchevents &:hover { stroke: darken(@color_extra6, 10%); }
+                    }
+                    &:nth-of-type(7) {
+                        stroke: @color_extra7;
+                        .no-touchevents &:hover { stroke: darken(@color_extra7, 10%); }
+                    }
+
+                    &:last-of-type {
+                        stroke: @color_text;
+                        .no-touchevents &:hover { cursor: default; stroke: @color_text; }
+
+                        @media @minwidth_l {
+                            transform: translateX(35px);
+                        }
+                    }
+                }
+            }
+            .ct-series-b {
+                display: none;
+                transform: translateX(4px);
+
+                @media @minwidth_m {
+                    transform: translateX(16px);
+                }
+
+                @media @minwidth_l {
+                    transform: translateX(28px);
+                }
+
+                .has--averages & {
+                    display: block;
+
+                }
+                .ct-bar {
+                    stroke: lighten(@color_text, 10%);
+                    stroke-width: 10px;
+
+                    @media @minwidth_m {
+                        stroke-width: 15px;
+                    }
+
+                    @media @minwidth_l {
+                        stroke-width: 20px;
+                    }
+
+                    &:nth-of-type(1) {
+                        stroke: lighten(@color_extra1, 10%);
+                    }
+                    &:nth-of-type(2) {
+                        stroke: lighten(@color_extra2, 10%);
+                    }
+                    &:nth-of-type(3) {
+                        stroke: lighten(@color_extra3, 10%);
+                    }
+                    &:nth-of-type(4) {
+                        stroke: lighten(@color_extra4, 10%);
+                    }
+                    &:nth-of-type(5) {
+                        stroke: lighten(@color_extra5, 10%);
+                    }
+                    &:nth-of-type(6) {
+                        stroke: lighten(@color_extra6, 10%);
+                    }
+                    &:nth-of-type(7) {
+                        stroke: lighten(@color_extra7, 10%);
+                    }
+                    &:last-of-type {
+                        stroke: lighten(@color_text, 10%);
+
+                        @media @minwidth_l {
+                            transform: translateX(35px);
+                        }
+                    }
+                }
+            }
+            .ct-label {
+                &.ct-horizontal {
+                    color: @color_text;
+                    .font(small);
+                    text-align: center;
+                }
+            }
+
+
+            @media @minwidth_l {
+                .ct-labels {
+                    foreignobject:last-child {
+                        transform: translateX(35px);
+                    }
+                }
+            }
+        }
+    }
+
+    &--tablewrapper {
+        .screen-reader-text();
+    }
+
+    &--textxwrapper {
+        padding-top: @gutter_width;
+        @media @minwidth_m {
+            padding-top: @gutter_width * 2;
+        }
+    }
+
+    &--grouptext,
+    &--surveytext {
+        display: none;
+
+        &:first-child {
+            display: block;
+        }
+        [data-toggled] & {
+            display: none;
+            &.is--active {
+                display: block;
+            }
+        }
+
+        padding-bottom: @gutter_width * 2;
+        @media @minwidth_m{
+            padding-bottom: @gutter_width * 4;
+        }
+
+        .h1, .h2, .h3, .h4, .h5, .h6,
+        h1,h2,h3,h4,h5,h6 {
+            text-align: center;
+        }
+
+        h1,h2,h3,h4,h5,h6,p,ul,ol {
+            margin-top: @gutter_width;
+            @media @minwidth_m {
+                margin-top: @gutter_width * 2;
+            }
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+    &--surveytext {
+        display: block;
+    }
+}

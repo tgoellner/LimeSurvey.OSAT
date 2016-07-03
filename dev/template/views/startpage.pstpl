@@ -1,0 +1,56 @@
+<!-- startpage.pstl -->
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>{SURVEYNAME}</title>
+<meta name="generator" content="LimeSurvey http://www.limesurvey.org" />
+
+<!-- The following line includes jquery-ui.css or jquery-ui-custom.css from template dir, template.css and needed specific css file for survey -->
+{TEMPLATECSS}
+
+<!-- The following line includes jquery.js, jquery-ui.js, survey_runtime.js , template.js and needed specific js file for survey -->
+{TEMPLATEJS}
+<link rel="shortcut icon" href="{TEMPLATEURL}favicon.ico" />
+{GOOGLE_ANALYTICS_JAVASCRIPT}
+</head>
+<body class="default lang-{SURVEYLANGUAGE} {SURVEYFORMAT} {OSAT_PAGE_CSS}" id="osat">
+    <header class="page-header">
+        <div class="page-header--top-bar">
+            <div class="center">
+                <h1>
+                    <a href="http://www.eu-fundraising.eu" target="_blank">
+                        EU-Fundraising Association
+                    </a>
+                </h1>
+            </div>
+        </div>
+        <div class="page-header--navigation">
+            <div class="center">
+                <h1 class="page-header--logo">
+                    {SURVEYNAME}
+                </h1>
+
+                <nav class="page-header--external-nav">
+                    <ul>
+                        <li class="navigation--item is--home">
+                            <a href="http://www.eu-fundraising.eu/?lang={SURVEYLANGUAGE}" target="_blank">
+                                Home
+                            </a>
+                        </li>
+                        {LOGOUT_LINK|<li class="navigation--item is--logout">|</li>}
+                    </ul>
+                </nav>
+
+                <nav class="page-header--language-nav">
+                    {LANGUAGECHANGER}
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="outerframe container" id="outerframeContainer">
+        <div class="row" id="main-row">
+
+            <div class='col-xs-12' id="yii-flash-message">{FLASHMESSAGE}</div>
+
+            <div class="col-sm-12 col-centered" id="main-col">
+<!-- end of startpage.pstl -->

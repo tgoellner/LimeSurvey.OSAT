@@ -86,7 +86,18 @@ class Assessments extends Survey_Common_Action
 
     private function _showAssessments($iSurveyID, $action)
     {
-        $oCriteria = new CDbCriteria(array('order' => 'id ASC'));
+        $languages = explode(' ', trim(Yii::app()->getConfig('restrictToLanguages')));
+        if(count($languages)>1)
+        {
+            // make sure we have the default language at first
+            $default = Yii::app()->getConfig("defaultlang");
+            $languages = array_merge(array($default), $languages);
+            $languages = array_unique($languages);
+            unset($default);
+        }
+        $languages = "'" . join("','",$languages) . "'";
+
+        $oCriteria = new CDbCriteria(array('order' => 'id ASC, FIELD(language, ' . $languages .')'));
         $oAssessments = Assessment::model()->findAllByAttributes(array('sid' => $iSurveyID), $oCriteria);
         $aData = $this->_collectGroupData($iSurveyID);
         $aHeadings = array(gT("Scope"), gT("Question group"), gT("Minimum"), gT("Maximum"));

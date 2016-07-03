@@ -1,0 +1,55 @@
+body.survey-start,
+body.survey-save,
+body.register-attributes,
+body.register-extraattributes {
+    background: @color_white;
+
+    .question--navigator {
+        margin-top: @gutter_width;
+    }
+
+    .page-footer {
+        border-top: 3px solid @color_text;
+    }
+
+    .outerframe {
+        .center();
+        padding: @gutter;
+
+        @media @minwidth_m {
+            padding: @gutter_width;
+        }
+
+        @media @minwidth_l {
+            padding-top: @gutter_width * 2;
+            padding-bottom: @gutter_width * 2;
+        }
+
+        >.row {
+            .center-min();
+            padding: @gutter;
+
+            @media @minwidth_m {
+                padding: @gutter_width;
+            }
+        }
+    }
+
+}
+
+.survey-welcome {
+    &--inner {
+        background: url(../files/illustrations/welcome.png) no-repeat center top;
+        background-size: auto 180px;
+        padding-top: 180 + @gutter_width;
+
+        h2 {
+            .h1();
+            text-align: center;
+        }
+        h3 {
+            .h2();
+            text-align: center;
+        }
+    }
+}

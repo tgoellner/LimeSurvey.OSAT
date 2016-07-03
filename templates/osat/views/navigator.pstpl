@@ -1,0 +1,15 @@
+<!-- Navigator hidden-xs-->
+<div class="question--navigator">
+    <div class="row" id="navigator-container">
+        <div class="navigate--prev">
+            {MOVEPREVBUTTON}
+        </div>
+        <div class="navigate--next">
+            {MOVENEXTBUTTON}
+        </div>
+
+        <div class="navigate--save-clear">
+            {SAVE}
+        </div>
+    </div>
+</div>

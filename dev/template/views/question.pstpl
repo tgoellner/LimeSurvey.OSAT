@@ -1,0 +1,36 @@
+
+<!-- Question -->
+    <div {QUESTION_ESSENTIALS} class="{QUESTION_CLASS}{QUESTION_MAN_CLASS}{QUESTION_INPUT_ERROR_CLASS} col-xs-12 question-container">
+
+        <!-- Question title -->
+        <div class="question--title question-wrapper question-title-container">
+            <div class="col-sm-12 questiontext">
+                <div class="qnumcode question-text simple--text">
+                    {QUESTION_TEXT}
+                </div>
+
+            </div>
+        </div>
+        <!-- Question valid message -->
+        <div class="question--validator question-wrapper">
+            <div class="col-sm-12 questionvalidcontainer">
+                {QUESTION_VALID_MESSAGE}
+                {QUESTION_MAN_MESSAGE}
+                {QUESTION_FILE_VALID_MESSAGE}
+            </div>
+        </div>
+
+        <!-- Answer -->
+        <div class="row question-wrapper answer-container">
+            <div class="col-sm-12 answer simple--text">
+                {ANSWER}
+            </div>
+        </div>
+
+        <!-- Question help -->
+        <div class="row question-wrapper question-help-container">
+            <div class="col-sm-12 question-help simple--text">
+                {QUESTIONHELP}
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,88 @@
+/* Buttons */
+.btn() {
+	box-sizing:			border-box;
+	display:			inline-block;
+	padding:			@gutter;
+	min-width:			@max_width/6;
+
+	max-width:			100%;
+	min-height:			20px;
+	text-align:			center;
+	border:				none;
+
+	background-color:	@color_primary;
+	color:				@color_white;
+	text-decoration:	none;
+	font-weight:		bold;
+
+	@media all and (max-width: 480px) {
+		min-width:		0;
+	}
+
+	.no-touchevents & {
+		&:hover {
+			background-color: @color_primary_light;
+		}
+	}
+
+	.csstransitions & {
+		.transition(~"background-color,color");
+	}
+}
+
+*[class^="btn-"], *[class*=" btn-"], *[class^="btn"], *[class*=" btn"] {
+	.btn();
+
+	&:active { /* pressed */
+		background-color:	@color_primary_light !important;
+		color:				@color_white !important;
+	}
+	&:focus {
+		background-color:	@color_primary_light !important;
+		color:				@color_white !important;
+	}
+	&.inactive,
+	&.disabled {
+		background-color:	@color_bg_shade !important;
+		color:				@color_bg_shade_d !important;
+	}
+
+	&.btn-text,
+	&.btn-added {
+		background-color:	transparent !important;
+		color:				@color_text !important;
+		text-decoration:	underline;
+		padding-left:		round(@gutter/2);
+		padding-right:		round(@gutter/2);
+		min-width:			0;
+		&.disabled {
+			background-color:	transparent !important;
+			color:				@color_bg_shade !important;
+		}
+		&:focus {
+			text-decoration:	none;
+		}
+	}
+
+	&.block {
+		display:		block;
+		width:			100%;
+		min-width:		0;
+	}
+
+	/* Checked / Unchecked types */
+	>.text {
+		display:	inline;
+	}
+	>.text.checked {
+		display:	none;
+	}
+	&.checked {
+		>.text {
+			display:	none;
+		}
+		>.text.checked {
+			display:	inline;
+		}
+	}
+}

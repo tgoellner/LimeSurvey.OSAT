@@ -1,0 +1,64 @@
+        </div> <!-- main-col -->
+    </div><!-- main-row -->
+</div><!-- outerframe -->
+
+<!-- Bootstrap Modal Alert -->
+<div id="bootstrap-alert-box-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="min-height:40px;">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">&nbsp;</h4>
+            </div>
+            <div class="modal-body"><p></p></div>
+            <div class="modal-footer">
+                <a href="#" data-dismiss="modal" class="btn btn-default">{CLOSE_TRANSLATION}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="page-footer">
+    <div class="center">
+        <div class="center-min">
+            <div class="page-footer--sponsors">
+                <p>
+                    <span class="label">{{Sponsored by}}</span>
+                </p>
+                <p>
+                    <span class="logo-erasmus-plus">Erasmus +</span>
+                </p>
+            </div>
+            <div class="page-footer--legal">
+                <p>
+                    <span data-toggle="modal" data-target="#legal-notice">{{Legal notice}}</span>
+                </p>
+                <p>
+                    &copy; 2016 <a href="#" target="_blank">{{Copyright owner}}</a><br / />
+                    {{All rights reserved}}
+                </p>
+            </div>
+        </div>
+        <div class="page-footer--back-to-top">
+            <a href="#top" class="back-to-top--link">{{Back to top}}</a>
+        </div>
+    </div>
+</footer>
+
+<!-- modals //-->
+<div class="modal fade" id="legal-notice" tabindex="-1" role="dialog" aria-labelledby="legal-notice_label">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="legal-notice_label">{{Legal notice}}</h4>
+            </div>
+            <div class="modal-body">
+                {LEGAL_NOTICE}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{Close}}</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -343,6 +343,15 @@ class Statistics_userController extends LSYii_Controller {
 
         //---------- CREATE STATISTICS ----------
         $redata = compact(array_keys(get_defined_vars()));
+/*
+        $event = new PluginEvent('beforeStatsPage');
+        $event->set('redata', $redata);
+        App()->getPluginManager()->dispatchEvent($event);
+        if (!is_null($event->get('redata')))
+        {
+            $redata = $event->get('redata');
+        }
+*/
         doHeader();
 
         /// $oTemplate is a global variable defined in controller/survey/index

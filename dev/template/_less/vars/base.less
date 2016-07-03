@@ -1,0 +1,37 @@
+/* *********************************************
+ * Grid options.
+ * ****************************************** */
+
+@namespace:				~"";
+@scope:					~"html";
+@rootpath:              ~"base";
+
+@gutter_width: 			20px;	// Your gutter width
+@columns: 				12; 	// The amount of columns you want
+@max_width: 			1180px;	// Set a maximum width of the site
+@content_width: 		750px;	// Set a maximum width of the content
+
+// Half the gutter for borders, margin, padding etc
+@gutter: 				@gutter_width*0.5;
+
+
+/* *********************************************
+ * Other variables
+ * ****************************************** */
+@minwidth_s:			~"all and (min-width: 480px)";
+@minwidth_m:			~"all and (min-width: 640px)";
+@minwidth_l:			~"all and (min-width: 768px)";
+@minwidth_xl:			~"all and (min-width: 960px)";
+@minwidth_xxl:			~"all and (min-width: 1180px)";
+
+@footer_height:			60px;
+@header_height:			45 + (@gutter_width * 2);
+
+@page_padding:			@gutter_width;
+@radius:				0;
+
+@formfieldpadding:		@gutter;
+@formfieldlineheight:	20px;
+
+@logo_width:			240px;
+@logo_height:			60px;

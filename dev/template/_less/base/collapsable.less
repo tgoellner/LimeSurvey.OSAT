@@ -1,0 +1,30 @@
+.collapsable {
+	.collapsing-title {
+		cursor:		pointer;
+	}
+	.collapsing-content {
+		overflow:	hidden;
+		height:		0;
+	}
+	&.uncollapsed {
+		.collapsing-content {
+			height:		auto;
+			.collapsable {
+				.collapsing-content {
+					overflow:	hidden;
+					height:		0;
+				}
+				&.uncollapsed {
+					.collapsing-content {
+						height:		auto;
+					}
+				}
+			}
+		}
+	}
+	.csstransition & {
+		.collapsing-transition {
+			.enhanceTransition();
+		}
+	}
+}

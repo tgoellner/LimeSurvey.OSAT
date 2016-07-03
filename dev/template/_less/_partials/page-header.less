@@ -1,0 +1,84 @@
+@logowidth: 150px;
+@logoheight: round(@logowidth * 0.9231);
+
+.page-header {
+    display: block;
+    position: relative;
+    background: @color_white;
+    padding-bottom: @gutter;
+    margin: 0;
+
+    &--top-bar {
+        display: block;
+        .border(bottom);
+        padding: 0;
+    }
+
+    &--navigation {
+        padding: @gutter 0;
+
+        .center {
+            padding-left: @logowidth + (@gutter_width * 2);
+            padding-top: @logoheight - 28px;
+            padding-bottom: 4px;
+        }
+    }
+
+    &--logo {
+        display: inline-block;
+        width: @logowidth;
+        height: @logoheight;
+        overflow: hidden;
+
+        background: no-repeat center;
+        background-size: contain;
+        .svg-uri('icons/eufa_logo_europeanisation');
+
+        text-indent: 150%;
+        white-space: nowrap;
+
+        position: absolute;
+        top: 0;
+        left: @gutter;
+    }
+
+    &--external-nav {
+        display: inline-block;
+        width: 100%;
+        text-align: right;
+
+        .navigation--item {
+            display: inline;
+            padding-left: @gutter_width;
+        }
+
+        @media @minwidth_m {
+            text-align: left;
+
+            .navigation--item {
+                padding-left: 0;
+                padding-right: @gutter_width;
+            }
+        }
+    }
+
+    &--language-nav {
+        display: inline-block;
+        width: 100px;
+
+        position: absolute;
+        top: 0;
+        right: @gutter;
+
+        .control-label {
+            padding: 0;
+            text-align: left;
+        }
+
+        @media @minwidth_m {
+            top: auto;
+            bottom: 0;
+            right: @gutter_width;
+        }
+    }
+}

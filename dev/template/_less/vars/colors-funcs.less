@@ -1,0 +1,75 @@
+// use it like .color(red, background) => background-color: @color_red;
+.color(@a:"", @prop: color) {
+	@color:		~"@{color_@{a}}";
+
+	& when(@prop = background), (@prop = border), (@prop = border-top), (@prop = border-left), (@prop = border-bottom), (@prop = border-right) {
+		& when (@color = "") {
+			@{prop}-color:	transparent;
+			color:			@color_text;
+		}
+		& when not (@color = "") {
+			@{prop}-color:	@color;
+			& when(lightness(color(@color)) < 40%) {
+				color:		@color_white;
+			}
+		}
+	}
+
+	& when (@prop = color) {
+		& when (@color = "") {
+			@{prop}:		@color_text;
+		}
+		& when not (@color = "") {
+			@{prop}:		@color;
+		}
+	}
+}
+
+// use it like .border(left, 10px, dotted); => border-left: 10px dotted @color_border;
+.border(@where: "", @size: 1px, @type: solid) {
+	box-sizing: border-box;
+	& when not (@where = "") {
+		border-@{where}:	@size @type @color_border;
+		padding-@{where}:	@gutter;
+	}
+	& when (@where = "") {
+		border:		@size @type @color_border;
+		padding:	@gutter;
+	}
+}
+
+// basic color definitions
+@colors: red, green, yellow, blue, orange, white, grey, black, primary, contrast, warning;
+
+.-(@i: length(@colors)) when (@i > 0) {
+    @name: extract(@colors, @i);
+    .@{name} {
+		.color(@name);
+		&-bg { .color(@name, background); }
+		&-border { .border(); .color(@name, border); }
+		&-border-top { .border(top); .color(@name, border-top); }
+		&-border-right { .border(right); .color(@name, border-right); }
+		&-border-bottom { .border(bottom); .color(@name, border-bottom); }
+		&-border-left { .border(left); .color(@name, border-left); }
+    }
+    .-((@i - 1));
+} .-;
+
+.hilite {
+	.color(primary);
+	&-bg { .color(primary, background); }
+	&-border { .border(); .color(primary, border); }
+	&-border-top { .border(top); .color(primary, border-top); }
+	&-border-right { .border(right); .color(primary, border-right); }
+	&-border-bottom { .border(bottom); .color(primary, border-bottom); }
+	&-border-left { .border(left); .color(primary, border-left); }
+}
+.shady {
+	.color(text_shade_l);
+	&-bg { .color(text_shade_l, background); }
+	&-border { .border(); .color(text_shade_l, border); }
+	&-border-top { .border(top); .color(text_shade_l, border-top); }
+	&-border-right { .border(right); .color(text_shade_l, border-right); }
+	&-border-bottom { .border(bottom); .color(text_shade_l, border-bottom); }
+	&-border-left { .border(left); .color(text_shade_l, border-left); }
+}

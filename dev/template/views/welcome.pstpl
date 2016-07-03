@@ -1,0 +1,6 @@
+<!-- Survey Welcome -->
+<div class="survey-welcome">
+    <div class="survey-welcome--inner simple--text">
+        {WELCOME}
+    </div>
+</div>

@@ -1056,6 +1056,11 @@ class statistics_helper {
                 //$sql was set somewhere before
                 if (!empty($sql)) {$query .= " AND $sql";}
 
+                if($qry = $this->getTokensByUserFilterQuery($surveyid))
+                {
+                    $query.= $qry;
+                }
+
                 //execute query
                 $result=Yii::app()->db->createCommand($query)->queryAll();
 
@@ -1726,6 +1731,11 @@ class statistics_helper {
 
             //check for any "sql" that has been passed from another script
             if (!empty($sql)) {$query .= " AND $sql";}
+
+            if($qry = $this->getTokensByUserFilterQuery($surveyid))
+            {
+                $query.= $qry;
+            }
 
             //get data
             $row=Yii::app()->db->createCommand($query)->queryScalar();
@@ -2571,6 +2581,11 @@ class statistics_helper {
 
             //check for any "sql" that has been passed from another script
             if (!empty($sql)) {$query .= " AND $sql";}
+
+            if($qry = $this->getTokensByUserFilterQuery($surveyid))
+            {
+                $query.= $qry;
+            }
 
             //get data
             $row=Yii::app()->db->createCommand($query)->queryScalar();
@@ -3925,6 +3940,74 @@ class statistics_helper {
              return $sOutputHTML;
      }
 
+     protected function getTokensByUserFilterQuery($surveyid, array $attributefilter = [])
+     {
+         if($tokens = $this->getTokensByUserFilter($surveyid, $attributefilter))
+         {
+             return " AND `token` IN ('" . join("', '", $tokens) . "')";
+         }
+         return null;
+     }
+
+    protected function getTokensByUserFilter($surveyid, array $attributefilter = [])
+    {
+        if(empty($attributefilter))
+        {
+            $attributefilter = isset($_POST['user_attribute']) ? (array) $_POST['user_attribute'] : array();
+        }
+
+        // filter by uer attributes
+        if(!empty($attributefilter))
+        {
+            $participant_ids = null;
+
+            foreach($attributefilter as $attribute_id => $option_ids)
+            {
+                if(!empty($option_ids))
+                {
+                    $attr_query = "SELECT participant_id FROM {{participant_attribute}} WHERE value IN (SELECT value FROM {{participant_attribute_values}} WHERE `attribute_id` = $attribute_id AND `value_id` IN (" . join(", ", $option_ids) . "))";
+                    $rows = Yii::app()->db->createCommand($attr_query)->query()->readAll();
+                    foreach($rows as $i => $r)
+                    {
+                        $rows[$i] = $r['participant_id'];
+                    }
+
+                    if($participant_ids === null)
+                    {
+                        $participant_ids = $rows;
+                    }
+                    else
+                    {
+                        $participant_ids = array_intersect($participant_ids, $rows);
+                    }
+                }
+            }
+            unset($attr_query, $rows, $i, $r);
+
+            if($participant_ids !== null)
+            {
+                $attr_query = "SELECT token FROM {{tokens_$surveyid}} WHERE `participant_id` IN (" . (!empty($participant_ids) ? "'" . join("', '", $participant_ids). "'" : "NULL" ) . ")";
+                $tokens = Yii::app()->db->createCommand($attr_query)->query()->readAll();
+                if(!empty($tokens))
+                {
+                    foreach($tokens as $i => $r)
+                    {
+                        $tokens[$i] = $r['token'];
+                    }
+                }
+                else {
+                    $tokens = ['NULL'];
+                }
+
+                unset($attr_query, $i, $r);
+
+                return $tokens;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Generates statistics with subviews
      */
@@ -4018,7 +4101,6 @@ class statistics_helper {
             else
                 $summary = $q2show;
 
-            //print_r($_POST);
             //if $summary isn't an array we create one
             if (isset($summary) && !is_array($summary))
             {
@@ -4032,7 +4114,7 @@ class statistics_helper {
         $selects=buildSelects($allfields, $surveyid, $language);
 
         //count number of answers
-        $query = "SELECT count(*) FROM {{survey_$surveyid}}";
+        $query = "SELECT count(*) FROM {{survey_$surveyid}} WHERE 1";
 
         //if incompleted answers should be filtert submitdate has to be not null
         if (incompleteAnsFilterState() == "incomplete") {$query .= " WHERE submitdate is null";}
@@ -4047,10 +4129,14 @@ class statistics_helper {
             //filter incomplete answers?
             if (incompleteAnsFilterState() == "complete" || incompleteAnsFilterState() == "incomplete") {$query .= " AND ";}
 
-            else {$query .= " WHERE ";}
 
             //add filter criteria to SQL
             $query .= implode(" AND ", $selects);
+        }
+
+        if($qry = $this->getTokensByUserFilterQuery($surveyid))
+        {
+            $query.= $qry;
         }
 
         //get me some data Scotty

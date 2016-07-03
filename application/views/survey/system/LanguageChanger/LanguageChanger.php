@@ -12,7 +12,7 @@
 <!-- views/survey/system/LanguageChanger -->
     <div class="form-group form-horizontal">
         <label id="langchanger-label" for="langchanger" class="col-sm-4 col-xs-4 control-label text-right">
-            <?php eT("Language:");?>
+            <?php echo ucfirst($sSelected); ?>
         </label>
 
         <div class='col-xs-8 col-sm-4'>

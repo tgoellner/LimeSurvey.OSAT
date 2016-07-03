@@ -1,0 +1,18 @@
+/* Definition lists... */
+.definition-list {
+	display:	table;
+	width:		100%;
+	>* {
+		display:	table-row;
+		width:		100%;
+		>* {
+			display:		table-cell;
+			vertical-align:	top;
+			padding:		0 0 0 @gutter;
+
+			&:first-child {
+				padding:	0;
+			}
+		}
+	}
+}

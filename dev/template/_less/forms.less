@@ -1,0 +1,82 @@
+/* *********************************************
+ * Forms
+ * ****************************************** */
+form,
+input,
+label,
+select,
+textarea {
+	.font();
+	border:					0;
+	padding:				0;
+	color: 					@color_text;
+	resize: 				none;
+	outline: 				none !important;
+	box-shadow: 			none !important;
+	background: 			transparent;
+
+	&::-ms-clear {
+  		display: none;
+  	}
+
+  	&::placeholder,
+	&.placeholdersjs {
+		color: 				@color_text;
+		.transition();
+	}
+
+		&:focus {
+			&::placeholder,
+			&.placeholdersjs {
+				opacity: .5;
+			}
+		}
+
+	&[disabled],
+	&.disabled {
+		opacity:		.5;
+	}
+
+	&.warning {
+		color:				@color_warning;
+
+	  	&::placeholder,
+		&.placeholdersjs {
+		   color: 			@color_warning;
+		}
+	}
+}
+
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+textarea {
+	-webkit-appearance:		textfield;
+	-moz-appearance:		textfield;
+	background:				@color_white;
+	box-sizing:				border-box;
+	padding:				@gutter;
+	display:				block;
+	width:					100%;
+	border:					1px solid @color_primary;
+
+	&.warning {
+		border-color:		@color_warning;
+	}
+
+	&:focus {
+		border-width: 3px;
+		padding: @gutter - 2;
+	}
+}

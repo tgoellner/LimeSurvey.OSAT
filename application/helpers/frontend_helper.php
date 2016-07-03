@@ -1298,6 +1298,28 @@ function buildsurveysession($surveyid,$preview=false)
     $qtypes=getQuestionTypeList('','array');
     $fieldmap=createFieldMap($surveyid,'full',true,false,$_SESSION['survey_'.$surveyid]['s_lang']);
 
+/*echo "\n\n-------------\n";
+
+    if(!empty($fieldmap))
+    {
+        foreach($fieldmap as $key => $field)
+        {
+            if(!empty($field['relevance']) && !empty($field['qid']))
+            {
+                echo "\n\tChecking " . $field['qid'] . " against " . $field['relevance'];
+
+                // must be a question with a relevance - let's check!
+                if (LimeExpressionManager::ProcessRelevance($field['relevance'], $field['qid']))
+                {
+                    echo "\n\t\tmatches.";
+                }
+                echo "\n\t\tdoes not match.";
+            }
+        }
+    }
+
+echo "\n\n-------------\n";
+die();*/
 
     // Randomization groups for groups
     $aRandomGroups=array();

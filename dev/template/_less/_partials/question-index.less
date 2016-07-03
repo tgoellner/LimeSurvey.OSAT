@@ -1,0 +1,146 @@
+.question-index {
+    padding-left: 42px;
+    position: relative;
+    z-index: 20;
+
+    @media @minwidth_xxl {
+        position: absolute;
+        left: 0;
+        max-width: (@max_width - @content_width - 4) / 2;
+        padding: @gutter_width;
+        padding-top: @gutter;
+        background-color: @color_white;
+    }
+
+    .count,
+    .active .name {
+        .font(strong);
+    }
+
+    .disabled {
+        a {
+            text-decoration: none;
+            cursor: default;
+        }
+    }
+
+    .dropdown-menu {
+        max-height: 0;
+        overflow: hidden;
+
+        .csstransitions & {
+            .transition(~"max-height");
+        }
+
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            bottom: @gutter;
+            left: 0;
+            right: 0;
+            border-top: 1px solid @color_grey;
+            opacity: 0;
+            .csstransitions & {
+                .transition(opacity);
+            }
+
+            @media @minwidth_xxl {
+                display: none;
+            }
+        }
+
+        li:last-child {
+            margin-bottom: @gutter_width;
+            @media @minwidth_xxl {
+                margin-bottom: 0;
+            }
+        }
+
+        @media @minwidth_xxl {
+            .linkToButton {
+                .clearfix();
+                padding-left: 30px;
+                display: block;
+                .count {
+                    display: block;
+                    margin-left: -30px;
+                    width: 30px;
+                    float: left;
+                }
+                .name {
+                    display: block;
+                }
+
+            }
+        }
+    }
+
+    .dropdown-toggle {
+        display: block;
+        font-size: 25px;
+        width: 1em;
+        height: 1em;
+        overflow: hidden;
+        text-indent: 150%;
+        white-space: nowrap;
+        position: absolute;
+        left: 0;
+        top: 6px;
+
+        @media @minwidth_l {
+            font-size: 32px;
+        }
+
+        @media @minwidth_xxl {
+            position: relative;
+            left: auto;
+            top: auto;
+        }
+
+        &:after,
+        &:before {
+            .glyphicon();
+            position: absolute;
+            top: 0;
+            left: 0;
+            text-indent: 0;
+        }
+        &:before {
+            content: "\e236";
+            opacity: 1;
+            .rotate(0deg);
+        }
+        &:after {
+            content: "\e014";
+            opacity: 0;
+            .rotate(180deg);
+        }
+        .csstransitions & {
+            &:before,
+            &:after {
+                .transition();
+            }
+        }
+    }
+
+    .open {
+        .dropdown-menu {
+            max-height: 300px;
+            list-style-type: none;
+            &:after {
+                opacity: 1;
+            }
+        }
+        .dropdown-toggle {
+            &:before {
+                opacity: 0;
+                .rotate(180deg);
+            }
+            &:after {
+                opacity: 1;
+                .rotate(0deg);
+            }
+        }
+    }
+}

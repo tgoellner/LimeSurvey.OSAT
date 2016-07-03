@@ -51,7 +51,7 @@
                 class='code code-title'
                 name='code_<?php echo $position; ?>_<?php echo $scale_id; ?>'
                 value="<?php echo $title; ?>"
-                maxlength='5' 
+                maxlength='5'
                 pattern='<?php echo $sPattern; ?>'
                 required='required'
             />
@@ -98,7 +98,7 @@
         </td>
     <?php elseif ($assessmentvisible): ?>
         <td class="assessment-value">
-            <?php echo $row['assessment_value']; ?>
+            <?php echo isset($row['assessment_value']) ? $row['assessment_value'] : ''; ?>
         </td>
     <?php else: ?>
         <td style='display:none;' class="assessment-value">

@@ -1,0 +1,4 @@
+<div class="register-form">
+    {REGISTERFORM}
+</div>
+<input type='hidden' class='hidemenubutton'/>

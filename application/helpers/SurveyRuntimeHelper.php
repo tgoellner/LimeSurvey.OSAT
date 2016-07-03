@@ -88,103 +88,86 @@ class SurveyRuntimeHelper {
 
     protected function createIncrementalQuestionIndexMenu($LEMsessid, $surveyMode)
     {
+        // Button will be shown inside the form. Not handled by replacement.
+        $htmlButtons = array();
         $html = '';
-        $html .=  "\n\n<!-- PRESENT THE INDEX MENU (incremental) -->\n";
-        $html .=  CHtml::openTag('li', array('id' => 'index-menu', 'class'=>'dropdown index-menu-incremental'));
-        $html .=  CHtml::link(gT("Question index").'&nbsp;<span class="caret"></span>', array('#'), array('class'=>'dropdown-toggle',  'data-toggle'=>"dropdown", 'role'=>"button", 'aria-haspopup'=>"true", 'aria-expanded'=>"false"));
+        $html .=  "\n\n<!-- PRESENT THE INDEX MENU (full) -->\n";
+        $html .=  CHtml::openTag('span', array('id' => 'index-menu', 'class'=>'dropdown index-menu-incremental-full'));
+        $html .=  CHtml::link(gT("Question index").'&nbsp;<span class="caret"></span>', array('#'), array('class'=>'dropdown-toggle', 'data-toggle'=>"dropdown", 'role'=>"button", 'aria-haspopup'=>"true", 'aria-expanded'=>"false"));
         $html .=  CHtml::openTag('ul', array('class'=>'dropdown-menu'));
 
         $stepIndex = LimeExpressionManager::GetStepIndexInfo();
-        $lastGseq=-1;
-        $gseq = -1;
-        $grel = true;
-        for($v = 0, $n = 0; $n != $_SESSION[$LEMsessid]['maxstep']; ++$n)
+        $currentStep = !empty($_SESSION[$LEMsessid]['step']) ? $_SESSION[$LEMsessid]['step'] - 1 : null;
+
+        $availableGroups = [];
+        $currentGroup = null;
+
+        foreach($stepIndex as $step => $stepInfo)
         {
-            if (!isset($stepIndex[$n])) {
-                continue;   // this is an invalid group - skip it
-            }
-            $stepInfo = $stepIndex[$n];
-
-            if ($surveyMode == 'question')
+            $availableGroups[] = $stepInfo['gid'];
+            if($currentStep != null && $currentStep == $step)
             {
-                if ($lastGseq != $stepInfo['gseq']) {
-                    // show the group label
-                    ++$gseq;
-                    $g = $_SESSION[$LEMsessid]['grouplist'][$gseq];
-                    $grel = !LimeExpressionManager::GroupIsIrrelevantOrHidden($gseq);
-                    if ($grel)
-                    {
-                        $gtitle = LimeExpressionManager::ProcessString($g['group_name']);
-                        //$html .=  '<h3>' . flattenText($gtitle) . "</h3>";
-                        if ($n>0)
-                            $html .= '<li role="separator" class="divider"></li>';
+                $currentGroup = $stepInfo['gid'];
+            }
+        }
+        $availableGroups = array_unique($availableGroups);
+        unset($step, $stepInfo);
 
-                        $html .= '<li class="dropdown-header"><a href="#">'.flattenText($gtitle).'</a></li>';
-                    }
-                    $lastGseq = $stepInfo['gseq'];
-                }
-                if (!$grel || !$stepInfo['show'])
+        foreach ($_SESSION[$LEMsessid]['grouplist'] as $key => $group)
+        {
+            $group['step'] = $key + 1;
+            if (LimeExpressionManager::GroupIsRelevant($group['gid']))
+            {
+                $li_css = ['group-' . $group['gid']];
+
+                if($group['gid'] == $currentGroup)
                 {
-                    continue;
+                    $li_css[] = 'current';
+                    $li_css[] = 'active';
                 }
-                $q = $_SESSION[$LEMsessid]['fieldarray'][$n];
-            }
-            else
-            {
-                ++$gseq;
-                if (!$stepInfo['show'])
+
+                if (!in_array('active', $li_css) && !in_array($group['gid'], $availableGroups))
                 {
-                    continue;
+                    $li_css[] = 'disabled';
                 }
-                $g = $_SESSION[$LEMsessid]['grouplist'][$gseq];
+
+                $classes = ' linkToButton ';
+                $sButtonSubmit = CHtml::htmlButton(
+                    gT('Go to this group'),
+                    array(
+                        'id' => 'button-'.$group['gid'],
+                        'type' => 'submit',
+                        'value' => $group['step'],
+                        'name' => 'move',
+                        'class' => 'jshide'
+                    )
+                );
+
+                // Button
+                $htmlButtons[] = CHtml::tag(
+                    'li',
+                    array(
+                        'data-gid' => $group['gid'],
+                        'title' => $group['description'],
+                        'class' => $classes,
+                    ),
+                    $group['group_name'].$sButtonSubmit
+                );
+
+                $html .= CHtml::openTag('li', array('class'=>join(' ', $li_css)));
+                $linktxt = '<span class="count">' . str_pad($group['step'],2,'0',STR_PAD_LEFT) . '</span> <span class="name">' . $group['group_name'] . '</span>';
+                $html .=  CHtml::link($linktxt, array('#'), array('class'=>$classes, 'data-button-to-click'=>'#button-'.$group['gid'], ));
+                $html .= CHtml::closeTag('li');
             }
-
-            if ($surveyMode == 'group')
-            {
-                $indexlabel = LimeExpressionManager::ProcessString($g['group_name']);
-                //$sButtonText=gT('Go to this group');
-                $sButtonText = LimeExpressionManager::ProcessString($g['group_name']);
-            }
-            else
-            {
-                $indexlabel = LimeExpressionManager::ProcessString($q[3]);
-                //$sButtonText=gT('Go to this question');
-                $sButtonText= LimeExpressionManager::ProcessString($q[3]);
-            }
-
-
-            $sText = (($surveyMode == 'group') ? flattenText($indexlabel) : flattenText($indexlabel));
-            $bGAnsw = !$stepInfo['anyUnanswered'];
-
-            ++$v;
-
-            $class = ($n == $_SESSION[$LEMsessid]['step'] - 1 ? 'current' : ($bGAnsw ? 'answer' : 'missing'));
-
-            $s = $n + 1;
-
-            // Button
-            $htmlButtons[] = CHtml::htmlButton($sButtonText,array('type'=>'submit','value'=>$s,'name'=>'move','class'=>'jshide'));
-
-            //$html .= '<li><a href="#">'.$sButtonText.'</a></li>';
-
-            $html .=  CHtml::openTag('li');
-            $html .=  CHtml::link($sButtonText, array('#'), array('class'=>'linkToButton', 'data-button-to-click'=>'#button-'.$g['gid'], ));
-            $html .= CHtml::closeTag('li');
-
         }
 
-        if ($_SESSION[$LEMsessid]['maxstep'] == $_SESSION[$LEMsessid]['totalsteps'])
-        {
-            $htmlButtons[] = CHtml::htmlButton(gT('Submit'),array('type'=>'submit','value'=>'movesubmit','name'=>'move','class'=>'submit button'));
-            $html .= '<li><a href="#">'.gT('Submit').'</a></li>';
-        }
 
         $html .= CHtml::closeTag('ul');
         $html .= CHtml::closeTag('li');
 
-        App()->getClientScript()->registerScript('manageIndex',"manageIndex()\n",CClientScript::POS_END);
+        //App()->getClientScript()->registerScript('manageIndex',"manageIndex()\n",CClientScript::POS_END);
 
-        return array('menulist'=>$html, 'buttons'=>array() );
+        return array('menulist'=>$html, 'buttons'=>$htmlButtons );
     }
 
     protected function createFullQuestionIndex($LEMsessid, $surveyMode)

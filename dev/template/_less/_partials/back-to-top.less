@@ -1,0 +1,26 @@
+.back-to-top {
+    &--link {
+        @w: 50px;
+
+        display: inline-block;
+        white-space: nowrap;
+        font-size: 0;
+        max-width: @w;
+        width: 100%;
+        min-width: @w;
+        height: auto;
+        overflow: hidden;
+        border: none;
+        line-height: 1em;
+
+        &:before {
+            display: inline-block;
+            width: 100%;
+            content: "";
+            padding-top: 100%;
+            background: no-repeat center;
+            background-size: contain;
+            .svg-uri(~"icons/eufa_icon_up", @color_text);
+        }
+    }
+}

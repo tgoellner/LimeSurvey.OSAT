@@ -1,0 +1,25 @@
+#chromeframe {
+	position:			fixed;
+	z-index:			99 !important;
+	top:				0;
+	left:				0;
+	right:				0;
+	background:			@color_warning;
+	color:				@color_white;
+	font-size:			12px;
+	line-height:		14px;
+	padding:			10px;
+	a {
+		color:				@color_white;
+		text-decoration:	underline;
+	}
+	opacity:	.5;
+	.no-touchevents & {
+		&:hover {
+			opacity:	1;
+		}
+	}
+	.csstransitions & {
+		.transition(~"opacity");
+	}
+}

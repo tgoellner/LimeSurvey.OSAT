@@ -1,0 +1,30 @@
+a {
+	color:					@color_primary;
+	text-decoration:		none;
+	outline: 				none;
+	box-shadow:				none;
+	.transition(color,0.1s);
+
+	&.inactive {
+		color:				@color_text;
+	}
+
+}
+abbr {
+	color:					@color_text_shade;
+	cursor:					help;
+}
+&.no-touchevents {
+	a:hover {
+		color:			@color_primary_dark;
+	}
+	abbr:hover {
+		color:			@color_text;
+	}
+	&.csstransition {
+		a,
+		abbr {
+			.transition(color,0.1s);
+		}
+	}
+}

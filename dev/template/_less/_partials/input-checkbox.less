@@ -1,0 +1,45 @@
+.checkbox {
+    input[type="checkbox"],
+    input[type="radio"] {
+        outline: none !important;
+        &:before,
+        &:after {
+            display: none;
+        }
+
+        + label {
+            font-size: 2rem;
+                outline: none !important;
+            &:before,
+            &:after {
+                line-height: 1em;
+                width: 1em;
+                height: 1em;
+            }
+
+            &:before {
+                border: 1px solid @color_text;
+                .radius(0);
+            }
+            &:after {
+                color: @color_text;
+                font-size: 0.75em;
+                line-height: 1.333em;
+                text-align: center;
+            }
+
+        &:checked {
+            }
+        }
+    }
+}
+
+*[data-toggle] {
+    cursor: pointer;
+    text-decoration: underline;
+    .no-touchevents & {
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}

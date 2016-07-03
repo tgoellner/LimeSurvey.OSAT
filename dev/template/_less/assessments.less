@@ -1,0 +1,27 @@
+body.stats-complete {
+    background: @color_white;
+
+    .question--navigator {
+        margin-top: @gutter_width;
+    }
+
+    .page-footer {
+        border-top: 3px solid @color_text;
+    }
+}
+
+.survey-assessments {
+    &--head {
+        text-align: center;
+
+        h1, h2, h3, h4, h5, h6, p {
+            margin-top: @gutter_width;
+            @media @minwidth_m {
+                margin-top: @gutter_width * 2;
+            }
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+}

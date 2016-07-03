@@ -1,0 +1,13 @@
+<div class="survey-assessments center">
+    <div class="center-min survey-assessments--head">
+        <h2 class="h1">{{Perfect!<br />Here is your result|raw}}</h2>
+        <p>
+            <a href="#" class="btn btn-default">{{Do you want ro save your results?}}</a>
+        </p>
+        <p>
+            {{If you save your results cou can access them later.}}
+        </p>
+    </div>
+</div>
+
+{ASSESSMENTS}

@@ -1,0 +1,60 @@
+.page-header--language-nav {
+    .form-group {
+        position: relative;
+        width: 100%;
+        display: inline-block;
+        .border();
+        padding: @gutter;
+
+        .font(strong);
+        line-height: 1em;
+
+        label {
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            line-height: 1em;
+            font-weight: inherit;
+
+            background: no-repeat;
+            background-position: center right;
+            .svg-uri("icons/eufa_icon_dropdown", @color_text);
+        }
+
+        >div {
+            position: static;
+        }
+
+        select {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 20;
+        }
+    }
+    .jshide {
+        display: none !important;
+    }
+}
+/*
+<div class="form-group form-horizontal">
+        <label id="langchanger-label" for="langchanger" class="col-sm-4 col-xs-4 control-label text-right">
+            De        </label>
+
+        <div class="col-xs-8 col-sm-4">
+            <select class="languagechanger form-control " data-targeturl="/survey/index.php/728594" name="langchanger" id="langchanger">
+<option value="el">ελληνικά</option>
+<option value="bg">Български</option>
+<option value="de" selected="selected">Deutsch</option>
+<option value="hr">Hrvatski</option>
+<option value="hu">Magyar</option>
+</select>        </div>
+        <div class="col-xs-0 col-sm-4">
+            <!--  We don't have to add this button if in previewmode -->
+            <button type="submit" id="changelangbtn" value="changelang" name="changelang" class="changelang jshide btn btn-default" style="display: none;">Sprache ändern</button>        </div>
+    </div>
+    */
