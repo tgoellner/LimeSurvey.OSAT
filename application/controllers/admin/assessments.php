@@ -86,11 +86,15 @@ class Assessments extends Survey_Common_Action
 
     private function _showAssessments($iSurveyID, $action)
     {
+
+        $oSurvey = Survey::model()->findByPk($iSurveyID);
+        $surveyinfo = getSurveyInfo($iSurveyID);
+
         $languages = explode(' ', trim(Yii::app()->getConfig('restrictToLanguages')));
         if(count($languages)>1)
         {
             // make sure we have the default language at first
-            $default = Yii::app()->getConfig("defaultlang");
+            $default = isset($surveyinfo['language']) ? $surveyinfo['language'] : Yii::app()->getConfig("defaultlang");
             $languages = array_merge(array($default), $languages);
             $languages = array_unique($languages);
             unset($default);
@@ -99,7 +103,23 @@ class Assessments extends Survey_Common_Action
 
         $oCriteria = new CDbCriteria(array('order' => 'id ASC, FIELD(language, ' . $languages .')'));
         $oAssessments = Assessment::model()->findAllByAttributes(array('sid' => $iSurveyID), $oCriteria);
+
+        if(strpos($languages,','))
+        {
+            $assessments = [];
+            foreach($oAssessments as $ass)
+            {
+                if(!isset($assessments[$ass['id']]) || empty($assessments[$ass['id']]['message']))
+                {
+                    $assessments[$ass['id']] = $ass;
+                }
+            }
+            $oAssessments = $assessments;
+            unset($assessments, $ass);
+        }
+
         $aData = $this->_collectGroupData($iSurveyID);
+
         $aHeadings = array(gT("Scope"), gT("Question group"), gT("Minimum"), gT("Maximum"));
         $aData['actiontitle'] = gT("Add");
         $aData['actionvalue'] = "assessmentadd";
@@ -108,8 +128,6 @@ class Assessments extends Survey_Common_Action
         if ($action == "assessmentedit" && Permission::model()->hasSurveyPermission($iSurveyID, 'assessments', 'update')) {
             $aData = $this->_collectEditData($aData);
         }
-        $oSurvey = Survey::model()->findByPk($iSurveyID);
-        $surveyinfo = getSurveyInfo($iSurveyID);
         $aData['surveyinfo'] = $surveyinfo;
         $aData['imageurl'] = Yii::app()->getConfig('adminimageurl');
         $aData['surveyid'] = $iSurveyID;

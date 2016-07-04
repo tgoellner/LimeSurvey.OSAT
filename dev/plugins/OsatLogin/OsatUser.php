@@ -91,7 +91,7 @@ class OsatUser
 		if($this->translator == null)
 		{
 			$this->setTranslator(['translator' => new OsatTranslator([
-				'folder' => dirname(__FILE__) . '/../osatlogin'
+				'folder' => dirname(__FILE__) . '/../OsatLogin'
 			])]);
 		}
 		return $this->translator;
