@@ -1,14 +1,13 @@
 <?php
-if(!class_exists('OsatUser'))
+if(!class_exists('Osat', false))
 {
-	require_once(dirname(__FILE__) . '/osatuser.php');
+	require_once(realpath(dirname(__FILE__) . '/../Osat/Osat.php'));
 }
-
 class OsatLogin extends Osat {
 
 	# protected $storage = 'DbStorage';
 	static protected $description = 'Enhanced login features';
-	static protected $name = 'Enhanced Login';
+	static protected $name = 'OSAT Login';
 	static protected $label = 'osatlogin';
 
 	protected $settings = [];

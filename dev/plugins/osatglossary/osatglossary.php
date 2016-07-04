@@ -1,9 +1,13 @@
 <?php
+if(!class_exists('Osat', false))
+{
+	require_once(realpath(dirname(__FILE__) . '/../Osat/Osat.php'));
+}
 
 class OsatGlossary extends Osat {
 
 	static protected $description = 'Adds a glossary';
-	static protected $name = 'Glossary';
+	static protected $name = 'OSAT Glossary';
 	static protected $label = 'osatglossary';
 
     protected $localeSettings = [

@@ -1,11 +1,10 @@
 <?php
-if(!class_exists('OsatTranslator'))
+foreach(['OsatTranslator', 'OsatExpressions'] as $class)
 {
-	require_once(dirname(__FILE__) . '/osattranslator.php');
-}
-if(!class_exists('OsatExpressions'))
-{
-	require_once(dirname(__FILE__) . '/osatexpressions.php');
+	if(!class_exists($class, false))
+	{
+		require_once(realpath(dirname(__FILE__) . '/' . $class . '.php'));
+	}
 }
 
 class Osat extends \ls\pluginmanager\PluginBase
@@ -89,7 +88,7 @@ class Osat extends \ls\pluginmanager\PluginBase
 		if($this->translator == null)
 		{
 			$this->translator = new OsatTranslator([
-				'folder' => dirname(__FILE__) . '/../' . static::$label,
+				'folder' => dirname(__FILE__) . '/../' . get_called_class(),
 				'settings' => $this->prepareLocaleSettings()
 			]);
 		}
@@ -102,8 +101,8 @@ class Osat extends \ls\pluginmanager\PluginBase
 		if($isAdmin)
 		{
 			$oAdminTheme = AdminTheme::getInstance();
-			$oAdminTheme->registerScriptFile( 'ADMIN_SCRIPT_PATH', '../../plugins/osat/assets/js/scripts.js');
-			$oAdminTheme->registerCssFile( 'ADMIN', '../../../plugins/osat/assets/css/styles.css');
+			$oAdminTheme->registerScriptFile( 'ADMIN_SCRIPT_PATH', '../../plugins/Osat/assets/js/scripts.js');
+			$oAdminTheme->registerCssFile( 'ADMIN', '../../../plugins/Osat/assets/css/styles.css');
 		}
 	}
 
