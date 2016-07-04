@@ -24,8 +24,8 @@ module.exports = function(grunt) {
 		less: {
             template : {
     			options: {
-    				compress: true,
-    				yuicompress: true,
+    				compress: false,
+    				yuicompress: false,
     				optimization: 2,
                     sourceMap : true,
                     sourceMapFilename : 'template/css/styles.css.map',

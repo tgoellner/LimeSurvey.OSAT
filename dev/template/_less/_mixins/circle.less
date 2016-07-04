@@ -1,0 +1,27 @@
+@keyframes circle {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359.9deg);
+  }
+}
+
+/* :not(:required) hides this rule from IE9 and below */
+.circle() {
+  animation: circle 1000ms ease 0s infinite normal;
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+}
+.circle-in() {
+  animation: circle 1000ms ease 0s infinite normal,
+             fadein 500ms ease 0s;
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+}
+.circle-out() {
+  animation: circle 1000ms ease 0s infinite normal,
+             fadeout 500ms ease 0s;
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+}

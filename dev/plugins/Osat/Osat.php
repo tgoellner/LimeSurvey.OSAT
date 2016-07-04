@@ -45,6 +45,7 @@ class Osat extends \ls\pluginmanager\PluginBase
 
 		# print_r($_SESSION); die();
 	}
+
     protected function _registerEvents()
     {
 		/**
@@ -81,6 +82,24 @@ class Osat extends \ls\pluginmanager\PluginBase
 		$content.= $myEvent->get('$content');
 
 		$event->set('content', $content);
+	}
+
+	protected function getRequest($key = null)
+	{
+		$request = Yii::app()->request->getParam(static::$label);
+		if(!empty($request))
+		{
+			if(!empty($key))
+			{
+				if(isset($request[$key]))
+				{
+					return $request[$key];
+				}
+				return null;
+			}
+			return $request;
+		}
+		return null;
 	}
 
 	public function getTranslator($pluginonly = false)

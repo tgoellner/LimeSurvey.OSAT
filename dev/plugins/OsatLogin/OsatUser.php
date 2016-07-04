@@ -260,6 +260,11 @@ class OsatUser
         return null;
     }
 
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
     public function getPassword()
     {
         if($label = $this->getPasswordAttribute())

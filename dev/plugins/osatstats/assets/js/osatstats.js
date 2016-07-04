@@ -37,6 +37,8 @@ $(document).on('ready', function(e){
                             }]
                         },
                         options: {
+                            high : 100,
+                            low : 0,
                             scales: {
                                 yAxes: [{
                                     ticks: {

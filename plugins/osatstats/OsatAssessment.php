@@ -10,6 +10,10 @@ class OsatAssessment
     protected $exactMatch;
     protected $thisCountsInAverage;
 
+    protected $requestedFilter;
+    protected $activeFilter;
+    protected $availableFilter;
+
     protected $min;
     protected $max;
     protected $total;
@@ -30,6 +34,7 @@ class OsatAssessment
         $this->surveyId = $attributes['surveyId'];
         $this->sToken = $attributes['sToken'];
         $this->sLanguage = empty($attributes['sLanguage']) ? App()->language : $attributes['sLanguage'];
+        $this->requestedFilter = empty($attributes['filter']) || !is_array($attributes['filter']) ? [] : $attributes['filter'];
 
         $this->exactMatch = empty($attributes['exactMatch']) || !((bool) $attributes['exactMatch']);
         $this->thisCountsInAverage = empty($attributes['thisCountsInAverage']) || !((bool) $attributes['thisCountsInAverage']);
@@ -73,10 +78,109 @@ class OsatAssessment
         {
             $this->surveyLanguage = $surveyData->language;
             $this->hasAssessment = !($surveyData->assessments != "Y");
-            unset($surveyData);
             return true;
         }
         return false;
+    }
+
+    public function getUrl(array $attributes = [])
+    {
+        // let's restart with this new token!
+		$controller = new RegisterController('survey');
+
+        $attributes = array_replace($attributes, array('token' => $this->sToken, 'lang' => $this->sLanguage));
+
+		return $controller->createUrl("/survey/index/sid/" . $this->surveyId, $attributes);
+    }
+
+    public function getAvailableFilter($key = null)
+    {
+        if(!isset($this->availableFilter))
+        {
+            $this->availableFilter = [];
+            if($surveyInfo = getSurveyInfo($this->surveyId, $this->sLanguage))
+            {
+                if(!empty($surveyInfo['attributedescriptions']))
+                {
+                    foreach($surveyInfo['attributedescriptions'] as $label => $options)
+                    {
+                        if($options['mandatory'] != 'Y')
+                        {
+                            continue;
+                        }
+
+                        // let's check if the attribute contains md5 or sha1 strings - we don't want to allow filtering against those!
+                        $query = "SELECT `$label`, COUNT(*) AS count FROM {{tokens_$this->surveyId}} WHERE $label NOT REGEXP '^[0-9a-f]{32}$' AND $label NOT REGEXP '^[0-9a-f]{40}$' AND $label <> '' GROUP BY $label ORDER BY $label ASC";
+                        $rows = Yii::app()->db->createCommand($query)->query()->readAll();
+                        if(empty($rows))
+                        {
+                            // nothing found so we won't show this filter
+                            continue;
+                        }
+
+                        $options['options'] = [];
+                        foreach($rows as $row)
+                        {
+                            $options['options'][$row[$label]] = $row['count'];
+                        }
+                        unset($query, $rows, $row);
+                        $this->availableFilter[$label] = $options;
+                    }
+                }
+                unset($label, $options);
+            }
+            unset($surveyInfo);
+        }
+
+        if(!empty($key))
+        {
+            return isset($this->availableFilter[$key]) ? $this->availableFilter[$key] : null;
+        }
+        return $this->availableFilter;
+    }
+
+    public function getActiveFilter($key = null)
+    {
+        if(!isset($this->activeFilter))
+        {
+            $this->activeFilter = [];
+            if(!empty($this->requestedFilter))
+            {
+                if($availableFilter = $this->getAvailableFilter())
+                {
+                    foreach($this->requestedFilter as $label => $values)
+                    {
+                        if(isset($availableFilter[$label]))
+                        {
+                            if(!empty($availableFilter[$label]['options']))
+                            {
+                                $values = (array) $values;
+                                $result = array_intersect($values, array_keys($availableFilter[$label]['options']));
+
+                                if(!empty($result))
+                                {
+                                    $this->activeFilter[$label] = $result;
+                                }
+                                unset($result);
+                            }
+                        }
+                    }
+                    unset($label, $values);
+                }
+            }
+        }
+
+        if(!empty($key))
+        {
+            return isset($this->activeFilter[$key]) ? $this->activeFilter[$key] : [];
+        }
+
+        return $this->activeFilter;
+    }
+
+    protected function getTokenCount()
+    {
+        return $this->tokenCount + ($this->thisCountsInAverage ? 1 : 0);
     }
 
     protected function initTokens()
@@ -97,7 +201,7 @@ class OsatAssessment
             return false;
         }
         $query = "SELECT * FROM {{survey_" . $this->surveyId . "}} WHERE token = '" . $this->sToken . "'";
-        
+
         $rows = Yii::app()->db->createCommand($query)->query()->readAll();
         if(empty($rows))
         {
@@ -152,18 +256,30 @@ class OsatAssessment
         }
         unset($field, $value, $query, $rows);
 
+        $filter = $this->getActiveFilter();
+
         // and now the answers of all the other tokens matching the answers of the current one (only )
         $query = "SELECT
             s.token,
             t.completed,
             " . join(", ", $answered) .
-            (!empty($unanswered) ? ", CONCAT(" . join(", ", $unanswered) . ") AS empty" : "") . "
+            (!empty($unanswered) && empty($filter) ? ", CONCAT(" . join(", ", $unanswered) . ") AS empty" : "") . "
         FROM
             {{survey_" . $this->surveyId . "}} s
         LEFT JOIN({{tokens_" . $this->surveyId . "}} t) ON (t.token = s.token)
         WHERE t.completed != 'N'
-        AND s.token <> '" . $this->sToken . "'" .
-        (!empty($unanswered) ? " HAVING (empty = '' OR empty IS NULL)" : "") . "
+        AND s.token <> '" . $this->sToken . "'";
+
+        // let's add the filters
+        if(!empty($filter))
+        {
+            foreach($filter as $field => $value)
+            {
+                $query.=" AND t.$field IN ('" . (join("', '", (array) $value)) . "')";
+            }
+        }
+
+        $query.= (!empty($unanswered && empty($filter)) ? " HAVING (empty = '' OR empty IS NULL)" : "") . "
         ORDER BY t.completed ASC";
 
         unset($answered, $unanswered);
@@ -184,13 +300,13 @@ class OsatAssessment
                         $qid = preg_replace('/^\d+X\d+X(\d+)$/', "$1", $field);
 
                         $value = $this->getScoreForValue($field, $value);
-
                         if(isset($this->questions[$qid]))
                         {
                             $this->questions[$qid]['average']+= $value;
-                            if(isset($this->questions[$qid]))
+
+                            if(isset($this->groups[$gid]))
                             {
-                                $this->questions[$qid]['average']+= $value;
+                                $this->groups[$gid]['average']+= $value;
                             }
                             $this->average+= $value;
                         }
@@ -203,22 +319,16 @@ class OsatAssessment
             unset($row, $rows, $query);
         }
 
-        // add this one to total count
-        if($this->thisCountsInAverage)
-        {
-            $this->tokenCount+= 1;
-        }
-
         // now caluclate averages for questions
-        foreach($this->questions as &$q)
+        foreach($this->questions as $id => &$q)
         {
             if($this->thisCountsInAverage)
             {
-                $q['average'] = ($q['average'] + $q['total']) / $this->tokenCount;
+                $q['average'] = ($q['average'] + $q['total']) / $this->getTokenCount();
             }
-            else if(!empty($this->tokenCount))
+            else if($this->getTokenCount())
             {
-                $q['average']/= $this->tokenCount;
+                $q['average']/= $this->getTokenCount();
             }
         }
 
@@ -227,23 +337,22 @@ class OsatAssessment
         {
             if($this->thisCountsInAverage)
             {
-                $g['average'] = ($g['average'] + $g['total']) / $this->tokenCount + 1;
+                $g['average'] = ($g['average'] + $g['total']) / $this->getTokenCount();
             }
-            else if(!empty($this->tokenCount))
+            else if($this->getTokenCount())
             {
-                $g['average']/= $this->tokenCount;
+                $g['average']/= $this->getTokenCount();
             }
         }
 
         // and for the survey
         if($this->thisCountsInAverage)
         {
-            $this->tokenCount+= 1;
-            $this->average = ($this->average + $this->total) / $this->tokenCount + 1;
+            $this->average = ($this->average + $this->total) / $this->getTokenCount();
         }
-        else if(!empty($this->tokenCount))
+        else if($this->getTokenCount())
         {
-            $this->average/= $this->tokenCount;
+            $this->average/= $this->getTokenCount();
         }
 
         return true;
@@ -374,7 +483,7 @@ class OsatAssessment
 
             if(empty($type) && isset($this->$what))
             {
-                return $this->$what;
+                return ($this->$what / $this->max) * 100;
             }
             else
             {
@@ -385,7 +494,7 @@ class OsatAssessment
                     $data = $this->$type;
                     if(isset($data[$id][$what]))
                     {
-                        return $data[$id][$what];
+                        return ($data[$id][$what] / $data[$id]['max']) * 100;
                     }
                 }
             }
@@ -430,7 +539,7 @@ class OsatAssessment
     {
         $assessments = [];
         $scope = "scope = 'T'";
-        $total = $this->getTotal();
+        $total = $this->total;
 
         if($gid === null)
         {
@@ -450,7 +559,7 @@ class OsatAssessment
                 }
 
                 $scope = "scope = 'G' AND gid = $gid";
-                $total = $this->getGroupTotal($gid);
+                $total = $this->groups[$gid]['total'];
             }
         }
 

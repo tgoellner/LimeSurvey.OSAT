@@ -28,7 +28,7 @@ class OsatStats extends Osat {
     {
 		$this->subscribe('beforeAdminMenuRender');
         $this->subscribe('osatAddLocales');
-		# $this->subscribe('beforeControllerAction');
+		$this->subscribe('beforeControllerAction');
         $this->subscribe('beforeSurveyPageOsatLate');
     }
 
@@ -49,10 +49,26 @@ class OsatStats extends Osat {
 
 	public function beforeControllerAction()
 	{
-        #$event = $this->event;
-        die(".");
-        #$event->set('run', 'Hello my dear.');
-        # $GLOBALS['OSATSTATS'] = true;
+		$headers = getallheaders();
+		if(!empty($headers['OSATAJAX']))
+		{
+			if($assessment = $this->getAssessment())
+			{
+				$myEvent = new PluginEvent('beforeEmManagerHelperProcessString');
+				$myEvent->set('stringToParse', $assessment);
+				App()->getPluginManager()->dispatchEvent($myEvent);
+				$assessment = $myEvent->get('stringToParse');
+
+				if(!empty($assessment))
+				{
+					http_response_code(200);
+					echo $assessment;
+					exit();
+				}
+			}
+			http_response_code(404);
+			exit();
+		}
 	}
 
     public function beforeSurveyPageOsatLate()
@@ -192,11 +208,25 @@ class OsatStats extends Osat {
             return null;
         }
 
-        if($assessment = new OsatAssessment(['surveyId' => $surveyId, 'sToken' => $sToken]))
+		$data = [
+			'surveyId' => $surveyId,
+			'sToken' => $sToken,
+			'hasAverages' => false
+		];
+
+		$filter = $this->getRequest('filter');
+		if(!empty($filter))
+		{
+			$data['hasAverages'] = true;
+			if(empty($filter['reset']))
+			{
+				$data['filter'] = $filter;
+			}
+		}
+
+		if($assessment = new OsatAssessment($data))
         {
-            $data = [
-                'assessment' => $assessment
-            ];
+            $data['assessment'] = $assessment;
 
             return Yii::app()->getController()->renderFile(dirname(__FILE__) . '/view/assessment.php', $data, true);
         }

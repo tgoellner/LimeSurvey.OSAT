@@ -299,6 +299,15 @@ class OsatLogin extends Osat {
 		return !empty($return) ? join(" ", $return) : false;
 	}
 
+	protected function canRedirect($sReloadUrl)
+	{
+		$currentUrl = trim(preg_replace('/([^\?]+)?(\?.*)?$/',"$1",$_SERVER['REQUEST_URI']), '/');
+		$sReloadUrl = trim($sReloadUrl, '/');
+
+		return $currentUrl != $sReloadUrl;
+
+	}
+
 	protected function setToken($surveyId, $sToken)
 	{
 		$LEMsessid = 'survey_' . $surveyId;
@@ -312,7 +321,8 @@ class OsatLogin extends Osat {
 		$controller = new RegisterController('index');
 
 		$sReloadUrl = $controller->createUrl("/survey/index/sid/{$surveyId}",array('token'=>$sToken,'lang'=>App()->language));
-		if($_SERVER['REQUEST_URI'] != $sReloadUrl)
+
+		if($this->canRedirect($sReloadUrl))
 		{
 			killSurveySession($surveyId);
 			$controller->redirect($sReloadUrl);
@@ -334,7 +344,8 @@ class OsatLogin extends Osat {
 		$urlParam = array_replace(array('lang'=>App()->language), $urlParam);
 
 		$sReloadUrl = $controller->createUrl("/survey/index/sid/{$surveyId}", $urlParam );
-		if($_SERVER['REQUEST_URI'] != $sReloadUrl)
+
+		if($this->canRedirect($sReloadUrl))
 		{
 			killSurveySession($surveyId);
 			$controller->redirect($sReloadUrl);

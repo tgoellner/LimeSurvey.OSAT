@@ -1,0 +1,40 @@
+@keyframes fadein {
+    0% {
+        display: block;
+        opacity: 0;
+    }
+    1% {
+        opacity: 0;
+        display: block;
+    }
+    100% {
+        opacity: 1;
+        display: block;
+    }
+}
+
+/* :not(:required) hides this rule from IE9 and below */
+.fadein() {
+    animation: fadein 500ms ease 0s;
+}
+
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+    }
+    99% {
+        opacity: 0;
+    }
+    100% {
+        display: none;
+        opacity: 0;
+    }
+}
+
+/* :not(:required) hides this rule from IE9 and below */
+.fadein() {
+    animation: fadein 500ms ease 0s;
+}
+.fadeout() {
+    animation: fadeout 200ms ease 0s;
+}
