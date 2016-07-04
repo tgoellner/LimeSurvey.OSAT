@@ -109,7 +109,7 @@ class Assessments extends Survey_Common_Action
             $assessments = [];
             foreach($oAssessments as $ass)
             {
-                if(!isset($assessments[$ass['id']]) || empty($assessments[$ass['id']]['message']))
+                if(!isset($assessments[$ass['id']]) || empty($assessments[$ass['id']]['name']))
                 {
                     $assessments[$ass['id']] = $ass;
                 }

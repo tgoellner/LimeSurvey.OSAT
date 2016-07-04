@@ -97,6 +97,7 @@ class OsatAssessment
             return false;
         }
         $query = "SELECT * FROM {{survey_" . $this->surveyId . "}} WHERE token = '" . $this->sToken . "'";
+        
         $rows = Yii::app()->db->createCommand($query)->query()->readAll();
         if(empty($rows))
         {

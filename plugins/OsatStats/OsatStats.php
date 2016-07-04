@@ -185,7 +185,6 @@ class OsatStats extends Osat {
             }
         }
 
-
         if(empty($surveyId) || empty($sToken))
         {
             // no surveyId and no token given so we cannot display any assessment - nothing to do,

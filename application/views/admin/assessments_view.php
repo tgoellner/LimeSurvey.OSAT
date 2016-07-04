@@ -44,47 +44,11 @@
     </thead>
 
     <!-- body -->
-    <style type="text/css">
-        tr[class^="assess-"] {
-            display: none;
-        }
-        tr[class^="assess-"].first,
-        tr[class^="assess-"].open {
-            display: table-row;
-        }
-        tr[class^="assess-"].first td:first-child {
-            cursor: pointer;
-            position: relative;
-        }
-        tr[class^="assess-"].first td:first-child:after {
-            content: "+";
-            display: inline-block;
-            width: 1em;
-            height: 1em;
-            line-height: 1em;
-            text-align: center;
-            border-radius: 50%;
-            background: #328637;
-            color: #fff;
-        }
-        tr[class^="assess-"].first.open td:first-child:after {
-            content: "-";
-        }
-
-    </style>
     <tbody>
-        <?php
-            $last_id = null;
-            foreach($assessments as $assess):
-                $is_first = false;
-                if($assess['id'] != $last_id) {
-                    $is_first = true;
-                    $last_id = $assess['id'];
-                }
-            ?>
-            <tr class="assess-<?php echo $last_id; echo $is_first ? ' first' : ''; ?>">
+        <?php foreach($assessments as $assess): ?>
+            <tr>
                 <!-- ID -->
-                <td class="assess-id" <?php echo $is_first ? ' onClick="$(\'tr.assess-'.$last_id.'\').toggleClass(\'open\')"' : ''; ?>>
+                <td>
                     <?php echo $assess['id'];?>
                 </td>
 
