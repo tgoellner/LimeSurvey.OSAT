@@ -29,6 +29,8 @@ class OsatUser
     protected $errors;
     protected $notices;
 
+    protected $status = [];
+
     public function __construct(array $attributes = [])
     {
         if(!empty($attributes['email']))
@@ -608,13 +610,15 @@ class OsatUser
 
             if((bool) $create)
             {
-                $_SESSION['osat']['login'][$this->getToken()] = time() + ($this->expires * 60);
+                $_SESSION['osat']['login'][$this->getToken()] = [
+                    'expires' => time() + ($this->expires * 60)
+                ];
             }
             else
             {
                 if(isset($_SESSION['osat']['login'][$this->getToken()]))
                 {
-                    if($_SESSION['osat']['login'][$this->getToken()] < time())
+                    if($_SESSION['osat']['login'][$this->getToken()]['expires'] < time())
                     {
                         // session expired
                         $this->logout();
@@ -622,7 +626,7 @@ class OsatUser
                     else
                     {
                         // refresh session
-                        $_SESSION['osat']['login'][$this->getToken()] = time() + ($this->expires * 60);
+                        $_SESSION['osat']['login'][$this->getToken()]['expires'] = time() + ($this->expires * 60);
                     }
                 }
             }
@@ -664,6 +668,32 @@ class OsatUser
             }
         }
         return null;
+    }
+
+    public function setSessionVar($key, $value)
+    {
+        if($this->isLoggedIn() && !empty($key))
+        {
+            if($value === null)
+            {
+                unset($_SESSION['osat']['login'][$this->getToken()][$key]);
+            }
+            else
+            {
+                $_SESSION['osat']['login'][$this->getToken()][$key] = $value;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function getSessionVar($key)
+    {
+        if($this->isLoggedIn() && !empty($key))
+        {
+            return isset($_SESSION['osat']['login'][$this->getToken()][$key]) ? $_SESSION['osat']['login'][$this->getToken()][$key] : null;
+        }
+        return false;
     }
 
     public function exists()
@@ -796,4 +826,104 @@ class OsatUser
     {
         return $this->getAttributesByManatory(false);
     }
+
+
+
+    public function getMissingAttributes()
+	{
+		$values = [];
+		foreach($this->getMandatoryAttributes() as $label => $options)
+		{
+			if(!empty($options['options']))
+			{
+				if(!isset($this->$label) || !in_array($this->$label, (array) $options['options']))
+				{
+					$values[$label] = $options;
+				}
+			}
+			else if(empty($this->$label))
+			{
+				$values[$label] = $options;
+			}
+		}
+
+		return $values;
+	}
+
+    public function hasMissingAttributes()
+    {
+        return count($this->getMissingAttributes()) > 0;
+    }
+
+	public function getMissingExtraAttributes()
+	{
+        $values = [];
+		foreach($this->getOptionalAttributes() as $label => $options)
+		{
+			if(!empty($options['options']))
+			{
+				if(!in_array($this->$label, (array) $options['options']))
+				{
+					$values[$label] = $options;
+				}
+			}
+			else if(empty($this->$label))
+			{
+				$values[$label] = $options;
+			}
+		}
+
+		return $values;
+	}
+
+    public function hasMissingExtraAttributes()
+    {
+        return count($this->getMissingExtraAttributes()) > 0;
+    }
+
+    public function hasCompletedSurvey()
+    {
+        if(!isset($this->status['hasCompletedSurvey']))
+        {
+            $this->status['hasCompletedSurvey'] = false;
+
+            if($tokenInstance = Token::model($this->surveyId)->editable()->findByAttributes(array('token' => $this->token)))
+    		{
+    			if($tokenInstance->completed != "N")
+    			{
+    				$this->status['hasCompletedSurvey'] = true;
+                }
+            }
+        }
+        return $this->status['hasCompletedSurvey'];
+    }
+
+    public function hasJustCompletedSurvey()
+    {
+        $t = $this->getSessionVar('hasJustCompletedSurvey');
+        if($t!== null)
+        {
+            return $t;
+        }
+
+        if(!isset($this->status['hasJustCompletedSurvey']))
+        {
+            $this->status['hasJustCompletedSurvey'] = false;
+
+            if(!empty($_SESSION['survey_'.$this->surveyId]['grouplist']))
+			{
+				if(!empty($_SESSION['survey_'.$this->surveyId]['relevanceStatus']))
+				{
+					if(!empty($_SESSION['survey_'.$this->surveyId]['totalquestions']))
+					{
+                        $this->setSessionVar('hasJustCompletedSurvey', true);
+                        return true;
+					}
+				}
+			}
+        }
+        return false;
+    }
+
+
 }

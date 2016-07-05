@@ -396,8 +396,8 @@ class Osat extends \ls\pluginmanager\PluginBase
 						$destination = call_user_func_array(array($expressions, $cmd), $args);
 						$destination = $this->formatOutput($destination, $args);
 
-						if($htmlesc)
-						{
+						if($htmlesc && ($destination == strip_tags($destination))) {
+							// only escape chars when $htmlesc is TRUE and if the string is not already HTML
 							$destination = htmlspecialchars($destination);
 						}
 

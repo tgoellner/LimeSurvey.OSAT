@@ -619,7 +619,7 @@ class OsatAssessment
         }
         unset($rows, $query, $languages);
 
-        if($gid !== null)
+        if($gid === null)
         {
             $this->assessments = $assessments;
         }

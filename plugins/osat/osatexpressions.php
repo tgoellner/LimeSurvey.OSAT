@@ -45,7 +45,7 @@ class OsatExpressions
         	$step = $this->stepIndex() - 1;
         	if($step >= 0)
         	{
-        		$this->currentStepInfo = LimeExpressionManager::GetStepIndexInfo($step);
+        		$this->currentStepInfo = @LimeExpressionManager::GetStepIndexInfo($step);
         	}
         }
 
@@ -373,5 +373,146 @@ class OsatExpressions
     	}
 
     	return '';
+    }
+
+    protected function processGroupDescription($gid = null, $what = 'description')
+    {
+        $return = [
+            'description' => '',
+            'outtro' => '',
+            'intro' => ''
+        ];
+
+        $description = null;
+
+        $div = '---';
+
+        if(empty($gid))
+        {
+            $gid = $this->groupId();
+        }
+
+        if(($grouplist = $this->getSurveySession('grouplist')) !== null)
+    	{
+            foreach($grouplist as $group)
+            {
+                if($group['gid'] == $gid)
+                {
+                    $description = isset($group['description']) ? $group['description'] : null;
+                }
+            }
+    	}
+
+        if($description === null)
+        {
+            if($group = QuestionGroup::model()->findByAttributes(array('sid' => $this->surveyId(), 'gid' => $gid, 'language' => App()->language)))
+            {
+                $description = $group->description;
+            }
+        }
+
+        // process the description: split into SUMMARY and FULL sections (if any marker is found)
+        if (!empty($description))
+        {
+            if (($pos = strpos($description, $div)) !== false)
+            {
+                $return['description'] = $this->validHtml(substr($description, 0, $pos));
+                $return['outro'] = $this->validHtml(substr($description, $pos + strlen($div)));
+
+                if (($pos = strpos($return['outro'] , $div)) !== false)
+                {
+                    $return['intro'] = $return['description'];
+                    $return['description'] = $this->validHtml(substr($return['outro'], 0, $pos));
+                    $return['outro'] = $this->validHtml(substr($return['outro'], $pos + strlen($div)));
+                }
+            }
+        }
+        unset($pos);
+
+        if(!empty($what))
+        {
+            return isset($return[$what]) ? $return[$what] : '';
+        }
+
+        return $return;
+    }
+
+    public function groupdescription($gid = null)
+    {
+        return $this->processGroupDescription($gid, 'description');
+    }
+    public function groupintro($gid = null)
+    {
+        return $this->processGroupDescription($gid, 'intro');
+    }
+    public function groupoutro($gid = null)
+    {
+        return $this->processGroupDescription($gid, 'outro');
+    }
+
+    private function validHtml($html)
+    {
+        $html = trim($html);
+
+        // remove open tag at the start of the string
+        if (preg_match('/<[^>\/]+>$/', $html)) {
+            $html = trim(preg_replace('/<[^>\/]+>$/', '', $html));
+        }
+        // remove closing tag at the start of the string
+        if (preg_match('/^<\/[^>]+>/', $html)) {
+            $html = trim(preg_replace('/^<\/[^>]+>/', '', $html));
+        }
+
+        // close unclosed tag at the end of the string
+        if (!preg_match('/<\/[^>]+>$/', $html)) {
+            preg_match_all('/<([a-z0-9]+)([^>\/]+)?>/', $html, $matches);
+
+            if (!empty($matches[0])) {
+                $close_tag = null;
+                for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
+                    // ignore all possible self closing tags
+                    if (!in_array($matches[1][$i], array(
+                        'area',
+                        'base',
+                        'br',
+                        'col',
+                        'command',
+                        'embed',
+                        'hr',
+                        'img',
+                        'input',
+                        'keygen',
+                        'link',
+                        'meta',
+                        'param',
+                        'source',
+                        'track',
+                        'wbr'
+                    ))
+                    ) {
+                        $close_tag = $matches[1][$i];
+                        break;
+                    }
+                }
+                unset($i);
+
+                if (!empty($close_tag)) {
+                    $html .= '</' . $close_tag . '>';
+                }
+                unset($close_tag);
+            }
+            unset($matches);
+        }
+
+        // open unopened tag at the start of the string
+        if (!preg_match('/^<[^>\/]+>/', $html)) {
+            preg_match_all('/<\/([a-z0-9]+)>/', $html, $matches);
+            if (!empty($matches[1][0])) {
+                $html = '<' . $matches[1][0] . '>' . $html;
+            }
+            unset($matches);
+        }
+
+        return $html;
     }
 }

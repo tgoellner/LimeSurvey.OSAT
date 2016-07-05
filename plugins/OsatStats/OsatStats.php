@@ -49,8 +49,7 @@ class OsatStats extends Osat {
 
 	public function beforeControllerAction()
 	{
-		$headers = getallheaders();
-		if(!empty($headers['OSATAJAX']))
+		if(!empty($_SERVER['HTTP_OSATAJAX']))
 		{
 			if($assessment = $this->getAssessment())
 			{
@@ -73,29 +72,29 @@ class OsatStats extends Osat {
 
     public function beforeSurveyPageOsatLate()
     {
+		global $tokenexist, $token, $previewmode, $thissurvey;
+
 		$event = $this->event;
 		$surveyId = $event->get('surveyId');
-
-        global $tokenexist, $token, $previewmode, $thissurvey;
-
         $sToken = isset($token) ? $token : (empty($sToken) ? Yii::app()->request->getParam('token') : $sToken);
         $sLanguage = empty($sLanguage) ? App()->language : $sLanguage;
 
-        if(empty($surveyId) || empty($sToken))
-        {
-            // OSAT User class exists?
-            if(class_exists('OsatUser'))
-            {
-                if($user = OsatUser::getUserFromSession())
-                {
-                    if($user->isLoggedIn())
-                    {
-                        $surveyId = $user->getSurveyId();
-                        $sToken = $user->getToken();
-                    }
-                }
-            }
-        }
+		if(class_exists('OsatUser'))
+		{
+			if($user = OsatUser::getUserFromSession())
+			{
+				if($user->isLoggedIn())
+				{
+					// overwrite survey and token details by user session
+					$surveyId = $user->getSurveyId();
+					$sToken = $user->getToken();
+				}
+				else
+				{
+					unset($user);
+				}
+			}
+		}
 
         if(empty($surveyId) || empty($sToken) || empty($thissurvey))
         {
@@ -104,7 +103,7 @@ class OsatStats extends Osat {
 
         $display_assessmentspage = false;
 
-        if (tableExists("{{tokens_".$surveyId."}}"))
+		if (tableExists("{{tokens_".$surveyId."}}"))
         {
             if ($thissurvey['alloweditaftercompletion'] == 'Y' )
             {
@@ -117,10 +116,10 @@ class OsatStats extends Osat {
 
             if (!isset($tokenInstance))
             {
-                $oToken = Token::model($surveyId)->findByAttributes(array('token' => $sToken));
+				$oToken = Token::model($surveyId)->findByAttributes(array('token' => $sToken));
                 if($oToken)
                 {
-                    $now = dateShift(date("Y-m-d H:i:s"), "Y-m-d H:i:s", Yii::app()->getConfig("timeadjust"));
+					$now = dateShift(date("Y-m-d H:i:s"), "Y-m-d H:i:s", Yii::app()->getConfig("timeadjust"));
                     if($oToken->completed != 'N' && !empty($oToken->completed))// This can not happen (TokenInstance must fix this)
                     {
                         $display_assessmentspage = true;
@@ -129,12 +128,30 @@ class OsatStats extends Osat {
             }
         }
 
-        if(!$display_assessmentspage)
+		if(!$display_assessmentspage)
         {
-            return;
+			if(!empty($user))
+			{
+				if($user->hasJustCompletedSurvey())
+				{
+					$_POST['osatbodycss'] = 'survey-complete';
+				}
+			}
+			elseif(!empty($_SESSION['survey_'.$surveyId]['grouplist']))
+			{
+				if(!empty($_SESSION['survey_'.$surveyId]['relevanceStatus']))
+				{
+					if(!empty($_SESSION['survey_'.$surveyId]['totalquestions']))
+					{
+						$_POST['osatbodycss'] = 'survey-complete';
+					}
+				}
+			}
+
+			return;
         }
 
-        $_POST['osatbodycss'] = 'stats-complete';
+		$_POST['osatbodycss'] = 'survey-complete';
 
         $data = [];
         if($data['languagechanger'] = makeLanguageChangerSurvey($sLanguage))
@@ -158,7 +175,24 @@ class OsatStats extends Osat {
         doHeader();
 
         // Get the register.pstpl file content, but replace default by own string
-        $output = file_get_contents($sTemplatePath.'/views/assessment.pstpl');
+        $template = 'osatstats.pstpl';
+
+		if(!empty($user))
+		{
+			if($user->hasJustCompletedSurvey())
+			{
+				$template = 'completed.pstpl';
+			}
+		}
+
+        if(!file_exists($templateFile = getTemplatePath($thissurvey['template']).'/views/' . $template))
+		{
+			if(!file_exists($templateFile = getTemplatePath().'/views/' . $template))
+			{
+				$templateFile = realpath(dirname(__FILE__) . '/view/' . $template);
+			}
+		}
+        $output = file_get_contents($templateFile);
 
         $data['thissurvey'] = $thissurvey;
         echo templatereplace(file_get_contents($sTemplatePath.'/views/startpage.pstpl'),array(), $data);

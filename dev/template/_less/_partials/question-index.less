@@ -13,7 +13,8 @@
     }
 
     .count,
-    .active .name {
+    .active .name,
+    .is--active .name {
         .font(strong);
     }
 
@@ -57,8 +58,26 @@
             }
         }
 
-        @media @minwidth_xxl {
+        .group-survey {
+            margin-top: @gutter_width;
+        }
+
+        .linkToGid,
+        .linkToButton {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .disabled {
+            .linkToGid,
             .linkToButton {
+                text-decoration: none;
+                cursor: default;
+            }
+        }
+
+        @media @minwidth_xxl {
+            .linkToButton,
+            .linkToGid {
                 .clearfix();
                 padding-left: 30px;
                 display: block;

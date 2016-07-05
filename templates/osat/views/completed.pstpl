@@ -1,25 +1,13 @@
-Perfect!
-Here is your result
+<div class="survey-assessments center">
+    <div class="center-min survey-assessments--head">
+        <h2 class="h1">{{Perfect!<br />Here is your result|raw}}</h2>
+        <p>
+            <a href="{EXTRAATTRIBUTES_URL}" class="btn btn-default">{{Do you want to save your results?}}</a>
+        </p>
+        <p>
+            {{If you save your results you can access them later.}}
+        </p>
+    </div>
+</div>
 
-BUTTON - DO YOU WANT TO SAVE YOUR RESULTS
--> OSATLOGIN->extraattributes
-If you dont save etc.
-
-{ASSESSMENT}
-
-
-
-<br />
-<table class="completed-table">
-    <tr>
-        <td class="completed-text">
-            <br />
-            {COMPLETED}
-            <br />
-            <br />
-            {URL}
-            <br /><br />
-        </td>
-    </tr>
-</table>
-<br />
+{ASSESSMENTS}

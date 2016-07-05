@@ -1,4 +1,4 @@
-body.stats-complete {
+body.survey-complete {
     background: @color_white;
 
     .question--navigator {
@@ -89,7 +89,7 @@ body.stats-complete {
             display: inline-block;
             text-align: left;
             .border();
-            padding: @gutter;
+            padding: 0;
             background: @color_white;
             margin: round(@gutter/2) @gutter;
 
@@ -103,10 +103,15 @@ body.stats-complete {
                 z-index: 10;
                 line-height: 1em;
                 font-weight: inherit;
+                padding: @gutter;
 
                 background: no-repeat;
-                background-position: center right;
+                background-position: center right @gutter;
                 .svg-uri("icons/eufa_icon_dropdown", @color_text);
+
+            	.csstransitions & {
+            		.transition(~"background-color,color");
+            	}
             }
 
             >div {
@@ -121,13 +126,19 @@ body.stats-complete {
                 height: 100%;
                 opacity: 0;
                 z-index: 20;
+
+                &:focus {
+                    + label {
+                        background-color: @color_bg_shade;
+                    }
+                }
             }
 
             .btn {
                 display: block;
-                background: transparent !important;
+                background: transparent;
                 color: @color_text !important;
-                padding: 0;
+                padding: @gutter;
                 margin: 0;
                 font-size: inherit;
                 font-weight: inherit;
@@ -138,6 +149,10 @@ body.stats-complete {
                 outline: none;
                 border: none;
                 line-height: inherit;
+
+                &:focus {
+                    background-color: @color_bg_shade !important;
+                }
             }
         }
     }
@@ -371,11 +386,40 @@ body.stats-complete {
 
             &.is--total {
                 width: 100%;
-                background: @color_text;
+                height: 100%;
+                    &:before {
+                        content: "";
+                        display: inline-block;
+                        width: 0;
+                        height: 100%;
+                        vertical-align: text-bottom;
 
-                .no-touchevents & {
-                    &:hover {
+                    }
+
+                button {
+                    display: inline-block;
+                    width: 100%;
+                    padding: 0;
+                    margin: 0;
+                    background: @color_text;
+                    outline: none;
+                    border: none;
+                    vertical-align: text-bottom;
+
+                    &:focus {
                         background: darken(@color_text, 10%);
+                    }
+
+
+                    .csstransitions & {
+                        .transition(~"width, height, background-color, opacity");
+                    }
+
+                    .no-touchevents & {
+                        cursor: pointer;
+                        &:hover {
+                            background: darken(@color_text, 10%);
+                        }
                     }
                 }
             }
@@ -397,24 +441,36 @@ body.stats-complete {
                     &:nth-of-type(@{i}) {
                         .osatstats-table--cell {
                             &.is--total {
-                                background-color: @color;
-                                &:after {
+                                button {
                                     background-color: @color;
+                                    &:after {
+                                        background-color: @color;
+                                    }
+                                    &:before {
+                                        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36px" height="12px"><path fill="@{color}" transform="rotate(0)" d="M2.658,0.000 C-13.615,0.000 50.938,0.000 34.662,0.000 C28.662,0.000 23.035,12.002 18.660,12.002 C14.285,12.002 8.594,0.000 2.658,0.000 Z"/></svg>');
+                                    }
+                                    &:focus {
+                                        background-color: darken(color(@color),10%);
+                                    }
                                 }
-                                &:before {
-                                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36px" height="12px"><path fill="@{color}" transform="rotate(0)" d="M2.658,0.000 C-13.615,0.000 50.938,0.000 34.662,0.000 C28.662,0.000 23.035,12.002 18.660,12.002 C14.285,12.002 8.594,0.000 2.658,0.000 Z"/></svg>');
-                                }
-
                             }
                             &.is--average {
                                 background-color: lighten(color(@color),10%);
+                                &:after {
+                                    background-color: lighten(color(@color),10%);
+                                }
+                                &:before {
+                                    @svgcolor: lighten(color(@color),10%);
+                                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36px" height="12px"><path fill="@{svgcolor}" transform="rotate(0)" d="M2.658,0.000 C-13.615,0.000 50.938,0.000 34.662,0.000 C28.662,0.000 23.035,12.002 18.660,12.002 C14.285,12.002 8.594,0.000 2.658,0.000 Z"/></svg>');
+                                }
                             }
                         }
                         .no-touchevents &:hover{
-                            cursor: pointer;
                             .osatstats-table--cell {
                                 &.is--total {
-                                    background-color: darken(color(@color),10%);
+                                    button {
+                                        background-color: darken(color(@color),10%);
+                                    }
                                 }
                             }
                         }
@@ -474,17 +530,16 @@ body.stats-complete {
 }
 
 .osatstats-text {
+    @media @minwidth_xxl {
+        .center-min {
+            position: static;
+        }
+    }
     &--assessment {
         display: none;
 
-        &:first-child {
+        &.is--active {
             display: block;
-        }
-        [data-toggled] & {
-            display: none;
-            &.is--active {
-                display: block;
-            }
         }
 
         padding-bottom: @gutter_width * 2;
@@ -492,18 +547,29 @@ body.stats-complete {
             padding-bottom: @gutter_width * 4;
         }
 
-        .h1, .h2, .h3, .h4, .h5, .h6,
-        h1,h2,h3,h4,h5,h6 {
+        &--label,
+        &--groupname {
+            .h2();
+            margin: 0;
             text-align: center;
         }
-
-        h1,h2,h3,h4,h5,h6,p,ul,ol {
+        &--summary,
+        &--assessment {
             margin-top: @gutter_width;
             @media @minwidth_m {
                 margin-top: @gutter_width * 2;
             }
-            &:first-child {
-                margin-top: 0;
+
+            h2,h3,h4 {
+                .h3();
+                text-align: center;
+            }
+
+            h1,h2,h3,h4,h5,h6,p,ul,ol {
+                margin-top: @gutter_width;
+                &:first-child {
+                    margin-top: 0;
+                }
             }
         }
     }

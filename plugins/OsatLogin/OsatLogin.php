@@ -417,103 +417,30 @@ class OsatLogin extends Osat {
 		return trim($this->getLogoutLink() . $this->getLoginLink());
 	}
 
-	protected function getMissingAttributesForUser(OsatUSer $user)
-	{
-		$values = [];
-		foreach($user->getMandatoryAttributes() as $label => $options)
-		{
-			if(!empty($options['options']))
-			{
-				if(!isset($user->$label) || !in_array($user->$label, (array) $options['options']))
-				{
-					$values[$label] = $options;
-				}
-			}
-			else if(empty($user->$label))
-			{
-				$values[$label] = $options;
-			}
-		}
-
-		return $values;
-	}
-
-	protected function getMissingExtraAttributesForUser(OsatUSer $user)
-	{
-		$values = [];
-		foreach($user->getOptionalAttributes() as $label => $options)
-		{
-			if(!empty($options['options']))
-			{
-				if(!in_array($user->$label, (array) $options['options']))
-				{
-					$values[$label] = $options;
-				}
-			}
-			else if(empty($user->$label))
-			{
-				$values[$label] = $options;
-			}
-		}
-
-		return $values;
-	}
-
 	protected function isCompleted(OsatUser $user)
 	{
-		global $thissurvey, $thisstep;
-		$sToken = $user->getToken();
-		$surveyId = $user->getSurveyid();
-
-		if($tokenInstance = Token::model($surveyId)->editable()->findByAttributes(array('token' => $sToken)))
+		if($user->hasJustCompletedSurvey() && Yii::app()->request->getParam('function') != 'extraattributes')
 		{
-			$oToken = Token::model($surveyId)->findByAttributes(array('token' => $sToken));
+			return false;
+		}
 
-			if($oToken->completed != "N")
+		if($user->hasCompletedSurvey())
+		{
+			if(count($attr = $user->getMissingExtraAttributes()))
 			{
-				// check for additional attributes
-				if(count($attr = $this->getMissingExtraAttributesForUser($user)))
-				{
-					// the registration is not completed yet, show attributes
-					$this->createRegisterPage([
-					   'missing_attributes' => $attr,
-					   'optional_attributes' => true,
-					   'function' => 'extraattributes',
-					   'surveyId' => $surveyId,
-					   'sToken' => $sToken
-				   ]);
-				   return false;
-				}
-				else
-				{
-					// let's set some settings
-					return true;
-
-/*					$controller = new RegisterController('index');
-
-					$sReloadUrl = $controller->createUrl("/{$surveyId}/language/" . App()->language);
-					print_r($sReloadUrl); echo "\n";
-
-					if($_SERVER['REQUEST_URI'] != $sReloadUrl)
-					{
-						print_r($_SERVER['REQUEST_URI']);
-							die();
-						$controller->redirect($sReloadUrl);
-					}
-					return;
-
-					# $sReloadUrl = $controller->createUrl("/statistics_user/action/surveyid/{$surveyId}/language/" . App()->language);
-					# return;
-					// the registration is complete, show results page
-					$controller = new RegisterController('index');
-
-				   # $sReloadUrl = $controller->createUrl("/statistics_user/action/surveyid/{$surveyId}/language/" . App()->language);
-				   if($_SERVER['REQUEST_URI'] != $sReloadUrl)
-				   {
-					   $controller->redirect($sReloadUrl);
-				   }
-*/
-				}
+				// the registration is not completed yet, show attributes
+				$this->createRegisterPage([
+				   'missing_attributes' => $attr,
+				   'optional_attributes' => true,
+				   'function' => 'extraattributes',
+				   'surveyId' => $user->get('surveyId'),
+				   'sToken' => $user->get('token')
+			   ]);
+			   return false;
+			}
+			else
+			{
+				return true;
 			}
 		}
 		return false;
@@ -569,7 +496,7 @@ class OsatLogin extends Osat {
 		{
 			if($user->isLoggedIn())
 			{
-				 if(count($attr = $this->getMissingAttributesForUser($user)) && $surveyId && !empty($sToken))
+				 if(count($attr = $user->getMissingAttributes()) && $surveyId && !empty($sToken))
 				 {
 					 $this->createRegisterPage([
 		 				'missing_attributes' => $attr,
@@ -748,7 +675,7 @@ class OsatLogin extends Osat {
 
 													if($sToken = $user->getToken())
 													{
-														if(count($attr = $this->getMissingAttributesForUser($user)))
+														if(count($attr = $user->getMissingAttributes()))
 														{
 															$registerform_vars['function'] = 'attributes';
 															$registerform_vars['missing_attributes'] = $attr;
@@ -852,7 +779,7 @@ class OsatLogin extends Osat {
 							{
 								if($sToken = $user->getToken())
 								{
-									if(count($attr = $this->getMissingAttributesForUser($user)))
+									if(count($attr = $user->getMissingAttributes()))
 									{
 										$registerform_vars['function'] = 'attributes';
 										$registerform_vars['missing_attributes'] = $attr;

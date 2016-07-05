@@ -1,0 +1,13 @@
+<div class="survey-assessments center">
+    <div class="center-min survey-assessments--head">
+        <h2 class="h1">{{Here is your result}}</h2>
+        <p>
+            {{Thank you for submitting your extended registration - here is your result of the survey. You can access it anytime you login again.}}
+        </p>
+        <p>
+            {{<a href="http://www.eu-fundraising.eu/" target="_blank" class="btn btn-default">Learn more about Chances of Europeanisation</a>|raw}}
+        </p>
+    </div>
+</div>
+
+{ASSESSMENTS}

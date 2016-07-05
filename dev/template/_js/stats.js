@@ -3,7 +3,7 @@ var osatstats = {
     {
         $(document).on({
             'click.osatstats' : osatstats.toggleQuestions
-        }, 'tr.osatstats-table--group');
+        }, '.osatstats-table:not(.is--chart) tr.osatstats-table--group');
 
         $(document).on({
             'change.osatstats' : osatstats.switchFilter
@@ -23,8 +23,8 @@ var osatstats = {
 
 
         $(document).on({
-            'click.osatstats' : osatstats.displayAssessment
-        }, '.is--chart tr.osatstats-table--group');
+            'click.osatstats' : osatstats.activateAssessment
+        }, '*[data-gid]');
     },
 
     toggleQuestions : function(e)
@@ -124,18 +124,13 @@ var osatstats = {
         return false;
     },
 
-    displayAssessment : function()
+    activateAssessment : function()
     {
-        var gid = $(this).parents('tbody').attr('data-gid'),
-            text = $('.osatstats-text--assessment[data-gid="' + gid + '"]');
+        var gid = $(this).attr('data-gid');
+        console.log("activate " + gid);
 
-        $('.osatstats-text').not('[data-toggled]').attr('data-toggled', true);
-        $('.osatstats-text .osatstats-text--assessment.is--active').removeClass('is--active');
-
-        if(text)
-        {
-            $(text).addClass('is--active');
-        }
+        $(".is--active[data-gid]").removeClass('is--active');
+        $('[data-gid="' + gid + '"]').addClass('is--active');
     }
 }
 
