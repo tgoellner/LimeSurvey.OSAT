@@ -27,6 +27,7 @@
                 </p>
                 <p>
                     <span class="logo-erasmus-plus">Erasmus +</span>
+                    <span class="erasmus-plus-text">{{Dieses Projekt wurde mit Unterstützung der Europäischen Kommission  nanziert. Die Verantwortung für den Inhalt dieser Veröffentlichung (Mitteilung) trägt allein der Verfasser; die Kommission haftet nicht für die weitere Verwendung der darin enthaltenen Angaben.}}</span>
                 </p>
             </div>
             <div class="page-footer--legal">

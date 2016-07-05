@@ -67,7 +67,31 @@ class OsatLogin extends Osat {
 
 		$this->subscribe('beforeStatsPage');
 
+
+		// $this->subscribe('beforeControllerAction');
+
     }
+
+
+	public function _DEACT_beforeControllerAction()
+	{
+		$event = $this->event;
+
+		if($controller = new OsatLoginController([
+			'translator' => $this->getTranslator()
+		])) {
+			if($controller->isActive())
+			{
+				if($return = $controller->doAction())
+				{
+					print_r($return);
+					die("done");
+				}
+			}
+			# print_r($controller);
+			die("xxx");
+		}
+	}
 
 	public function beforeStatsPage()
 	{
@@ -377,6 +401,9 @@ class OsatLogin extends Osat {
 			case 'attributes' :
 				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'attributes', 'lang' => $sLanguage]);
 				break;
+			case 'extraattributes' :
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'extraattributes', 'lang' => $sLanguage]);
+				break;
 			case null :
 				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'lang' => $sLanguage]);
 				break;
@@ -419,7 +446,7 @@ class OsatLogin extends Osat {
 
 	protected function isCompleted(OsatUser $user)
 	{
-		if($user->hasJustCompletedSurvey() && Yii::app()->request->getParam('function') != 'extraattributes')
+		if($user->hasJustCompletedSurvey() && strpos(Yii::app()->request->getParam('function'), 'attributes')===false)
 		{
 			return false;
 		}
@@ -508,6 +535,7 @@ class OsatLogin extends Osat {
 				 }
 				 else
 				 {
+
 					 $this->isCompleted($user);
 					 $resetToken = true;
 				 }
@@ -754,7 +782,13 @@ class OsatLogin extends Osat {
 								// try to save the user
 								if($user->save())
 								{
+									if(!$user->hasMissingExtraAttributes())
+									{
+										$user->setSessionVar('hasJustCompletedSurvey', null);
+									}
+
 									$this->setToken($surveyId, $sToken);
+
 									return;
 								}
 								else

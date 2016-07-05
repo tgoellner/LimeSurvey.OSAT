@@ -1,5 +1,7 @@
 <div class="osatstats">
-    <?php if(is_object($assessment) && $groups = $assessment->getGroups()): ?><div class="osatstats--assessment">
+<?php if(is_object($assessment) && $groups = $assessment->getGroups()): ?>
+    <?php echo $header; ?>
+    <div class="osatstats--assessment">
         <?php
 
             $grouplist = [];
@@ -167,13 +169,17 @@
                         </tr>
                     </thead>
 
-                    <?php foreach($grouplist as $gid => $group):
+                    <?php $c = 0; foreach($grouplist as $gid => $group):
                             $questions = $assessment->getGroupQuestions($gid); ?><<?php echo $gid=='survey' ? 'tfoot' : 'tbody'; ?> class="has--<?php echo empty($questions) ? 'no-' : ''; ?>questions">
                         <tr class="osatstats-table--group">
                             <td class="osatstats-table--cell is--label"><?php echo htmlspecialchars($group['label']); ?></td>
                             <td class="osatstats-table--cell is--name"><?php echo $gid=='survey' ? '{{Total}}' : htmlspecialchars($group['name']); ?></td>
                             <td class="osatstats-table--cell is--total">
-                                <button data-gid="<?php echo $gid; ?>" style="height:<?php echo number_format($group['total'], 2, '.', ''); ?>%" data-balloon="{{You reached %1$s of %2$s|<?php echo $group['total_score']; ?>|<?php echo $group['max']; ?>}}">
+                                <button
+                                    data-gid="<?php echo $gid; ?>"
+                                    style="height:<?php echo number_format($group['total'], 2, '.', ''); ?>%"
+                                    data-balloon="{{You reached %1$s of %2$s|<?php echo $group['total_score']; ?>|<?php echo $group['max']; ?>}}"
+                                    data-balloon-pos="<?php echo $c < count($grouplist)/2 ? 'top' : 'top'; ?>">
                                     <span class="osatstats-table--cell--percentage" aria-described-by="g<?php echo $gid; ?>-total"><?php echo floatval(number_format($group['total'], 2)); ?>%</span>
                                     <span id="g<?php echo $gid; ?>-total" class="osatstats-table--cell--score" data-value="<?php echo $group['total_score']; ?>" data-max="<?php echo $group['max']; ?>">
                                         {{You reached %1$s of %2$s|<?php echo $group['total_score']; ?>|<?php echo $group['max']; ?>}}
@@ -207,7 +213,7 @@
                                 </span>
                             </td>
                         </tr><?php endforeach; endif; ?>
-                    </<?php echo $gid=='survey' ? 'tfoot' : 'tbody'; ?>><?php endforeach; ?>
+                    </<?php echo $gid=='survey' ? 'tfoot' : 'tbody'; ?>><?php $c++; endforeach; ?>
                 </table>
             </div>
         </div>

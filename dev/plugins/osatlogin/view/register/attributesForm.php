@@ -63,11 +63,14 @@
 
             <?php if(empty($optional_attributes)): ?><div class="register--text required-attributes-text simple--text">
                 {REQUIRED_ATTRIBUTES_TEXT}
-            </div><?php else: ?><p class="register--hint">
+            </div><?php else: ?><p>
                 * {{are obligatory fields}}
             </p><?php endif; ?>
 
             <div class="form-group submit">
+                <?php if(!empty($optional_attributes)): ?><p class="register--hint">
+                    <a href="javascript:window.history.back()">{{Cancel}}</a>
+                </p><?php endif; ?>
                 <button type="submit" id="register" value="login" name="register" accesskey="n" class="submit btn btn-lg btn-primary">{{<?php echo !empty($optional_attributes) ? 'Send' : 'Forward' ; ?>}}</button>
             </div>
         <?php echo CHtml::endForm(); ?>

@@ -181,6 +181,7 @@ class OsatStats extends Osat {
 		{
 			if($user->hasJustCompletedSurvey())
 			{
+				$_POST['osatbodycss'].= ' survey-is-just-completed';
 				$template = 'completed.pstpl';
 			}
 		}
@@ -222,18 +223,15 @@ class OsatStats extends Osat {
     	$sToken = empty($sToken) ? Yii::app()->request->getParam('token') : $sToken;
     	$sLanguage = empty($sLanguage) ? App()->language : $sLanguage;
 
-        if(empty($surveyId) || empty($sToken))
-        {
-            // OSAT User class exists?
-            if(class_exists('OsatUser'))
-            {
-                if($user = OsatUser::getUserFromSession())
-                {
-                    $surveyId = $user->getSurveyId();
-                    $sToken = $user->getToken();
-                }
-            }
-        }
+		// OSAT User class exists?
+		if(class_exists('OsatUser'))
+		{
+			if($user = OsatUser::getUserFromSession())
+			{
+				$surveyId = $user->getSurveyId();
+				$sToken = $user->getToken();
+			}
+		}
 
         if(empty($surveyId) || empty($sToken))
         {
@@ -261,6 +259,8 @@ class OsatStats extends Osat {
 		if($assessment = new OsatAssessment($data))
         {
             $data['assessment'] = $assessment;
+			$data['header'] = !empty($user) && !$user->hasJustCompletedSurvey() ? Yii::app()->getController()->renderFile(dirname(__FILE__) . '/view/assessment_header.php', $data, true) : '';
+
 
             return Yii::app()->getController()->renderFile(dirname(__FILE__) . '/view/assessment.php', $data, true);
         }

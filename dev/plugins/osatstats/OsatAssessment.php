@@ -191,6 +191,7 @@ class OsatAssessment
             // token is not found or it did not complete the survey yet
             return false;
         }
+        $this->tokenData = $tokenData;
 
         $answered = [];
         $unanswered = [];
