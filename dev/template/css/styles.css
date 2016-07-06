@@ -5172,6 +5172,144 @@ tfoot .osatstats-table--cell.is--label {
 .osatstats-text--assessment--assessment ol:first-child {
   margin-top: 0;
 }
+.osat-feedback {
+  position: relative;
+  border-top: 1px solid #154194;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+@media all and (min-width: 768px) {
+  .osat-feedback {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+}
+.osat-feedback.is--loading:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 80;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+.osat-feedback.is--loading:after {
+  content: "";
+  display: block;
+  font-size: 50px;
+  width: 1em;
+  height: 1em;
+  background: no-repeat center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20standalone%3D%22no%22%3F%3E%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20width%3D%22100%25%22%20height%3D%22100%25%22%20viewBox%3D%220%200%2050%2050%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20xml%3Aspace%3D%22preserve%22%20style%3D%22fill-rule%3Aevenodd%3Bclip-rule%3Aevenodd%3Bstroke-linejoin%3Around%3Bstroke-miterlimit%3A1.41421%3B%22%3E%3Cg%3E%3Cpath%20d%3D%22M25.008%2C5c-0.175%2C0.001%20-0.35%2C0.003%20-0.525%2C0.007c-0.214%2C0.006%20-0.427%2C0.014%20-0.641%2C0.026c-1.048%2C0.063%20-2.09%2C0.201%20-3.116%2C0.425c-1.911%2C0.417%20-3.758%2C1.118%20-5.465%2C2.073c-1.995%2C1.116%20-3.796%2C2.575%20-5.303%2C4.294c-1.433%2C1.634%20-2.599%2C3.5%20-3.433%2C5.507c-0.746%2C1.792%20-1.225%2C3.691%20-1.422%2C5.622c-0.205%2C2.025%20-0.105%2C4.082%200.304%2C6.076c0.409%2C1.998%201.128%2C3.929%202.124%2C5.709c1.155%2C2.065%202.678%2C3.922%204.476%2C5.46c1.869%2C1.6%204.03%2C2.852%206.35%2C3.67c2.495%2C0.88%205.161%2C1.249%207.801%2C1.098c2.761%2C-0.158%205.48%2C-0.893%207.941%2C-2.155c2.966%2C-1.52%205.534%2C-3.786%207.417%2C-6.536c1.493%2C-2.181%202.547%2C-4.656%203.077%2C-7.246c0.273%2C-1.329%200.403%2C-2.681%200.407%2C-4.038l5%2C0.016c-0.005%2C1.479%20-0.13%2C2.956%20-0.391%2C4.413c-0.486%2C2.717%20-1.428%2C5.349%20-2.776%2C7.759c-1.467%2C2.622%20-3.408%2C4.975%20-5.703%2C6.915c-2.153%2C1.821%20-4.614%2C3.276%20-7.25%2C4.279c-2.28%2C0.867%20-4.686%2C1.395%20-7.119%2C1.565c-2.426%2C0.169%20-4.877%2C-0.012%20-7.251%2C-0.545c-2.535%2C-0.569%20-4.977%2C-1.539%20-7.213%2C-2.862c-2.586%2C-1.529%20-4.89%2C-3.525%20-6.774%2C-5.864c-1.933%2C-2.4%20-3.418%2C-5.154%20-4.352%2C-8.091c-1.004%2C-3.158%20-1.366%2C-6.513%20-1.072%2C-9.814c0.305%2C-3.433%201.33%2C-6.792%202.994%2C-9.811c1.815%2C-3.29%204.375%2C-6.158%207.437%2C-8.336c2.733%2C-1.944%205.854%2C-3.329%209.132%2C-4.043c1.126%2C-0.246%202.269%2C-0.413%203.418%2C-0.5c0.585%2C-0.045%201.172%2C-0.067%201.759%2C-0.073l0.153%2C0c0.005%2C1.667%200.011%2C3.333%200.016%2C5Z%22%20style%3D%22fill%3A%23154194%3Bfill-rule%3Anonzero%3B%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  position: absolute;
+  z-index: 81;
+  top: 50%;
+  left: 50%;
+  margin-left: -0.5em;
+  margin-top: -0.5em;
+  animation: circle 1000ms ease 0s infinite normal;
+  transform: rotate(0deg);
+  transform-origin: 50% 50%;
+}
+.osat-feedback .inner {
+  max-width: 1180px;
+  padding: 0 10px;
+  display: block;
+  position: relative;
+  margin: 0 auto;
+  *zoom: 1;
+  max-width: 750px;
+}
+.osat-feedback .inner:before,
+.osat-feedback .inner:after {
+  content: "";
+  display: table;
+}
+.osat-feedback .inner:after {
+  clear: both;
+}
+@media all and (min-width: 640px) {
+  .osat-feedback .inner {
+    padding: 0 20px;
+  }
+}
+.center .osat-feedback .inner {
+  padding: 0;
+}
+.osat-feedback--title {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.85714286em;
+  letter-spacing: 0.05em;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
+  font-size: 2.0rem;
+  line-height: 1.4em;
+  text-align: center;
+}
+@media all and (min-width: 768px) {
+  .osat-feedback--title {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1.8rem;
+    line-height: 1.85714286em;
+    letter-spacing: 0.05em;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 2.7rem;
+    line-height: 1.2962963em;
+  }
+}
+.osat-feedback--form {
+  margin-top: 20px;
+}
+.osat-feedback .form-group {
+  margin-top: 20px;
+}
+.osat-feedback .form-group--caption {
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.85714286em;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  margin-top: 40px;
+}
+.osat-feedback .form-group .checkbox label {
+  padding-left: 10px;
+}
+.osat-feedback .form-group .checkbox label:before,
+.osat-feedback .form-group .checkbox label:after {
+  top: 7px;
+}
+.osat-feedback .form-group .checkbox input {
+  position: absolute;
+}
+.osat-feedback .form-group textarea {
+  height: 150px;
+}
+.osat-feedback .form-group button {
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.85714286em;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  font-size: 2.0rem;
+  line-height: 1.4em;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  padding: 20px;
+  margin: 0 auto;
+  display: block;
+}
 @media print {
   html,
   body {

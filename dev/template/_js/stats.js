@@ -95,7 +95,7 @@ var osatstats = {
             type : 'POST',
             url : $(form).attr('action'),
             headers: {
-                "OSATAJAX" : "TRUE"
+                "OSATSTATS_AJAX" : "TRUE"
             },
             data : $(form).serialize()
         })

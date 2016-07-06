@@ -49,7 +49,7 @@ class OsatStats extends Osat {
 
 	public function beforeControllerAction()
 	{
-		if(!empty($_SERVER['HTTP_OSATAJAX']))
+		if(!empty($_SERVER['HTTP_OSATSTATS_AJAX']))
 		{
 			if($assessment = $this->getAssessment())
 			{

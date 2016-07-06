@@ -347,8 +347,6 @@ class OsatUser
     {
         if(!$this->exists())
         {
-            echo "\n\nNOW CREATE A TOKEN\n\n";
-
             $aSurveyInfo = getSurveyInfo($this->surveyId);
             $sLanguage = Yii::app()->request->getParam('lang','');
             if($sLanguage == "")
