@@ -2,6 +2,8 @@
 
 class OsatUser
 {
+    const salt = 'jabiduttiperslikkenberg';
+
     protected $expires = 30;
 
     protected $fillable = [
@@ -923,5 +925,34 @@ class OsatUser
         return false;
     }
 
+    public static function findByForgotPasswordSecret($secret, $surveyId = null, $translator = null)
+    {
+        if($user = new static())
+        {
+            $pAttr = $user->getPasswordAttribute() ? $user->getPasswordAttribute() : null;
+            $query = "encrypt(md5(CONCAT(`email`, `token`" . (!empty($pAttr) ? ", `$pAttr`" : "") . ", CURRENT_DATE())), '" . static::salt . "')";
+            return static::_load($query, $secret, $surveyId, $translator);
+        }
+        return null;
+    }
 
+    public static function getForgotPasswordSecret($email, $surveyId = null)
+    {
+        if(empty($surveyId))
+        {
+            $surveyId = static::getCurrentSurveyId();
+        }
+
+        if($user = new static())
+        {
+            $pAttr = $user->getPasswordAttribute() ? $user->getPasswordAttribute() : null;
+            $query = "SELECT encrypt(md5(CONCAT(`email`, `token`" . (!empty($pAttr) ? ", `$pAttr`" : "") . ", CURRENT_DATE())), '" . static::salt . "') AS `secret` FROM {{tokens_$surveyId}} WHERE `email` = '$email' LIMIT 1";
+            $rows = Yii::app()->db->createCommand($query)->query()->readAll();
+            if(count($rows))
+            {
+                return $rows[0]['secret'];
+            }
+        }
+        return null;
+    }
 }

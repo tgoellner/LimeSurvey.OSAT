@@ -315,7 +315,15 @@ class OsatLogin extends Osat {
 		$sReloadUrl = trim($sReloadUrl, '/');
 
 		return $currentUrl != $sReloadUrl;
+	}
 
+	protected function redirectTo($sReloadUrl)
+	{
+		$controller = new RegisterController('index');
+		if($this->canRedirect($sReloadUrl))
+		{
+			$controller->redirect($sReloadUrl);
+		}
 	}
 
 	protected function setToken($surveyId, $sToken)
@@ -362,36 +370,37 @@ class OsatLogin extends Osat {
 		}
 	}
 
-	public function getUrl($type = null, $surveyId = null, $sLanguage = null)
+	public function getUrl($type = null, $surveyId = null, array $params = [])
 	{
 		$surveyId = empty($surveyId) ? Yii::app()->request->getParam('sid') : $surveyId;
-		$sLanguage = empty($sLanguage) ? App()->language : $sLanguage;
+		$params['lang'] = empty($params['lang']) ? App()->language : $params['lang'];
+		$params['action'] = 'register';
 
 		switch($type)
 		{
 			case 'logout' :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'logout', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'logout']));
 				break;
 			case 'register' :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'register', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'register']));
 				break;
 			case 'forgot_password' :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'forgot-password', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'forgot-password']));
 				break;
 			case 'reset_password' :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'reset-password', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'reset-password']));
 				break;
 			case 'login' :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'login', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'login']));
 				break;
 			case 'attributes' :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'attributes', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'attributes']));
 				break;
 			case 'extraattributes' :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'function' => 'extraattributes', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'extraattributes']));
 				break;
 			case null :
-				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['action' => 'register', 'lang' => $sLanguage]);
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", $params);
 				break;
 			default :
 				return '';
@@ -406,7 +415,7 @@ class OsatLogin extends Osat {
 			return '';
 		}
 
-		$url = $this->getUrl('logout', $surveyId, $sLanguage);
+		$url = $this->getUrl('logout', $surveyId, ['lang' => $sLanguage]);
 		$text = $this->getTranslator()->translate('Log in');
 		$css = 'login';
 		return '<a href="' . $url . '" class="osat-extended-login--' . $css . '" aria-label="' . htmlspecialchars($text) . '">' . htmlspecialchars($text) . '</a>';
@@ -416,7 +425,7 @@ class OsatLogin extends Osat {
 	{
 		if($user = $this->getUserFromSession())
 		{
-			$url = $this->getUrl('logout', $surveyId, $sLanguage);
+			$url = $this->getUrl('logout', $surveyId, ['lang' => $sLanguage]);
 			$text = $this->getTranslator()->translate('Log out');
 			$css = 'logout';
 			return '<a href="' . $url . '" class="osat-extended-login--' . $css . '" aria-label="' . htmlspecialchars($text) . '">' . htmlspecialchars($text) . '</a>';
@@ -583,16 +592,17 @@ class OsatLogin extends Osat {
 				'register_email' => '',
 				'register_password' => '',
 				'register_password_confirm' => '',
+				'register_secret' => '',
 
 				'missing_attributes' => [],
 
-				'url_login' => $this->getUrl('login', $surveyId, $sLanguage),
-				'url_register' => $this->getUrl('register', $surveyId, $sLanguage),
-				'url_forgot_password' => $this->getUrl('forgot_password', $surveyId, $sLanguage),
-				'url_reset_password' => $this->getUrl('reset_password', $surveyId, $sLanguage),
-				'url_attributes' => $this->getUrl('url_attributes', $surveyId, $sLanguage),
+				'url_login' => $this->getUrl('login', $surveyId, ['lang' => $sLanguage]),
+				'url_register' => $this->getUrl('register', $surveyId, ['lang' => $sLanguage]),
+				'url_forgot_password' => $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage]),
+				'url_reset_password' => $this->getUrl('reset_password', $surveyId, ['lang' => $sLanguage]),
+				'url_attributes' => $this->getUrl('url_attributes', $surveyId, ['lang' => $sLanguage]),
 
-				'urlAction' => $this->getUrl(null, $surveyId, $sLanguage),
+				'urlAction' => $this->getUrl(null, $surveyId, ['lang' => $sLanguage]),
 				'bCaptcha' => function_exists("ImageCreate") && isCaptchaEnabled('registrationscreen', $aSurveyInfo['usecaptcha']),
 
 				'errors' => []
@@ -732,10 +742,107 @@ class OsatLogin extends Osat {
 
 					break;
 				case 'forgot-password' :
+					if($registerform_vars['form_submitted'])
+					{
+						if(filter_var($registerform_vars['register_email'], FILTER_VALIDATE_EMAIL))
+						{
+							// we have a valid email
+							if($secret = OsatUser::getForgotPasswordSecret($registerform_vars['register_email']))
+							{
+								// and the email could be found so we have a secret that we can send out via email
+								if($this->sendForgotPasswordEmail($registerform_vars['register_email'], $secret, $surveyId, $sLanguage))
+								{
+									// redirect and display notice!
+									$url = $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage, 'secretsent' => 1]);
+									$this->redirectTo($url);
+								}
+								else
+								{
+									$registerform_vars['errors'][] = $this->getTranslator()->translate('Something went wrong trying to send you a reset link - please try again later or contact us if this error does not disappear.');
+								}
+							}
+							else
+							{
+								$registerform_vars['errors'][] = $this->getTranslator()->translate('We could not find an account matching your email address - did you already sign up? <a href="%s">You can register here.</a>', $this->getUrl('register', $surveyId, ['lang' => $sLanguage]));
+							}
+						}
+					}
+					else if((bool) Yii::app()->request->getParam('secretsent', null))
+					{
+						$registerform_vars['notices'][] = $this->getTranslator()->translate('We have send you a link to reset your password - check your mailbox and follow the link. Note that this link will expire tomorrow midnight.');
+					}
+					else if((bool) Yii::app()->request->getParam('secretwrong', null))
+					{
+						$registerform_vars['errors'][] = $this->getTranslator()->translate('Sorry, the password reset link you provided has either expired or already been used. <a href="%s">You can restart the reset process here.</a>', $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage]));
+					}
+
 					$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/forgotPasswordForm.php', $registerform_vars, true);
 					break;
 				case 'reset-password' :
+					if($registerform_vars['form_submitted'])
+					{
+						if(!empty($registerform_vars['register_secret']))
+						{
+							if($user = OsatUser::findByForgotPasswordSecret(base64_decode($registerform_vars['register_secret']), $surveyId, $this->getTranslator()))
+							{
+								// we have a valid email
+								if($error = $this->invalidPassword($registerform_vars['register_password']))
+								{
+									// but the password is invalid
+									$registerform_vars['errors'][] = $error;
+								}
+								else
+								{
+									// password is valid
+									if($registerform_vars['register_password'] != $registerform_vars['register_password_confirm'])
+									{
+										// but confirmation does not match
+										$registerform_vars['errors'][] = $this->getTranslator()->translate('The two passwords did not match');
+									}
+									else
+									{
+										// store the old pw
+										$oldpw = $user->getPassword();
+
+										// set password
+										$user->setPassword($registerform_vars['register_password']);
+
+										if($user->save() || ($oldpw == $user->getPassword()))
+										{
+											// user saved or old pw equals new one...
+											// redirect to login page
+											$url = $this->getUrl('login', $surveyId, ['lang' => $sLanguage, 'passwordreset' => 1]);
+											$this->redirectTo($url);
+										}
+									}
+								}
+							}
+							else
+							{
+								// redirect and display notice!
+								$url = $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage, 'secretwrong' => 1]);
+								$this->redirectTo($url);
+							}
+						}
+						else
+						{
+							$registerform_vars['errors'][] = $this->getTranslator()->translate('Looks as if you have used the reset password form without resetting your password first. <a href="%s">You can start the reset process here.</a>', $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage]));
+						}
+					}
+					elseif($secret = Yii::app()->request->getParam('secret', null))
+					{
+						if($user = OsatUser::findByForgotPasswordSecret(base64_decode($secret), $surveyId, $this->getTranslator()))
+						{
+							$registerform_vars['register_secret'] = $secret;
+						}
+						else
+						{
+							$registerform_vars['errors'][] = $this->getTranslator()->translate('Sorry, the password reset link you provided has either expired or already been used. <a href="%s">You can restart the reset process here.</a>', $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage]));
+						}
+					}
+
 					$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/resetPasswordForm.php', $registerform_vars, true);
+
 					break;
 				case 'logout' :
 					if($user = $this->getUserFromSession())
@@ -838,6 +945,10 @@ class OsatLogin extends Osat {
 					else if(!empty($registerform_vars['register_email']))
 					{
 						$registerform_vars['errors'][] = $this->getTranslator()->translate('You need to login before you can access this survey.');
+					}
+					else if((bool) Yii::app()->request->getParam('passwordreset', null))
+					{
+						$registerform_vars['notices'][] = $this->getTranslator()->translate('Your password has been reset. Try to log in again. If you still have problems to login contact us!');
 					}
 
 					if(empty($registerpage_vars['REGISTERFORM']))
@@ -1066,4 +1177,33 @@ class OsatLogin extends Osat {
 
 		return false;
 	}
+
+	protected function sendForgotPasswordEmail($email, $secret, $surveyId, $sLanguage)
+	{
+        if(!($aSurveyInfo = getSurveyInfo($surveyId, $sLanguage)) || empty($email) || empty($secret))
+        {
+            return false;
+        }
+
+		$aMail['subject'] = $this->getTranslator()->translate('Your password request for »%s«', $aSurveyInfo['surveyls_title']);
+        $aMail['message'] = $this->getTranslator()->translate('We received a request for resetting your password - to proceed you have to follow the link:') . "\n\n" .
+							App()->createAbsoluteUrl(
+								"/survey/index/sid/{$surveyId}", [
+									'action' => 'register',
+									'function' => 'reset-password',
+									'lang' => $sLanguage,
+									'secret' => base64_encode($secret)
+								],
+								(!empty($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http')
+							) . "\n\n" .
+							$this->getTranslator()->translate('Note that this link will expire tomorrow midnight.') . "\n\n" .
+							$this->getTranslator()->translate('If you don\'t want to reset your password you can ignore this email.');
+
+        $sFrom = "{$aSurveyInfo['adminname']} <{$aSurveyInfo['adminemail']}>";
+        $sBounce = getBounceEmail($surveyId);
+        $sTo = $aSurveyInfo['adminemail'];
+        $sitename =  Yii::app()->getConfig('sitename');
+
+        return SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename, false, $sBounce, null);
+    }
 }

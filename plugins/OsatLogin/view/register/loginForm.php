@@ -3,7 +3,11 @@
     <div class="inner">
         <h2 class="register--title">{{Log in}}</h2>
         <p class="register--hint">
-            {{If you don't have an account yet,<br />you can <a href="%s">sign up here</a>.|<?php echo $url_register; ?>|raw}}
+            <?php if(!empty($notices)): ?>
+                <?php echo nl2br(join("\n", $notices)); ?>
+            <?php else: ?>
+                {{If you don't have an account yet,<br />you can <a href="%s">sign up here</a>.|<?php echo $url_register; ?>|raw}}
+            <?php endif; ?>
         </p>
 
         <?php if(!empty($errors)): ?><div class="alert alert-danger text-danger register--error" role="alert">
