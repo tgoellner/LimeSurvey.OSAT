@@ -142,8 +142,10 @@ Feedback form submitted on {senddate} from {remoteip} using the page {pageurl}'
 
     public function getFeedbackForm($surveyId = null, $sToken = null, $sLanguage = null)
     {
+		global $token;
+
 		$surveyId = empty($surveyId) ? Yii::app()->request->getParam('sid') : $surveyId;
-    	$sToken = empty($sToken) ? (!empty($_SESSION['survey_'.$surveyId]['token']) ? $_SESSION['survey_'.$surveyId]['token'] : null) : $sToken;
+    	$sToken = empty($sToken) ? (!empty($token) ? $token : Yii::app()->request->getParam('token', null)) : $sToken;
     	$sLanguage = empty($sLanguage) ? App()->language : $sLanguage;
 
 		if(empty($surveyId) || empty($sToken))
@@ -245,11 +247,12 @@ Feedback form submitted on {senddate} from {remoteip} using the page {pageurl}'
 
     protected function insertFeedbackForm($string)
     {
-        if(preg_match('/\{FEEDBACKFORM\}/',$string))
+
+		if(preg_match('/\{FEEDBACKFORM\}/',$string))
         {
-            if($assessment = $this->getFeedbackForm())
+            if($replace = $this->getFeedbackForm())
             {
-                $string = str_replace('{FEEDBACKFORM}', $assessment, $string);
+                $string = str_replace('{FEEDBACKFORM}', $replace, $string);
             }
         }
 

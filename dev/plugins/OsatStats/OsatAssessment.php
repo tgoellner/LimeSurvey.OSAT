@@ -484,7 +484,7 @@ class OsatAssessment
 
             if(empty($type) && isset($this->$what))
             {
-                return empty($this->max) = 0 : ($this->$what / $this->max) * 100;
+                return empty($this->max) ? 0 : ($this->$what / $this->max) * 100;
             }
             else
             {
