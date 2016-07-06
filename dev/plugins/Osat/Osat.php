@@ -15,6 +15,7 @@ class Osat extends \ls\pluginmanager\PluginBase
 	static protected $name = 'OSAT';
 	static protected $label = 'osat';
 
+	protected $menuLabel = "Translations";
 	protected $settings = [];
 	protected $pluginSettings = null;
     protected $localeSettings = [
@@ -133,7 +134,7 @@ class Osat extends \ls\pluginmanager\PluginBase
 			$menu = $this->addMenuItemToOsatAdminMenu($event, [
 				'isDivider' => false,
 				'isSmallText' => false,
-				'label' => $this->getTranslator()->translate('Translations'),
+				'label' => $this->getTranslator()->translate($this->menuLabel),
 				'href' => Yii::app()->createUrl('/admin/pluginmanager/sa/configure', array('id' => $this->getId())),
 				'iconClass' => ''
 			]);

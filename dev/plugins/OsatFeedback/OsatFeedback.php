@@ -9,10 +9,11 @@ class OsatFeedback extends Osat {
 	static protected $name = 'OSAT Feedback';
 	static protected $label = 'osatfeedback';
 
+    protected $menuLabel = "Feedback";
     protected $localeSettings = [
 		'translate' => [
 			'type' => 'text',
-			'title' => 'Stats',
+			'title' => 'Feedback',
 			'help' => '"String to translate","Translation of the String" [, (optional) "Plural translation"'
 		]
 	];

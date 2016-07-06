@@ -9,6 +9,7 @@ class OsatStats extends Osat {
 	static protected $name = 'OSAT Stats';
 	static protected $label = 'osatstats';
 
+	protected $menuLabel = "Stats";
     protected $localeSettings = [
 		'translate' => [
 			'type' => 'text',
@@ -31,21 +32,6 @@ class OsatStats extends Osat {
 		$this->subscribe('beforeControllerAction');
         $this->subscribe('beforeSurveyPageOsatLate');
     }
-
-	public function beforeAdminMenuRender()
-	{
-		if(Permission::model()->hasGlobalPermission('settings','update') && $this->pluginManager->isPluginActive(static::$label))
-		{
-			$event = $this->event;
-			$menu = $this->addMenuItemToOsatAdminMenu($event, [
-				'isDivider' => false,
-				'isSmallText' => false,
-				'label' => $this->getTranslator()->translate('Stats'),
-				'href' => Yii::app()->createUrl('/admin/pluginmanager/sa/configure', array('id' => $this->getId())),
-				'iconClass' => ''
-			]);
-		}
-	}
 
 	public function beforeControllerAction()
 	{

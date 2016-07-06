@@ -10,6 +10,7 @@ class OsatLogin extends Osat {
 	static protected $name = 'OSAT Login';
 	static protected $label = 'osatlogin';
 
+	protected $menuLabel = "Login";
 	protected $settings = [];
     protected $localeSettings = [
 		'translate' => [
@@ -218,21 +219,6 @@ class OsatLogin extends Osat {
 		}
 
 		return $this->translator;
-	}
-
-    public function beforeAdminMenuRender()
-	{
-		if(Permission::model()->hasGlobalPermission('settings','update') && $this->pluginManager->isPluginActive(static::$label))
-		{
-			$event = $this->event;
-			$menu = $this->addMenuItemToOsatAdminMenu($event, [
-				'isDivider' => false,
-				'isSmallText' => false,
-				'label' => 'Enhanced Login',
-				'href' => Yii::app()->createUrl('/admin/pluginmanager/sa/configure', array('id' => $this->getId())),
-				'iconClass' => ''
-			]);
-		}
 	}
 
 	protected function getSurveySession($key = null)

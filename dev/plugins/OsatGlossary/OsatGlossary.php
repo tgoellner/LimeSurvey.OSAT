@@ -10,7 +10,8 @@ class OsatGlossary extends Osat {
 	static protected $name = 'OSAT Glossary';
 	static protected $label = 'osatglossary';
 
-    protected $localeSettings = [
+	protected $menuLabel = "Glossary";
+	protected $localeSettings = [
 		'translate' => [
 			'type' => 'text',
 			'title' => 'Glossary definitions',
@@ -66,21 +67,6 @@ class OsatGlossary extends Osat {
 		}
 
 		return $this->translator;
-	}
-
-    public function beforeAdminMenuRender()
-	{
-		if(Permission::model()->hasGlobalPermission('settings','update') && $this->pluginManager->isPluginActive(static::$label))
-		{
-			$event = $this->event;
-			$menu = $this->addMenuItemToOsatAdminMenu($event, [
-				'isDivider' => false,
-				'isSmallText' => false,
-				'label' => $this->getTranslator()->translate('Glossary'),
-				'href' => Yii::app()->createUrl('/admin/pluginmanager/sa/configure', array('id' => $this->getId())),
-				'iconClass' => ''
-			]);
-		}
 	}
 
 	public function insertGlossaryTerms($string)
