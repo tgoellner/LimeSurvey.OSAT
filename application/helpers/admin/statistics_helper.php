@@ -3940,6 +3940,12 @@ class statistics_helper {
              return $sOutputHTML;
      }
 
+     /**
+      * Filters a statistic by token attributes
+      * @param  [type] $surveyid        [description]
+      * @param  [type] $attributefilter [description]
+      * @return [type]                  [description]
+      */
      protected function getTokensByUserFilterQuery($surveyid, array $attributefilter = [])
      {
          if($tokens = $this->getTokensByUserFilter($surveyid, $attributefilter))
