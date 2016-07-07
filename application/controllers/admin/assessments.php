@@ -86,10 +86,10 @@ class Assessments extends Survey_Common_Action
 
     private function _showAssessments($iSurveyID, $action)
     {
-
         $oSurvey = Survey::model()->findByPk($iSurveyID);
         $surveyinfo = getSurveyInfo($iSurveyID);
 
+        // changed sow e only have one item representing all languages (insted of all languages in the list)
         $languages = explode(' ', trim(Yii::app()->getConfig('restrictToLanguages')));
         if(count($languages)>1)
         {
