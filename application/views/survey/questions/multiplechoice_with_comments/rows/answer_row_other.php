@@ -72,7 +72,7 @@
 
         <input
             class='form-control text input-sm <?php echo $kpclass; ?>'
-
+            
             type='text'
             size='40'
             id='<?php echo $inputCommentId;?>'
