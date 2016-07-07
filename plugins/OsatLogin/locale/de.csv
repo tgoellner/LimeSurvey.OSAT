@@ -15,7 +15,8 @@
 "%s is not a valid participant id","%s ist keine gültige participant_id"
 "%1$s in %2$s is not a valid email address","%1$s im Feld %2$s ist keine gültige E-Mail-Adresse."
 "%1$s in %2$s is not a number","%1$s im Feld %2$s ist keine gültige Zahl"
-"%1$s in %2$s is not a decimal",%1$s im Feld %2$s ist keine gpltige Dezimalzahl"
+"%1$s in %2$s is not a decimal",%1$s im Feld %2$s ist keine gültige Dezimalzahl"
+"%s is already taken by another user.","%s wird bereits von einem anderen Nutzer verwendet."
 "Firstname","Vorname"
 "Lastname","Nachname"
 "Email","E-Mail"
@@ -38,7 +39,7 @@
 "You have to accept the terms of service and the privacy policy to create an account.", "Sie müssen den Nutzungsbedingungen und den Datenschutzrichtlinien zustimmen, um ein Konto anzulegen."
 "Terms of service", "Nutzungsbedingungen"
 "Privacy Policy","Datenschutzbestimmungen"
-"You need to login before you can access this survey.","Sie müssen sich erst anmelden, um an dieser Umfrage teilzunehmen."
+"You need to login before you can access this survey.","Sie müssen sich erst anmelden, um an dieser Umfrage teilzunehmen oder Ihre Ergennisse anzusehen."
 "Privacy policy","Datenschutzbestimmungen"
 "Legal notice","Impressum"
 

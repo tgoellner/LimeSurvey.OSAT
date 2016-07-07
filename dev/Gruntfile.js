@@ -72,7 +72,7 @@ module.exports = function(grunt) {
 				tasks: ['less:default', 'shell:default']
 			},
             rsync: {
-              files: ['template/**/*', '!template/_*/**/*', 'plugins/**/*', '!plugins/_*/**/*'],
+              files: ['templates/**/*', '!templates/_*/**/*', 'plugins/**/*', '!plugins/_*/**/*'],
               tasks: ['shell:default']
             }
 		}

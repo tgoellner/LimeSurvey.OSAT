@@ -48,6 +48,7 @@ class OsatLogin extends Osat {
 		'capitals' => false,
 		'special_characters' => false
 	];
+	protected $indexaction = 'register';
 
 	public function __construct(PluginManager $manager, $id)
     {
@@ -465,7 +466,7 @@ class OsatLogin extends Osat {
 			{
 				$user->logout();
 			}
-			$this->clearToken($surveyId);
+			$this->clearToken($surveyId, ['action' => 'register', 'function' => 'login']);
 			return;
 		}
 
@@ -482,7 +483,7 @@ class OsatLogin extends Osat {
 				if(!$user->isLoggedIn())
 				{
 					$user->logout();
-					$this->clearToken($surveyId, ['register_email' => $user->email]);
+					$this->clearToken($surveyId, ['function'=>'login', 'action' => 'register', 'register_email' => $user->email]);
 				}
 			}
 		}
@@ -610,6 +611,20 @@ class OsatLogin extends Osat {
 			}
 
 			$registerform_vars['function'] = empty($registerform_vars['function']) ? Yii::app()->request->getParam('function') : $registerform_vars['function'];
+			if(!in_array($registerform_vars['function'], ['register', 'forgot-password', 'reset-password', 'logout', 'attributes', 'extraattributes', 'login']))
+			{
+				$registerform_vars['function'] = $this->indexaction;
+/*
+				if($urlToken = Yii::app()->request->getParam('token'))
+				{
+					if($user = OsatUser::findByToken($urlToken))
+					{
+						if($sessionUser = OsatUser::findByToken($urlToken))
+					}
+				}
+*/
+
+			}
 
 			switch($registerform_vars['function'])
 			{
@@ -830,18 +845,45 @@ class OsatLogin extends Osat {
 				case 'logout' :
 					if($user = $this->getUserFromSession())
 					{
-						$user->logout();
+					 	$user->logout();
 					}
-					$this->clearToken();
+					$this->clearToken(null, ['action' => 'register', 'function' => 'login']);
 					return;
 					break;
 				case 'attributes' :
 				case 'extraattributes' :
+					// prefill user values
+					if(!$registerform_vars['form_submitted'])
+					{
+						if($user = $this->getUserFromSession())
+						{
+							$registerform_vars['register_firstname'] = $user->firstname;
+							$registerform_vars['register_lastname'] = $user->lastname;
+							$registerform_vars['register_email'] = $user->email;
+							foreach($user->getAttributes() as $k => $v)
+							{
+								if($v != $user->getPassword())
+								{
+									$registerform_vars['register_' . $k] = isset($user->$k) ? $user->$k : '';
+								}
+							}
+						}
+					}
+
 					if($registerform_vars['form_submitted'])
 					{
 						if($user = $this->getUserFromSession())
 						{
 							$values = [];
+							if($registerform_vars['function'] == 'extraattributes')
+							{
+								$values = [
+									'firstname' => $registerform_vars['register_firstname'],
+									'lastname' => $registerform_vars['register_lastname'],
+									'email' => $registerform_vars['register_email']
+								];
+							}
+
 							foreach($registerform_vars as $k => $v)
 							{
 								if(preg_match('/^register_attribute_/', $k))
@@ -850,10 +892,38 @@ class OsatLogin extends Osat {
 								}
 							}
 
+							$setPassword = null;
+							if(!empty($registerform_vars['register_password']))
+							{
+								if($error = $this->invalidPassword($registerform_vars['register_password']))
+								{
+									// but the password is invalid
+									$registerform_vars['errors'][] = $error;
+								}
+								else
+								{
+									// password is valid
+									if($registerform_vars['register_password'] != $registerform_vars['register_password_confirm'])
+									{
+										// but confirmation does not match
+										$registerform_vars['errors'][] = $this->getTranslator()->translate('The two passwords did not match');
+									}
+									else
+									{
+										$setPassword = $registerform_vars['register_password'];
+									}
+								}
+							}
 
-							if(!empty($values))
+
+							if(!empty($values) && empty($registerform_vars['errors']))
 							{
 								$user->fill($values);
+
+								if(!empty($setPassword))
+								{
+									$user->setPassword($setPassword);
+								}
 
 								// try to save the user
 								if($user->save())
@@ -876,10 +946,18 @@ class OsatLogin extends Osat {
 						}
 					}
 
-					$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/attributesForm.php', $registerform_vars, true);
+					if($registerform_vars['function'] == 'extraattributes')
+					{
+						$tf = 'extraAttributesForm';
+					}
+					else
+					{
+						$tf = 'attributesForm';
+					}
+
+					$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/' . $tf . '.php', $registerform_vars, true);
 					break;
-				default :
-					$registerform_vars['function'] = 'login';
+				case 'login' :
 					if($registerform_vars['form_submitted'])
 					{
 						// try to find user email address in user database table

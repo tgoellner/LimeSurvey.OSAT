@@ -19,7 +19,6 @@
         <description>OSAT LimeSurvey Template.</description>
         <last_update>2016-06-06 15:06:00</last_update>
     </metadatas>
-
     <!--
         Here the list of the css/js files to load.
         Any file here will be loaded via the asset manager

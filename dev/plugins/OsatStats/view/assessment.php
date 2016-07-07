@@ -248,6 +248,7 @@
                             <?php if(!empty($group['assessment']['message'])): ?><?php echo $group['assessment']['message']; ?><?php endif; ?>
                         </div><?php endif; ?>
                     </div><?php $c++; endforeach; ?>
+                    <span class="copyprotect"></span>
                 </div>
             </div>
         </div>

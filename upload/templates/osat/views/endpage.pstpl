@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="page-footer--back-to-top">
-            <a href="#top" class="back-to-top--link">{{Back to top}}</a>
+            <a href="#outerframeContainer" class="back-to-top--link">{{Back to top}}</a>
         </div>
     </div>
 </footer>

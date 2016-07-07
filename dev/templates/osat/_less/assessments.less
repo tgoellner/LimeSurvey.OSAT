@@ -606,8 +606,15 @@ body.survey-complete {
             position: static;
         }
     }
+
+    user-select: none;
+    input, textarea {
+        user-select: text;
+    }
+
     &--assessment {
         display: none;
+        position: relative;
 
         &.is--active {
             display: block;

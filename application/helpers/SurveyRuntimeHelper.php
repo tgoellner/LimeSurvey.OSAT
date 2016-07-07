@@ -259,7 +259,14 @@ class SurveyRuntimeHelper {
 
                 $html .= CHtml::openTag('li', array('class'=>join(' ', $li_css)));
                 $linktxt = '<span class="count">' . str_pad($group['step'],2,'0',STR_PAD_LEFT) . '</span> <span class="name">' . $group['group_name'] . '</span>';
-                $html .=  CHtml::link($linktxt, array('#'), array('class'=>$classes, 'data-button-to-click'=>'#button-'.$group['gid'], ));
+                if(in_array('disabled', $li_css))
+                {
+                    $html .=  '<span class="' . $classes . '">' . $linktxt. '</span>';
+                }
+                else
+                {
+                    $html .=  CHtml::link($linktxt, array('#'), array('class'=>$classes, 'data-button-to-click'=>'#button-'.$group['gid'], ));
+                }
                 $html .= CHtml::closeTag('li');
             }
         }

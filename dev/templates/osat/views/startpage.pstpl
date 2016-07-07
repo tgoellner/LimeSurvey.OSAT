@@ -12,7 +12,7 @@
 <link rel="shortcut icon" href="{TEMPLATEURL}favicon.ico" />
 {GOOGLE_ANALYTICS_JAVASCRIPT}
 </head>
-<body class="default lang-{SURVEYLANGUAGE} {SURVEYFORMAT} {OSAT_PAGE_CSS}" id="osat">
+<body class="default lang-{SURVEYLANGUAGE} {SURVEYFORMAT} {OSAT_PAGE_CSS}" id="osat" role="application">
     <header class="page-header">
         <div class="page-header--top-bar">
             <div class="center">
@@ -47,7 +47,7 @@
         </div>
     </header>
 
-    <div class="outerframe container" id="outerframeContainer">
+    <div class="outerframe container" id="outerframeContainer" role="main">
         <div class="row" id="main-row">
 
             <div class='col-xs-12' id="yii-flash-message">{FLASHMESSAGE}</div>

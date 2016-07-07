@@ -17,7 +17,7 @@ class OsatUser
     protected $validate = [
         'firstname' => 'required',
         'lastname' => 'required',
-        'email' => 'required|email'
+        'email' => 'required|email|unique'
     ];
 
     protected $original;
@@ -481,6 +481,14 @@ class OsatUser
                                     $this->errors[] = $this->getTranslator()->translate('%1$s in %2$s is not a decimal', $test_value, $field);
                                 }
                                 break;
+                            case 'unique' :
+                                $query = "SELECT * FROM {{tokens_" . $this->getSurveyId() . "}} WHERE `$field` = '" . $test_value . "' AND `token` <> '". $this->getToken() . "' LIMIT 1";
+                                $rows = Yii::app()->db->createCommand($query)->query()->readAll();
+                                if(count($rows) == 1)
+                                {
+                                    $this->errors[] = $this->getTranslator()->translate('%s is already taken by another user.', $test_value);
+                                }
+                                break;
                         }
                     }
                 }
@@ -610,15 +618,16 @@ class OsatUser
 
             if((bool) $create)
             {
-                $_SESSION['osat']['login'][$this->getToken()] = [
+                $_SESSION['osat']['login'] = [
+                    'token' => $this->getToken(),
                     'expires' => time() + ($this->expires * 60)
                 ];
             }
             else
             {
-                if(isset($_SESSION['osat']['login'][$this->getToken()]))
+                if(isset($_SESSION['osat']['login']['token']) && $_SESSION['osat']['login']['token'] == $this->getToken())
                 {
-                    if($_SESSION['osat']['login'][$this->getToken()]['expires'] < time())
+                    if($_SESSION['osat']['login']['expires'] < time())
                     {
                         // session expired
                         $this->logout();
@@ -626,12 +635,12 @@ class OsatUser
                     else
                     {
                         // refresh session
-                        $_SESSION['osat']['login'][$this->getToken()]['expires'] = time() + ($this->expires * 60);
+                        $_SESSION['osat']['login']['expires'] = time() + ($this->expires * 60);
                     }
                 }
             }
 
-            if(isset($_SESSION['osat']['login'][$this->getToken()]))
+            if(isset($_SESSION['osat']['login']['token']) && $_SESSION['osat']['login']['token'] == $this->getToken())
             {
                 return true;
             }
@@ -652,21 +661,18 @@ class OsatUser
 
     public static function getUserFromSession($translator = null)
     {
-        if(!empty($_SESSION['osat']['login']))
+        if(isset($_SESSION['osat']['login']['token']) && $_SESSION['osat']['login']['expires'] > time())
         {
-            $tokens = array_keys($_SESSION['osat']['login']);
-            if(count($tokens) == 1)
+            if($user = static::findByToken($_SESSION['osat']['login']['token'], null, $translator))
             {
-                $token = $tokens[0];
-                if($user = static::findByToken($token, null, $translator))
+                if($user->login())
                 {
-                    if($user->login())
-                    {
-                        return $user;
-                    }
+                    return $user;
                 }
             }
         }
+        unset($_SESSION['osat']['login']);
+
         return null;
     }
 
@@ -676,11 +682,11 @@ class OsatUser
         {
             if($value === null)
             {
-                unset($_SESSION['osat']['login'][$this->getToken()][$key]);
+                unset($_SESSION['osat']['login'][$key]);
             }
-            else
+            elseif(!in_array($key, ['token', 'expires']))
             {
-                $_SESSION['osat']['login'][$this->getToken()][$key] = $value;
+                $_SESSION['osat']['login'][$key] = $value;
             }
             return true;
         }
@@ -691,7 +697,7 @@ class OsatUser
     {
         if($this->isLoggedIn() && !empty($key))
         {
-            return isset($_SESSION['osat']['login'][$this->getToken()][$key]) ? $_SESSION['osat']['login'][$this->getToken()][$key] : null;
+            return isset($_SESSION['osat']['login'][$key]) ? $_SESSION['osat']['login'][$key] : null;
         }
         return false;
     }
