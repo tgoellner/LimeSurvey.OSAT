@@ -309,23 +309,6 @@ class OsatLogin extends Osat {
 		return !empty($return) ? join(" ", $return) : false;
 	}
 
-	protected function canRedirect($sReloadUrl)
-	{
-		$currentUrl = trim(preg_replace('/([^\?]+)?(\?.*)?$/',"$1",$_SERVER['REQUEST_URI']), '/');
-		$sReloadUrl = trim($sReloadUrl, '/');
-
-		return $currentUrl != $sReloadUrl;
-	}
-
-	protected function redirectTo($sReloadUrl)
-	{
-		$controller = new RegisterController('index');
-		if($this->canRedirect($sReloadUrl))
-		{
-			$controller->redirect($sReloadUrl);
-		}
-	}
-
 	protected function setToken($surveyId, $sToken)
 	{
 		$LEMsessid = 'survey_' . $surveyId;

@@ -59,7 +59,43 @@ class Osat extends \ls\pluginmanager\PluginBase
         $this->subscribe('beforeEmManagerHelperProcessString');
 
 
+		$this->subscribe('beforeControllerAction');
         $this->subscribe('beforeSurveyPage');
+	}
+
+	public function beforeControllerAction()
+	{
+		$event = $this->event;
+		if($event->get('controller') == 'surveys' && $event->get('action') == 'publicList')
+		{
+			// is there only one survey? let's redirect to this one!
+			$surveys = Survey::model()->active()->open()->with('languagesettings')->findAll();
+			if(count($surveys == 1))
+			{
+				$surveyId = $surveys[0]->getAttribute('sid');
+				$sReloadUrl = Yii::app()->createUrl("/survey/index/sid/{$surveyId}");
+
+				$this->redirectTo($sReloadUrl);
+				exit;
+			}
+		}
+	}
+
+	protected function canRedirect($sReloadUrl)
+	{
+		$currentUrl = trim(preg_replace('/([^\?]+)?(\?.*)?$/',"$1",$_SERVER['REQUEST_URI']), '/');
+		$sReloadUrl = trim($sReloadUrl, '/');
+
+		return $currentUrl != $sReloadUrl;
+	}
+
+	protected function redirectTo($sReloadUrl)
+	{
+		$controller = new RegisterController('index');
+		if($this->canRedirect($sReloadUrl))
+		{
+			$controller->redirect($sReloadUrl);
+		}
 	}
 
 	public function beforeSurveyPage()
