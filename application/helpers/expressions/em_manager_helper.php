@@ -4414,13 +4414,13 @@
             }
             $stringToParse = $string;   // decode called later htmlspecialchars_decode($string,ENT_QUOTES);
             $qnum = is_null($questionNum) ? 0 : $questionNum;
-            // extra replacements go here!
 
-            // let's define a custom event here!
+            // start: define a custom event
             $event = new PluginEvent('beforeEmManagerHelperProcessString');
             $event->set('stringToParse', $stringToParse);
             App()->getPluginManager()->dispatchEvent($event);
             $stringToParse = $event->get('stringToParse');
+            // end: definign our custom event
 
             $result = $LEM->em->sProcessStringContainingExpressions($stringToParse,$qnum, $numRecursionLevels, $whichPrettyPrintIteration, $groupSeq, $questionSeq, $staticReplacement);
 
