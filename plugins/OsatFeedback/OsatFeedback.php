@@ -142,10 +142,18 @@ Feedback form submitted on {senddate} from {remoteip} using the page {pageurl}'
 
     public function getFeedbackForm($surveyId = null, $sToken = null, $sLanguage = null)
     {
-		global $token;
-
 		$surveyId = empty($surveyId) ? Yii::app()->request->getParam('sid') : $surveyId;
-    	$sToken = empty($sToken) ? (!empty($token) ? $token : Yii::app()->request->getParam('token', null)) : $sToken;
+
+		if(isset($_SESSION['survey_'.$surveyId]['token']))
+		{
+			$sToken = $_SESSION['survey_'.$surveyId]['token'];
+		}
+		else {
+			global $token;
+			$sToken = $token;
+		}
+
+		$sToken = empty($sToken) ? (!empty($token) ? $token : Yii::app()->request->getParam('token', null)) : $sToken;
     	$sLanguage = empty($sLanguage) ? App()->language : $sLanguage;
 
 		if(empty($surveyId) || empty($sToken))
