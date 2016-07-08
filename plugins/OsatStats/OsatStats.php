@@ -151,8 +151,6 @@ class OsatStats extends Osat {
 
         $sTemplatePath = getTemplatePath($thissurvey['template']);
 
-        App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('generalscripts')."../plugins/OsatStats/assets/js/osatstats.js");
-
         ob_start(function($buffer, $phase) {
             App()->getClientScript()->render($buffer);
             App()->getClientScript()->reset();

@@ -856,6 +856,11 @@ class OsatLogin extends Osat {
 					break;
 				case 'attributes' :
 				case 'extraattributes' :
+					if(Yii::app()->request->getParam('function') == 'login')
+					{
+						$registerform_vars['form_submitted'] = false;
+					}
+
 					// prefill user values
 					if(!$registerform_vars['form_submitted'])
 					{

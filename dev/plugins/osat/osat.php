@@ -157,7 +157,7 @@ class Osat extends \ls\pluginmanager\PluginBase
 		if($isAdmin)
 		{
 			$oAdminTheme = AdminTheme::getInstance();
-			$oAdminTheme->registerScriptFile( 'ADMIN_SCRIPT_PATH', '../../plugins/Osat/assets/js/scripts.js');
+			$oAdminTheme->registerScriptFile( 'ADMIN_SCRIPT_PATH', '../../plugins/Osat/assets/scripts/scripts.js');
 			$oAdminTheme->registerCssFile( 'ADMIN', '../../../plugins/Osat/assets/css/styles.css');
 		}
 	}
