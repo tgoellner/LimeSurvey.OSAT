@@ -12,6 +12,10 @@
         padding-top: @gutter_width * 2;
     }
 
+    @media print {
+        display: none;
+    }
+
     &.is--loading {
         &:before {
             content: "";
