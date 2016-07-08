@@ -11,7 +11,7 @@
             <?php echo nl2br(join("\n", $errors)); ?>
         </div><?php endif; ?>
 
-        <?php echo CHtml::form($urlAction,'post',array('id'=>'limesurvey', 'role' => 'form')); ?>
+        <?php echo CHtml::form($urlAction,'post',array('id'=>'osatregister', 'role' => 'form')); ?>
 
             <input type="hidden" name="lang" value="<?php echo $sLanguage; ?>" id="register_lang" />
             <input type="hidden" name="function" value="extraattributes" />
@@ -87,7 +87,7 @@
 
             <div class="form-group submit">
                 <p class="register--hint">
-                    <a href="javascript:window.history.back()">{{Cancel}}</a>
+                    <a href="<?php echo $backUrl; ?>">{{Cancel}}</a>
                 </p>
                 <button type="submit" id="register" value="login" name="register" accesskey="n" class="submit btn btn-lg btn-primary">{{<?php echo !empty($optional_attributes) ? 'Send' : 'Forward' ; ?>}}</button>
             </div>

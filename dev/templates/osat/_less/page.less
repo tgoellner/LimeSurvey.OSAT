@@ -15,7 +15,9 @@ body {
     color:                  @color_text;
 	padding-right:			0 !important;
 
+
 	.touchevents & {
+		-webkit-text-size-adjust: 100%;
 		* {
 			cursor: pointer;
 			-webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -84,4 +86,47 @@ abbr {
 
 .text-danger {
 	color: @color_red;
+}
+
+
+
+
+.outerframe {
+	.center();
+	padding: @gutter;
+
+	@media @minwidth_m {
+		padding: @gutter_width;
+	}
+
+	@media @minwidth_l {
+		padding-top: @gutter_width * 2;
+		padding-bottom: 120px;
+	}
+
+	>.row {
+		.center-min();
+		background: @color_white;
+		padding: @gutter;
+
+		@media @minwidth_m {
+			padding: @gutter_width;
+		}
+	}
+	body[class*="question-"] &,
+	body.survey-complete &,
+	body.survey-is-just-completed & {
+		max-width: none;
+		width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+		padding-top: 0;
+		overflow: hidden;
+		>.row {
+			max-width: none;
+			width: 100%;
+			padding: 0;
+			background: transparent;
+		}
+	}
 }

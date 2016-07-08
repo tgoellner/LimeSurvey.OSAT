@@ -383,11 +383,13 @@ class OsatLogin extends Osat {
 			case 'extraattributes' :
 				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'extraattributes']));
 				break;
+			case 'survey' :
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", ['lang' => $params['lang']]);
+				break;
 			case null :
 				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", $params);
 				break;
 			default :
-				return '';
 				break;
 		}
 	}
@@ -587,10 +589,12 @@ class OsatLogin extends Osat {
 				'url_attributes' => $this->getUrl('url_attributes', $surveyId, ['lang' => $sLanguage]),
 
 				'urlAction' => $this->getUrl(null, $surveyId, ['lang' => $sLanguage]),
+				'backUrl' => $this->getUrl('survey', $surveyId, ['lang' => $sLanguage]),
 				'bCaptcha' => function_exists("ImageCreate") && isCaptchaEnabled('registrationscreen', $aSurveyInfo['usecaptcha']),
 
 				'errors' => []
 			];
+
 			$registerform_vars = array_replace($registerform_vars, $attributes);
 
 			foreach($registerform_vars as $k => $v)

@@ -116,6 +116,7 @@ class OsatStats extends Osat {
 
 		if(!$display_assessmentspage)
         {
+
 			if(!empty($user))
 			{
 				if($user->hasJustCompletedSurvey())
@@ -129,7 +130,10 @@ class OsatStats extends Osat {
 				{
 					if(!empty($_SESSION['survey_'.$surveyId]['totalquestions']))
 					{
-						$_POST['osatbodycss'] = 'survey-complete';
+						if(count($_SESSION['survey_'.$surveyId]['relevanceStatus']) >= $_SESSION['survey_'.$surveyId]['totalquestions'])
+						{
+							$_POST['osatbodycss'] = 'survey-complete';
+						}
 					}
 				}
 			}
@@ -147,8 +151,6 @@ class OsatStats extends Osat {
 
         $sTemplatePath = getTemplatePath($thissurvey['template']);
 
-        App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('generalscripts')."../plugins/OsatStats/assets/js/chartist/chartist.js");
-        App()->getClientScript()->registerCssFile(Yii::app()->getConfig('generalscripts')."../plugins/OsatStats/assets/js/chartist/chartist.css");
         App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('generalscripts')."../plugins/OsatStats/assets/js/osatstats.js");
 
         ob_start(function($buffer, $phase) {
@@ -167,7 +169,7 @@ class OsatStats extends Osat {
 		{
 			if($user->hasJustCompletedSurvey())
 			{
-				$_POST['osatbodycss'].= ' survey-is-just-completed';
+				$_POST['osatbodycss'] = (!empty($_POST['osatbodycss']) ? $_POST['osatbodycss'] : '') . ' survey-is-just-completed';
 				$template = 'completed.pstpl';
 			}
 		}

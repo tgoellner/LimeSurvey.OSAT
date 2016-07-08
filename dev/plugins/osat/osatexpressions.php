@@ -227,30 +227,26 @@ class OsatExpressions
             $css[] = $osatbodycss;
         }
 
-        if(empty($osatlogin))
-        {
-        	if($t = $this->stepIndex())
-        	{
-        		$css[] = 'step-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
-        	}
-
-        	if($t = $this->questionNo())
-        	{
-        		$css[] = 'question-no-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
-        	}
-        	if($t = $this->questionCode())
-        	{
-        		$css[] = 'question-code-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
-        	}
-        	if($t = $this->groupNo())
-        	{
-        		$css[] = 'group-no-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
-        	}
-        	if($t = $this->groupId())
-        	{
-        		$css[] = 'group-id-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
-        	}
-        }
+    	if($t = $this->stepIndex())
+    	{
+    		$css[] = 'step-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
+    	}
+    	if($t = $this->questionNo())
+    	{
+    		$css[] = 'question-no-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
+    	}
+    	if($t = $this->questionCode())
+    	{
+    		$css[] = 'question-code-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
+    	}
+    	if($t = $this->groupNo())
+    	{
+    		$css[] = 'group-no-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
+    	}
+    	if($t = $this->groupId())
+    	{
+    		$css[] = 'group-id-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
+    	}
 
     	if($t = $this->surveyId())
     	{

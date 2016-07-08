@@ -918,10 +918,10 @@ class OsatUser
 
             if(!empty($_SESSION['survey_'.$this->surveyId]['grouplist']))
 			{
-				if(!empty($_SESSION['survey_'.$this->surveyId]['relevanceStatus']))
+				if(!empty($_SESSION['survey_'.$this->surveyId]['maxstep']))
 				{
-					if(!empty($_SESSION['survey_'.$this->surveyId]['totalquestions']))
-					{
+                    if($_SESSION['survey_'.$this->surveyId]['maxstep'] >= $_SESSION['survey_'.$this->surveyId]['totalquestions'])
+                    {
                         $this->setSessionVar('hasJustCompletedSurvey', true);
                         return true;
 					}

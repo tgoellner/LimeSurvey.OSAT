@@ -35,7 +35,7 @@
                     <span data-toggle="modal" data-target="#legal-notice">{{Legal notice}}</span>
                 </p>
                 <p>
-                    &copy; 2016 <a href="#" target="_blank">{{Copyright owner}}</a><br / />
+                    &copy; 2016 <a href="#" target="_blank">{{Copyright owner}}</a><br />
                     {{All rights reserved}}
                 </p>
             </div>

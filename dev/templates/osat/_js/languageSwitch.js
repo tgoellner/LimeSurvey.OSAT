@@ -1,6 +1,5 @@
 $(document).on('ready', function()
 {
-    console.log("READY");
     $(document).on(
     {
         'change.osat' : function(e)

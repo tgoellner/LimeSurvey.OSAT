@@ -71,6 +71,13 @@ class OsatGlossary extends Osat {
 
 	public function insertGlossaryTerms($string)
 	{
+
+		$escapewrap = '<!-- glossary %s //-->';
+
+		// escape all already inserted glossary terms
+		$string = preg_replace('/\<span class="osat--glossary"([^\>]+)>(.*)\<\/span\>/', sprintf($escapewrap, base64_encode("<span class=\"osat--glossary\"$1>$2</span>")), $string);
+
+
 		// find all texts between tags...
 		preg_match_all("/(<[^><]+>)([^<]+)?(<\/[^>]+>)?/", $string, $tags);
 		if(!empty($tags[2]))
@@ -97,7 +104,7 @@ class OsatGlossary extends Osat {
 				{
 					$find = trim($find);
 
-					$replace = '<span class="osat--glossary" data-balloon="' . addslashes(htmlspecialchars(reset($replace))) . '"><abbr>%s</abbr></span>';
+					$replace = '<span class="osat--glossary" aria-label="' . addslashes(htmlspecialchars(reset($replace))) . '" data-balloon-length="large" data-balloon="' . addslashes(htmlspecialchars(reset($replace))) . '"><abbr>%s</abbr></span>';
 					$preg = "/([^a-zA-Z\pL]|^)(?!\<abbr\>)(" . preg_quote ($find) . ")(?!\<\/abbr\>)([^a-zA-Z\pL]|$)/i";
 
 					preg_match_all($preg, $dst_new, $matches);
@@ -107,7 +114,7 @@ class OsatGlossary extends Osat {
 					{
 						foreach($matches[2] as $mi => $ms)
 						{
-							$replacements[$ms] = sprintf($replace, $matches[2][$mi]);
+							$replacements[$ms] = sprintf($escapewrap, base64_encode(sprintf($replace, $matches[2][$mi])));
 						}
 					}
 
@@ -130,6 +137,20 @@ class OsatGlossary extends Osat {
 				}
 			}
 		}
+
+		// unescape all inserted glossary terms
+		$preg = preg_quote($escapewrap);
+		$preg = str_replace('%s', '([^ ]+)', $preg);
+		# print_r("~$preg~"); die();
+		preg_match_all("~$preg~", $string, $matches);
+		if(!empty($matches[0]))
+		{
+			foreach($matches[0] as $i => $match)
+			{
+				$string = str_replace($match, base64_decode($matches[1][$i]), $string);
+			}
+		}
+		unset($preg, $matches, $escapewrap);
 
 		return $string;
 	}

@@ -35,7 +35,7 @@ var osatfeedback = {
             if(container && data)
             {
                 $(container).replaceWith($(data));
-                osatstats.addSubmitEvent(data);
+                osatfeedback.addSubmitEvent(data);
             }
             else
             {

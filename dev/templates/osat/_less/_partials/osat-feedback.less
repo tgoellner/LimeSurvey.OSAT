@@ -1,12 +1,15 @@
+.osatstats {
+    position: relative;
+    z-index: 20;
+}
 .osat-feedback {
     position: relative;
     border-top: 1px solid @color_text;
     padding-top: @gutter_width;
-    padding-bottom: @gutter_width;
+    z-index: 10;
 
     @media @minwidth_l {
         padding-top: @gutter_width * 2;
-        padding-bottom: @gutter_width * 2;
     }
 
     &.is--loading {
@@ -68,7 +71,7 @@
                 padding-left: @gutter;
                 &:before,
                 &:after {
-                    top: 7px;
+                    top: 4px;
                 }
             }
             input {

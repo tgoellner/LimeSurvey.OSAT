@@ -117,7 +117,7 @@
 
             <div class="osatstats-table--filter">
                 <h3 class="osatstats-table--filter--title">{{Compare by:}}</h3>
-                <?php echo CHtml::form($assessment->getUrl(), 'post', array('id'=>'assessmentfilter', 'role' => 'form')); ?>
+                <?php echo CHtml::form($assessment->getUrl(), 'post', array('id'=>'assessmentfilter')); ?>
 
                     <div class="form-group">
                         <button type="submit" id="assessmentfilter_overall" value="1" name="osatstats[filter][reset]" class="btn">{{Overall}}</button>
@@ -137,21 +137,20 @@
                         </label>
                     </div><?php endforeach; ?>
                 <?php echo CHtml::endForm(); ?>
-
-                </form>
             </div>
 
             <div class="osatstats-table--wrapper">
                 <table class="table osatstats-table--table">
-                    <colgroup>
-                        <col width="5%" />
-                        <col />
-                        <col width="20%" />
-                        <col width="20%" />
-                    </colgroup>
                     <caption>
                         {{Your results for this survey}}
                     </caption>
+
+                    <colgroup>
+                        <col style="width:5%" />
+                        <col />
+                        <col style="width:20%" />
+                        <col style="width:20%" />
+                    </colgroup>
 
                     <thead>
                         <tr>
@@ -180,14 +179,14 @@
                                     style="height:<?php echo number_format($group['total'], 2, '.', ''); ?>%"
                                     data-balloon="{{You reached %1$s of %2$s|<?php echo $group['total_score']; ?>|<?php echo $group['max']; ?>}}"
                                     data-balloon-pos="<?php echo $c < count($grouplist)/2 ? 'top' : 'top'; ?>">
-                                    <span class="osatstats-table--cell--percentage" aria-described-by="g<?php echo $gid; ?>-total"><?php echo floatval(number_format($group['total'], 2)); ?>%</span>
+                                    <span class="osatstats-table--cell--percentage" aria-labelledby="g<?php echo $gid; ?>-total"><?php echo floatval(number_format($group['total'], 2)); ?>%</span>
                                     <span id="g<?php echo $gid; ?>-total" class="osatstats-table--cell--score" data-value="<?php echo $group['total_score']; ?>" data-max="<?php echo $group['max']; ?>">
                                         {{You reached %1$s of %2$s|<?php echo $group['total_score']; ?>|<?php echo $group['max']; ?>}}
                                     </span>
                                 </button>
                             </td>
                             <td class="osatstats-table--cell is--average" style="height:<?php echo number_format($group['average'], 2, '.', ''); ?>%" data-balloon="{{Average value is %1$s of %2$s|<?php echo floatval(number_format($group['average_score'], 2)); ?>|<?php echo $group['max']; ?>}}">
-                                <span class="osatstats-table--cell--percentage" aria-described-by="g<?php echo $gid; ?>-average"><?php echo floatval(number_format($group['average'], 2)); ?>%</span>
+                                <span class="osatstats-table--cell--percentage" aria-labelledby="g<?php echo $gid; ?>-average"><?php echo floatval(number_format($group['average'], 2)); ?>%</span>
                                 <span id="g<?php echo $gid; ?>-average" class="osatstats-table--cell--score" data-value="<?php echo floatval(number_format($group['average_score'], 2)); ?>" data-max="<?php echo $group['max']; ?>">
                                     {{Average value is %1$s of %2$s|<?php echo floatval(number_format($group['average_score'], 2)); ?>|<?php echo $group['max']; ?>}}
                                 </span>
@@ -201,13 +200,13 @@
                             <td></td>
                             <td class="osatstats-table--cell is--name"><?php echo htmlspecialchars($sQuestion->question); ?></td>
                             <td class="osatstats-table--cell is--total" style="height:<?php echo number_format($assessment->getQuestionTotal($qid), 2, '.', ''); ?>%" data-balloon="{{You reached %1$s of %2$s|<?php echo $question['total']; ?>|<?php echo $question['max']; ?>}}">
-                                <span class="osatstats-table--cell--percentage" aria-described-by="q<?php echo $gid; ?>-total"><?php echo floatval(number_format($assessment->getQuestionTotal($qid), 2)); ?>%</span>
+                                <span class="osatstats-table--cell--percentage" aria-labelledby="q<?php echo $qid; ?>-total"><?php echo floatval(number_format($assessment->getQuestionTotal($qid), 2)); ?>%</span>
                                 <span id="q<?php echo $qid; ?>-total" class="osatstats-table--cell--score" data-value="<?php echo $question['total']; ?>" data-max="<?php echo $question['max']; ?>">
                                     {{You reached %1$s of %2$s|<?php echo $question['total']; ?>|<?php echo $question['max']; ?>}}
                                 </span>
                             </td>
                             <td class="osatstats-table--cell is--average" style="height:<?php echo number_format($assessment->getQuestionAverage($qid), 2, '.', ''); ?>%" data-balloon="{{Average value is %1$s of %2$s|<?php echo floatval(number_format($question['average'],2)); ?>|<?php echo $question['max']; ?>}}">
-                                <span class="osatstats-table--cell--percentage" aria-described-by="q<?php echo $gid; ?>-average"><?php echo floatval(number_format($assessment->getQuestionAverage($qid), 2)); ?>%</span>
+                                <span class="osatstats-table--cell--percentage" aria-labelledby="q<?php echo $qid; ?>-average"><?php echo floatval(number_format($assessment->getQuestionAverage($qid), 2)); ?>%</span>
                                 <span id="q<?php echo $qid; ?>-average" class="osatstats-table--cell--score" data-value="<?php echo $question['average']; ?>" data-max="<?php echo $question['max']; ?>">
                                     {{Average value is %1$s of %2$s|<?php echo floatval(number_format($question['average'],2)); ?>|<?php echo $question['max']; ?>}}
                                 </span>
@@ -222,7 +221,7 @@
             <div class="center-min">
 
                 <div class="question-index">
-                    <span id="index-menu" class="dropdown">
+                    <nav id="index-menu" class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Summary index&nbsp;<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <?php $c = 0; foreach($grouplist as $gid => $group): ?><li class="group-<?php echo $gid; ?><?php echo empty($c) ? ' is--active': '';?>" data-gid="<?php echo $gid; ?>">
@@ -231,7 +230,7 @@
                                 </a>
                             </li><?php $c++; endforeach; ?>
                         </ul>
-                    </span>
+                    </nav>
                 </div>
 
 

@@ -1,5 +1,5 @@
 <div class="survey-assessments center">
-    <div class="center-min survey-assessments--head">
+    <div class="center survey-assessments--head">
         <h2 class="h1">{{Perfect!<br />Here is your result|raw}}</h2>
         <p>
             <a href="{EXTRAATTRIBUTES_URL}" class="btn btn-default">{{Do you want to save your results?}}</a>

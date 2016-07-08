@@ -38,7 +38,7 @@ class OsatFeedback extends Osat {
 			if($result = $this->getFeedbackForm())
 			{
 				$myEvent = new PluginEvent('beforeEmManagerHelperProcessString');
-				$myEvent->set('stringToParse', $assessment);
+				$myEvent->set('stringToParse', $result);
 				App()->getPluginManager()->dispatchEvent($myEvent);
 				$result = $myEvent->get('stringToParse');
 
@@ -74,11 +74,11 @@ class OsatFeedback extends Osat {
                     'type' => 'checkbox',
                     'multiple' => 0,
                     'options' => [
-                        'Very helpful',
-                        'Nice tool',
-                        'Ok',
-                        'Could be better',
-                        'Won\'t recommend it'
+                        $this->getTranslator()->translate('Very helpful'),
+                        $this->getTranslator()->translate('Nice tool'),
+                        $this->getTranslator()->translate('Ok'),
+                        $this->getTranslator()->translate('Could be better'),
+                        $this->getTranslator()->translate('Won\'t recommend it')
                     ],
                     'title' => 'Rating',
                     'label' => 'Please rate our Europeanisation-Assessment-Tool:',
@@ -98,7 +98,7 @@ class OsatFeedback extends Osat {
                     'multiple' => 1,
                     'title' => 'Testimonial',
                     'options' => [
-                        'My Feedback can be used as a testimonial'
+                        $this->getTranslator()->translate('My Feedback can be used as a testimonial')
                     ],
                     'value' => ''
                 ]
@@ -143,18 +143,35 @@ Feedback form submitted on {senddate} from {remoteip} using the page {pageurl}'
     public function getFeedbackForm($surveyId = null, $sToken = null, $sLanguage = null)
     {
 		$surveyId = empty($surveyId) ? Yii::app()->request->getParam('sid') : $surveyId;
-
-		if(isset($_SESSION['survey_'.$surveyId]['token']))
-		{
-			$sToken = $_SESSION['survey_'.$surveyId]['token'];
-		}
-		else {
-			global $token;
-			$sToken = $token;
-		}
-
 		$sToken = empty($sToken) ? (!empty($token) ? $token : Yii::app()->request->getParam('token', null)) : $sToken;
-    	$sLanguage = empty($sLanguage) ? App()->language : $sLanguage;
+		$sLanguage = empty($sLanguage) ? App()->language : $sLanguage;
+
+		if(empty($sToken))
+		{
+			if(isset($_SESSION['survey_'.$surveyId]['token']))
+			{
+				// try to get token from Session
+				$sToken = $_SESSION['survey_'.$surveyId]['token'];
+			}
+			else {
+				// try to get token from global var
+				global $token;
+				$sToken = $token;
+			}
+
+			// still empty - try to fetch it from a OsatUser
+			if(empty($sToken))
+			{
+				if(class_exists('OsatUser'))
+				{
+					if($user = OsatUser::getUserFromSession())
+					{
+						$sToken = $user->getToken();
+					}
+				}
+			}
+		}
+
 
 		if(empty($surveyId) || empty($sToken))
         {
@@ -205,6 +222,10 @@ Feedback form submitted on {senddate} from {remoteip} using the page {pageurl}'
                             {
                                 $options['options'] = (array) $options['options'];
                                 $options['value'] = (array) $data['submitted'][$label];
+								foreach($options['value'] as &$v)
+								{
+									$v = stripslashes($v);
+								}
                                 if(count(array_diff($options['value'], $options['options'])))
                                 {
                                     $data['errors'][] = $this->getTranslator()->translate('Please provide a valid option in %s.', $this->getTranslator()->translate(!empty($options['title']) ? $options['title'] : $options['label']));

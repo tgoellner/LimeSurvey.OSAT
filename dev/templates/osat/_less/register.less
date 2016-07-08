@@ -6,30 +6,6 @@ body.register-reset-password {
     background: url(../files/illustrations/body-welcome.svg) no-repeat right bottom;
     background-size: auto 80%;
     background-color: @color_extra1;
-
-    .outerframe {
-        .center();
-        padding: @gutter;
-
-        @media @minwidth_m {
-            padding: @gutter_width;
-        }
-
-        @media @minwidth_l {
-            padding-top: @gutter_width * 2;
-            padding-bottom: @gutter_width * 2;
-        }
-
-        >.row {
-            .center-min();
-            background: @color_white;
-            padding: @gutter;
-
-            @media @minwidth_m {
-                padding: @gutter_width;
-            }
-        }
-    }
 }
 
 .register--title {
@@ -40,7 +16,7 @@ body.register-reset-password {
 .register-form {
     margin-top: @gutter_width;
 
-    #limesurvey {
+    #osatregister {
         margin-top: @gutter_width;
     }
 
@@ -73,28 +49,7 @@ body.register-reset-password {
     }
 }
 .btn#register {
-    .font(strong, xl);
-    width: 100%;
-    text-align: left;
-    padding: @gutter_width;
-    padding-left: 120px;
-
-    position: relative;
-    &:before {
-        @s: 40px;
-        content: "";
-        display: block;
-        width: @s;
-        height: @s;
-        background: transparent no-repeat center;
-        background-size: contain;
-        .svg-uri(~"icons/eufa_icon_dropdown", @color_white);
-        .rotate(-90deg);
-
-        position: absolute;
-        top: 50%; margin-top: round(@s/-2);
-        left: round(@s/2);
-    }
+    .forward();
 }
 
 
@@ -117,7 +72,7 @@ body.register-reset-password {
             padding-left: @gutter_width;
             &:before,
             &:after {
-                top: 7px;
+                top: 4px;
             }
         }
         input {
@@ -175,7 +130,9 @@ body.register-reset-password {
     form {
     }
 }
-
+.optional-attributes-text {
+    margin-bottom: @gutter_width;
+}
 
 body.register-attributes {
     .outerframe {

@@ -18,7 +18,7 @@
             <input type="hidden" name="lang" value="<?php echo $sLanguage; ?>" />
             <input type="hidden" name="osatfeedback[submitted]" value="1" />
 
-            <?php foreach($fields as $label => $options): ?><div class="form-group-wrapper" class="osat-feedback--field is--<?php echo $label; ?>">
+            <?php foreach($fields as $label => $options): ?><div class="form-group-wrapper osat-feedback--field is--<?php echo $label; ?>">
                 <?php if(!empty($options['label'])): ?><p class="form-group--caption">
                     {{<?php echo $options['label']; ?>}}
                 </p><?php endif; ?>
@@ -29,9 +29,9 @@
                     <?php if(isset($options['options'])): ?>
                         <?php if($options['type'] == 'checkbox' || $options['type'] == 'radio'): ?>
                             <?php foreach($options['options'] as $i => $v): ?><div class="<?php echo $options['type']; ?> inline">
-                        <input type="<?php echo $options['multiple'] ? 'checkbox' : 'radio'; ?>"<?php echo !empty($options['required']) ? ' required' : ''; ?> id="osat-feedback--<?php echo $label . '-' . $i; ?>" name="<?php echo $options['name']; ?>" value="{{<?php echo $v; ?>}}"<?php echo !empty($options['value']) && in_array($v, $options['value']) ? ' checked="checked"' : ''; ?> />
+                        <input type="<?php echo $options['multiple'] ? 'checkbox' : 'radio'; ?>"<?php echo !empty($options['required']) ? ' required' : ''; ?> id="osat-feedback--<?php echo $label . '-' . $i; ?>" name="<?php echo $options['name']; ?>" value="<?php echo addslashes($v); ?>"<?php echo !empty($options['value']) && in_array($v, $options['value']) ? ' checked="checked"' : ''; ?> />
                         <label for="osat-feedback--<?php echo $label . '-' . $i; ?>">
-                            {{<?php echo $v; ?>}}
+                            <?php echo htmlspecialchars($v); ?>
                         </label>
                     </div><?php endforeach; ?>
                         <?php else: ?>

@@ -107,6 +107,7 @@ var osatstats = {
             {
                 $(container).replaceWith($(data));
                 osatstats.addSubmitEvent(data);
+                $(window).trigger('resize');
             }
             else
             {
@@ -115,7 +116,6 @@ var osatstats = {
         }, container))
         .fail(function() {
             $(this).addClass('has--error');
-            console.log('ERROR');
         })
         .always($.proxy(function(data) {
             $(this).removeClass('is--loading');

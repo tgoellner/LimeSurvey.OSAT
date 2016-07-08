@@ -5,8 +5,11 @@
     display: block;
     position: relative;
     background: @color_white;
-    padding-bottom: @gutter;
+    padding-bottom: @gutter_width * 3;
     margin: 0;
+    @media @minwidth_s {
+        padding-bottom: @gutter_width;
+    }
 
     &--top-bar {
         display: block;
@@ -38,17 +41,32 @@
         white-space: nowrap;
 
         position: absolute;
-        top: 0;
+        top: -4px;
         left: @gutter;
     }
 
     &--external-nav {
-        display: inline-block;
-        width: 100%;
-        text-align: right;
+        position: absolute;
+        bottom: -21px;
+        right: @gutter;
+
+        @media @minwidth_xs {
+            position: relative;
+            bottom: auto;
+            right: auto;
+
+            display: inline-block;
+            width: 100%;
+            text-align: right;
+        }
 
         .navigation--item {
-            display: inline;
+            display: block;
+            text-align: right;
+            @media @minwidth_xs {
+                display: inline;
+                text-align: inherit;
+            }
             padding-left: @gutter_width;
         }
 
@@ -64,7 +82,7 @@
 
     &--language-nav {
         display: inline-block;
-        width: 100px;
+        width: 85px;
 
         position: absolute;
         top: 0;
@@ -73,6 +91,7 @@
         .control-label {
             padding: 0;
             text-align: left;
+            text-transform: uppercase;
         }
 
         @media @minwidth_m {

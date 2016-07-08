@@ -11,7 +11,7 @@
             <?php echo nl2br(join("\n", $errors)); ?>
         </div><?php endif; ?>
 
-        <?php echo CHtml::form($urlAction,'post',array('id'=>'limesurvey', 'role' => 'form')); ?>
+        <?php echo CHtml::form($urlAction,'post',array('id'=>'osatregister')); ?>
 
             <input type="hidden" name="lang" value="<?php echo $sLanguage; ?>" id="register_lang" />
             <input type="hidden" name="function" value="attributes" />
@@ -34,7 +34,7 @@
                         <input type="radio" required id="<?php echo $label . '_' . $i; ?>" value="<?php echo htmlspecialchars($opt); ?>" name="register_<?php echo $label; ?>"<?php if($value == $opt): ?> checked="checked"<?php endif; ?> />
                         <label for="<?php echo $label . '_' . $i; ?>">
                             {{<?php echo $opt; ?>}}
-                        </span>
+                        </label>
                     </div>
                         <?php endforeach; ?>
                     <?php else: // otherwise display a select box ?>

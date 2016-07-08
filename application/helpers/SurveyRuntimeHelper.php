@@ -195,7 +195,7 @@ class SurveyRuntimeHelper {
         $htmlButtons = array();
         $html = '';
         $html .=  "\n\n<!-- PRESENT THE INDEX MENU (full) -->\n";
-        $html .=  CHtml::openTag('span', array('id' => 'index-menu', 'class'=>'dropdown index-menu-incremental-full'));
+        $html .=  CHtml::openTag('nav', array('id' => 'index-menu', 'class'=>'dropdown index-menu-incremental-full'));
         $html .=  CHtml::link(gT("Question index").'&nbsp;<span class="caret"></span>', array('#'), array('class'=>'dropdown-toggle', 'data-toggle'=>"dropdown", 'role'=>"button", 'aria-haspopup'=>"true", 'aria-expanded'=>"false"));
         $html .=  CHtml::openTag('ul', array('class'=>'dropdown-menu'));
 
@@ -273,7 +273,7 @@ class SurveyRuntimeHelper {
 
 
         $html .= CHtml::closeTag('ul');
-        $html .= CHtml::closeTag('li');
+        $html .= CHtml::closeTag('nav');
 
         return array('menulist'=>$html, 'buttons'=>$htmlButtons );
     }

@@ -17,7 +17,7 @@
         <div class="page-header--top-bar">
             <div class="center">
                 <h1>
-                    <a href="http://www.eu-fundraising.eu" target="_blank">
+                    <a href="http://www.eu-fundraising.eu/" target="_blank">
                         EU-Fundraising Association
                     </a>
                 </h1>
@@ -32,9 +32,7 @@
                 <nav class="page-header--external-nav">
                     <ul>
                         <li class="navigation--item is--home">
-                            <a href="http://www.eu-fundraising.eu/?lang={SURVEYLANGUAGE}" target="_blank">
-                                Home
-                            </a>
+                            <a href="http://europeanisation.eu-fundraising.eu/{SURVEYLANGUAGE}/" target="_blank">{{Home}}</a>
                         </li>
                         {LOGOUT_LINK|<li class="navigation--item is--logout">|</li>}
                     </ul>

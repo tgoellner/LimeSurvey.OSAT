@@ -1,6 +1,4 @@
 $(document).on('ready', function(e){
-    console.log("Show stats");
-
     $('.is---chart-js').each(function(i, el){
         var data = $(el).attr('data-json');
         if(data)

@@ -21,7 +21,7 @@
 
 	.no-touchevents & {
 		&:hover {
-			background-color: @color_primary_light;
+			background-color: @color_extra3;
 		}
 	}
 
@@ -34,11 +34,11 @@
 	.btn();
 
 	&:active { /* pressed */
-		background-color:	@color_primary_light !important;
+		background-color:	@color_extra3 !important;
 		color:				@color_white !important;
 	}
 	&:focus {
-		background-color:	@color_primary_light !important;
+		background-color:	@color_extra3 !important;
 		color:				@color_white !important;
 	}
 	&.inactive,
@@ -85,4 +85,28 @@
 			display:	inline;
 		}
 	}
+}
+
+.forward() {
+	@s: 32px;
+    .font(strong, xl);
+    width: 100%;
+    text-align: left;
+    padding: @gutter_width;
+    padding-left: (@gutter_width * 3) + @s;
+    position: relative;
+    &:before {
+        content: "";
+        display: block;
+        width: @s;
+        height: @s;
+        background: transparent no-repeat center;
+        background-size: contain;
+        .svg-uri(~"icons/eufa_icon_dropdown", @color_white);
+        .rotate(-90deg);
+
+        position: absolute;
+        top: 50%; margin-top: round(@s/-2);
+        left: @gutter_width * 1;
+    }
 }

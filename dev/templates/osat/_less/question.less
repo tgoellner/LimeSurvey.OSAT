@@ -1,5 +1,4 @@
 .question-container {
-    background: @color_bg;
 
     .col-sm-12 {
         .center-min();
@@ -13,12 +12,12 @@
 
 .question-title-container {
     background: @color_white;
+    padding: @gutter;
     padding-top: 0;
-    padding-bottom: @gutter;
 
     @media @minwidth_m {
+        padding: @gutter_width;
         padding-top: 0;
-        padding-bottom: @gutter_width;
     }
 }
 
@@ -27,7 +26,7 @@
     input, textarea {
         user-select: text;
     }
-    
+
     .radio {
         padding: 0;
         margin: 0;
@@ -88,8 +87,19 @@
         }
     }
 }
+.answer-container {
+    padding-left: @gutter;
+    padding-right: @gutter;
+    @media @minwidth_m {
+        padding-left: @gutter_width;
+        padding-right: @gutter_width;
+    }
+}
 .question-help-container {
-    padding: @gutter 0;
+    padding: @gutter;
+    @media @minwidth_m {
+        padding: @gutter_width;
+    }
 }
 .question-help {
     text-align: right;
@@ -98,13 +108,15 @@
 }
 
 .question--navigator {
-    .center-min();
-    padding: 0 !important;
+    .center();
     text-align: right;
-    margin-bottom: @gutter_width;
 
     .jshide {
         display: none;
+    }
+    >.row {
+        .center-min();
+        padding: 0 !important;
     }
 
     #moveprevbtn,
@@ -138,29 +150,7 @@
 
     #movenextbtn,
     #movesubmitbtn {
-        .font(strong, xl);
-        width: 100%;
-        text-align: left;
-        padding: @gutter_width;
-        padding-left: 120px;
-
-        position: relative;
-        &:before {
-            @s: 40px;
-            content: "";
-            display: block;
-            width: @s;
-            height: @s;
-            background: transparent no-repeat center;
-            background-size: contain;
-            .svg-uri(~"icons/eufa_icon_dropdown", @color_white);
-            .rotate(-90deg);
-
-            position: absolute;
-            top: 50%; margin-top: round(@s/-2);
-            left: round(@s/2);
-        }
-
+        .forward();
     }
 }
 

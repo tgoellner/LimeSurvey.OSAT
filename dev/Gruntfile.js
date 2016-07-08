@@ -4,7 +4,8 @@ module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
 
-  var pkg = grunt.file.readJSON('package.json');
+  var pkg = grunt.file.readJSON('package.json'),
+        mode = grunt.option('mode') || 'dev';
 
     // setting browser compatibility
     pkg.supportedBrowsers = ['> 5% in DE', 'ie 10'];
@@ -16,11 +17,10 @@ module.exports = function(grunt) {
 		less: {
             default : {
                 options: {
-                    compress: true,
-                    yuicompress: true,
+                    compress: mode == 'stage',
+                    yuicompress: mode == 'stage',
                     optimization: 2,
-                    sourceMap : true,
-                    // sourceMapFilename : 'plugins/osat/assets/css/styles.css.map',
+                    sourceMap : mode != 'stage',
                     sourceMapURL : './styles.css.map',
                     plugins: [
                         new (require('less-plugin-autoprefix'))({browsers: pkg.supportedBrowsers })
@@ -45,17 +45,17 @@ module.exports = function(grunt) {
 			options: {
 				separator: ';\n',
 				stripBanners: true,
-                sourceMap: true
+                sourceMap: mode != 'stage'
 			}
 		},
 
 		uglify: {
 			options: {
-                sourceMap : true,
-                sourceMapIncludeSources : true,
+                sourceMap : mode != 'stage',
+                sourceMapIncludeSources : mode != 'stage',
                 sourceMapIn : function(path) { return path.replace(/\.js/,"\.js\.map")},
 				compress: {
-					// drop_console: false
+					drop_console: mode == 'stage'
 				}
 			}
 		},
@@ -89,7 +89,7 @@ module.exports = function(grunt) {
         var concat = grunt.config.get('concat') || {};
         concat[taskLabel] = {
             src : [dir + '/**/*.js'],
-            dest: dir + '/../js/scripts.js'
+            dest: dir + '/../scripts/scripts.js'
         };
         grunt.config.set('concat', concat);
 
