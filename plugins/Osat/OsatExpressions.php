@@ -316,7 +316,7 @@ class OsatExpressions
 
         		foreach($availableQuestions as $i => $question)
         		{
-        			if($question['qcode'] == $this->questionCode())
+        			if(isset($question['qcode']) && $question['qcode'] == $this->questionCode())
         			{
         				$this->questionNo = $i+1;
         			}
@@ -355,7 +355,7 @@ class OsatExpressions
     {
     	if($stepIndex = $this->getCurrentStepInfo())
     	{
-    		return $stepIndex['qcode'];
+    		return isset($stepIndex['qcode']) ? $stepIndex['qcode'] : null;
     	}
 
     	return '';
