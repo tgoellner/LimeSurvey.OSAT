@@ -31,6 +31,8 @@ class OsatUser
     protected $errors;
     protected $notices;
 
+    protected $questions;
+
     protected $status = [];
 
     public function __construct(array $attributes = [])
@@ -887,19 +889,67 @@ class OsatUser
         return count($this->getMissingExtraAttributes()) > 0;
     }
 
+    public function getQuestions()
+    {
+        if(!is_array($this->questions))
+        {
+            $this->questions = [];
+
+            $questions = Question::model()->getQuestionsWithSubQuestions($this->surveyId, $this->language);
+            if(!empty($questions))
+            {
+                foreach($questions as $question)
+                {
+                    $qid = $question['sid'] . 'X' . $question['gid'] . "X" . $question['qid'];
+                    if($question['relevance'] == '1')
+                    {
+                        $this->questions[$qid] = null;
+                    }
+                    else if(preg_match('/TOKEN:ATTRIBUTE_([0-9]+) == "([^"]+)"/',$question['relevance']))
+                    {
+                        $attribute = preg_replace('/.*ATTRIBUTE_([0-9]+) ==.*/',"attribute_$1", $question['relevance']);
+                        $value = preg_replace('/.*TOKEN:ATTRIBUTE_([0-9]+) == "([^"]+).*/',"$2", $question['relevance']);
+                        if(!isset($this->$attribute) || ($this->$attribute == $value))
+                        {
+                            $this->questions[$qid] = null;
+                        }
+                        unset($attribute, $value);
+                    }
+                }
+                unset($question);
+            }
+            unset($questions);
+
+            if(tableExists("{{survey_{$this->surveyId}}}"))
+            {
+                $query = "SELECT * FROM `{{survey_{$this->surveyId}}}` WHERE `token` = '{$this->token}'";
+                $rows = Yii::app()->db->createCommand($query)->query()->readAll();
+                if(count($rows))
+                {
+                    foreach($rows[0] as $k => $v)
+                    {
+                        if(in_array($k, array_keys($this->questions)))
+                        {
+                            $this->questions[$k] = $v;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this->questions;
+    }
+
     public function hasCompletedSurvey()
     {
         if(!isset($this->status['hasCompletedSurvey']))
         {
             $this->status['hasCompletedSurvey'] = false;
+            $questions = $this->getQuestions();
+            $keys = array_keys($questions);
+            $values = array_filter($questions);
 
-            if($tokenInstance = Token::model($this->surveyId)->editable()->findByAttributes(array('token' => $this->token)))
-    		{
-    			if($tokenInstance->completed != "N")
-    			{
-    				$this->status['hasCompletedSurvey'] = true;
-                }
-            }
+            $this->status['hasCompletedSurvey'] = count($keys) <= count($values);
         }
         return $this->status['hasCompletedSurvey'];
     }
@@ -916,16 +966,28 @@ class OsatUser
         {
             $this->status['hasJustCompletedSurvey'] = false;
 
-            if(!empty($_SESSION['survey_'.$this->surveyId]['grouplist']))
-			{
-				if(!empty($_SESSION['survey_'.$this->surveyId]['maxstep']))
-				{
-                    if($_SESSION['survey_'.$this->surveyId]['maxstep'] >= $_SESSION['survey_'.$this->surveyId]['totalquestions'])
+            if(!$this->hasCompletedSurvey())
+            {
+                $questions = $this->getQuestions();
+                $keys = array_keys($questions);
+                $values = array_filter($questions);
+                $missing = array_diff($keys, array_keys($values));
+
+                if(count($missing) == 1)
+                {
+                    $missing = reset($missing);
+                    if(isset($_POST[$missing]))
                     {
-                        $this->setSessionVar('hasJustCompletedSurvey', true);
-                        return true;
-					}
-				}
+                        $this->questions[$missing] = $_POST[$missing];
+                        $this->status['hasJustCompletedSurvey'] = true;
+                    }
+                }
+            }
+
+            if($this->status['hasJustCompletedSurvey'])
+            {
+                $this->setSessionVar('hasJustCompletedSurvey', true);
+                return true;
 			}
         }
         return false;

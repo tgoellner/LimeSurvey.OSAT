@@ -58,7 +58,6 @@ class Osat extends \ls\pluginmanager\PluginBase
 		$this->subscribe('beforeQuestionRender');
         $this->subscribe('beforeEmManagerHelperProcessString');
 
-
 		$this->subscribe('beforeControllerAction');
         $this->subscribe('beforeSurveyPage');
 	}

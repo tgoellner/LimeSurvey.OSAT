@@ -4,8 +4,6 @@
     }
 
     body {
-        width: 17cm;
-        min-height: 29.7cm;
         overflow: hidden;
         margin: 0 auto;
     }
@@ -50,6 +48,8 @@
             content: "Personal document";
             .font(strong);
             color: @color_bg;
+            color: rgba(0, 0, 0, 0);
+            text-shadow: 0 0 0 @color_bg;
 
             font-size: 130px;
             line-height: 0.9em;;
@@ -80,6 +80,7 @@
     }
 
     .page-footer {
+        font-size: 75%;
         &--back-to-top {
             display: none;
         }
@@ -91,6 +92,7 @@
             float: left;
             width: 49.999%;
             *[data-target] {
+                position:relative;
                 display: inline-block;
                 width: @logowidth;
                 height: @logoheight;
@@ -98,10 +100,19 @@
 
                 background: no-repeat center;
                 background-size: contain;
-                .svg-uri('icons/eufa_logo_europeanisation');
 
                 text-indent: 150%;
                 white-space: nowrap;
+
+                &:before {
+                    .svg-url('icons/eufa_logo_europeanisation');
+                    text-indent: 0;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
             }
             p:last-child {
                 &:before {

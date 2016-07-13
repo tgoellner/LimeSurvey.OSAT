@@ -150,3 +150,11 @@
 	@replace: replace("@{replace-uri}", escape('style="fill:#f0f'), escape('style="fill:@{fill}'), "g");
 	background-image: e(@replace);
 }
+
+
+.svg-url(@name, @fill: "#f0f") {
+	@data-uri: data-uri('image/svg+xml;charset=UTF-8', './templates/osat/files/@{name}.svg');
+	@replace-uri: replace("@{data-uri}", escape('fill="#f0f"'), escape('fill="@{fill}"'), "g");
+	@replace: replace("@{replace-uri}", escape('style="fill:#f0f'), escape('style="fill:@{fill}'), "g");
+	content: e(@replace);
+}

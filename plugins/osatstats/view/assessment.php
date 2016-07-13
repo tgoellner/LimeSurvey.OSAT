@@ -177,18 +177,18 @@
                                 <button
                                     data-gid="<?php echo $gid; ?>"
                                     style="height:<?php echo number_format($group['total'], 2, '.', ''); ?>%"
-                                    data-balloon="{{You reached %1$s of %2$s|<?php echo $group['total_score']; ?>|<?php echo $group['max']; ?>}}"
+                                    data-balloon="{{You reached %s|<?php echo ceil($group['total']) . '%'; ?>}}"
                                     data-balloon-pos="<?php echo $c < count($grouplist)/2 ? 'top' : 'top'; ?>">
                                     <span class="osatstats-table--cell--percentage" aria-labelledby="g<?php echo $gid; ?>-total"><?php echo floatval(number_format($group['total'], 2)); ?>%</span>
                                     <span id="g<?php echo $gid; ?>-total" class="osatstats-table--cell--score" data-value="<?php echo $group['total_score']; ?>" data-max="<?php echo $group['max']; ?>">
-                                        {{You reached %1$s of %2$s|<?php echo $group['total_score']; ?>|<?php echo $group['max']; ?>}}
+                                        {{You reached %s|<?php echo ceil($group['total']) . '%'; ?>}}
                                     </span>
                                 </button>
                             </td>
-                            <td class="osatstats-table--cell is--average" style="height:<?php echo number_format($group['average'], 2, '.', ''); ?>%" data-balloon="{{Average value is %1$s of %2$s|<?php echo floatval(number_format($group['average_score'], 2)); ?>|<?php echo $group['max']; ?>}}">
+                            <td class="osatstats-table--cell is--average" style="height:<?php echo number_format($group['average'], 2, '.', ''); ?>%" data-balloon="{{Average value is %s|<?php echo number_format($group['average'], 2, '.', '') . '%' ?>}}">
                                 <span class="osatstats-table--cell--percentage" aria-labelledby="g<?php echo $gid; ?>-average"><?php echo floatval(number_format($group['average'], 2)); ?>%</span>
                                 <span id="g<?php echo $gid; ?>-average" class="osatstats-table--cell--score" data-value="<?php echo floatval(number_format($group['average_score'], 2)); ?>" data-max="<?php echo $group['max']; ?>">
-                                    {{Average value is %1$s of %2$s|<?php echo floatval(number_format($group['average_score'], 2)); ?>|<?php echo $group['max']; ?>}}
+                                    {{Average value is %s|<?php echo number_format($group['average'], 2, '.', '') . '%' ?>}}
                                 </span>
                             </td>
                         </tr>
@@ -199,16 +199,16 @@
                         ?><tr class="osatstats-table--question" data-qid="<?php echo $qid; ?>">
                             <td></td>
                             <td class="osatstats-table--cell is--name"><?php echo htmlspecialchars($sQuestion->question); ?></td>
-                            <td class="osatstats-table--cell is--total" style="height:<?php echo number_format($assessment->getQuestionTotal($qid), 2, '.', ''); ?>%" data-balloon="{{You reached %1$s of %2$s|<?php echo $question['total']; ?>|<?php echo $question['max']; ?>}}">
+                            <td class="osatstats-table--cell is--total" style="height:<?php echo number_format($assessment->getQuestionTotal($qid), 2, '.', ''); ?>%" data-balloon="{{You reached %s|<?php echo ceil($question['total']) . '%'; ?>}}">
                                 <span class="osatstats-table--cell--percentage" aria-labelledby="q<?php echo $qid; ?>-total"><?php echo floatval(number_format($assessment->getQuestionTotal($qid), 2)); ?>%</span>
                                 <span id="q<?php echo $qid; ?>-total" class="osatstats-table--cell--score" data-value="<?php echo $question['total']; ?>" data-max="<?php echo $question['max']; ?>">
-                                    {{You reached %1$s of %2$s|<?php echo $question['total']; ?>|<?php echo $question['max']; ?>}}
+                                    {{You reached %s|<?php echo ceil($question['total']) . '%'; ?>}}
                                 </span>
                             </td>
-                            <td class="osatstats-table--cell is--average" style="height:<?php echo number_format($assessment->getQuestionAverage($qid), 2, '.', ''); ?>%" data-balloon="{{Average value is %1$s of %2$s|<?php echo floatval(number_format($question['average'],2)); ?>|<?php echo $question['max']; ?>}}">
+                            <td class="osatstats-table--cell is--average" style="height:<?php echo number_format($assessment->getQuestionAverage($qid), 2, '.', ''); ?>%" data-balloon="{{Average value is %s|<?php echo number_format($question['average'], 2, '.', '') . '%' ?>}}">
                                 <span class="osatstats-table--cell--percentage" aria-labelledby="q<?php echo $qid; ?>-average"><?php echo floatval(number_format($assessment->getQuestionAverage($qid), 2)); ?>%</span>
                                 <span id="q<?php echo $qid; ?>-average" class="osatstats-table--cell--score" data-value="<?php echo $question['average']; ?>" data-max="<?php echo $question['max']; ?>">
-                                    {{Average value is %1$s of %2$s|<?php echo floatval(number_format($question['average'],2)); ?>|<?php echo $question['max']; ?>}}
+                                    {{Average value is %s|<?php echo number_format($question['average'], 2, '.', '') . '%' ?>}}
                                 </span>
                             </td>
                         </tr><?php endforeach; endif; ?>

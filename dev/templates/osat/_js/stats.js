@@ -42,6 +42,12 @@ var osatstats = {
             value = [],
             label = $('label[for="' + this.id + '"]').first();
 
+        // delete if filters cann be added
+        $(form).find('select').not(this).each(function(i,el){
+            el.selectedIndex = 0;
+            $.proxy(osatstats.switchFilter, el);
+        });
+
         for( var i = 0; i < this.options.length; i++)
         {
             if(this.options[i].selected == true)

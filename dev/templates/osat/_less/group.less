@@ -2,12 +2,15 @@
 
     &--header {
         text-align: center;
-        padding: @gutter_width * 2 0 @gutter_width 0;
+        padding: @gutter_width * 4.5 0 @gutter_width 0;
         color: @color_white;
         background: @color_primary;
+        background-position: top center;
+        background-repeat: no-repeat;
+        background-size: auto 140px;
 
         @media @minwidth_m {
-            padding-top: @gutter_width;
+            // padding-top: @gutter_width ;
         }
 
         &--title {
@@ -19,8 +22,29 @@
             }
         }
 
+        .-(@i: 1) when (@i < 8) {
+            @color:		~"@{color_extra@{i}}";
+            @c: @i - 1;
+
+            #group-@{c} & {
+                background-color: @color;
+                background-image: ~"url(../files/illustrations/group-0@{i}.svg)";
+                &--title {
+                    &:before {
+                        content: "0@{i}";
+                    }
+                }
+            }
+            .-((@i + 1));
+        } .-;
+        #group-5 & {
+            background-image: ~"url(../files/illustrations/group-06.png)";
+        }    
+
+/*
         #group-0 & {
             .color(extra1, background);
+            background-image: url(../files/illustrations/group-01.png);
             &--title {
                 &:before {
                     content: "01";
@@ -30,6 +54,7 @@
 
         #group-1 & {
             .color(extra2, background);
+            background-image: url(../files/illustrations/group-02.png);
             &--title {
                 &:before {
                     content: "02";
@@ -39,6 +64,7 @@
 
         #group-2 & {
             .color(extra3, background);
+            background-image: url(../files/illustrations/group-03.png);
             &--title {
                 &:before {
                     content: "03";
@@ -81,6 +107,7 @@
                 }
             }
         }
+        */
     }
 
     &--intro {

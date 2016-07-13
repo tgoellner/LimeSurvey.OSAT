@@ -474,7 +474,8 @@ body.survey-is-just-completed {
                 .osatstats-table--cell {
                     &.is--total {
                         button {
-                            background-color: @color;
+                            background-color: @color !important;
+                            @media print { border-left: 60px solid @color; }
                             &:after {
                                 background-color: @color;
                                 color: contrast(color(~"@{color}"), @color_text, @color_white);
@@ -489,7 +490,8 @@ body.survey-is-just-completed {
                         }
                     }
                     &.is--average {
-                        background-color: lighten(color(@color),10%);
+                        background-color: lighten(color(@color),10%) !important;
+                        @media print { border-left: 20px solid lighten(color(@color),10%); }
                         &:after {
                             background-color: lighten(color(@color),10%);
                             color: contrast(lighten(color(@color), 10%), @color_text, @color_white, 30%);
@@ -517,7 +519,8 @@ body.survey-is-just-completed {
                         .osatstats-table--cell {
                             &.is--total {
                                 button {
-                                    background-color: @color;
+                                    background-color: @color !important;
+                                    @media print { border-left: 60px solid @color; }
                                     &:after {
                                         background-color: @color;
                                         color: contrast(color(~"@{color}"), @color_text, @color_white);
@@ -532,7 +535,8 @@ body.survey-is-just-completed {
                                 }
                             }
                             &.is--average {
-                                background-color: lighten(color(@color),10%);
+                                background-color: lighten(color(@color),10%) !important;
+                                @media print { border-left: 20px solid lighten(color(@color),10%); }
                                 &:after {
                                     background-color: lighten(color(@color),10%);
                                     color: contrast(lighten(color(@color), 10%), @color_text, @color_white);
