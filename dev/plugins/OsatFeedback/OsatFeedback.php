@@ -289,7 +289,6 @@ Feedback form submitted on {senddate} from {remoteip} using the page {pageurl}'
 
     protected function sendFeedbackEmail(array $preset = [], array $data = [])
     {
-		return false;
         if(!($aSurveyInfo = getSurveyInfo($data['surveyId'], $data['sLanguage'])))
         {
             return false;
