@@ -1,7 +1,5 @@
 $(document).on('ready', function()
 {
-    console.log("DROPDOWN");
-
     $(document).on(
     {
         'change.osat' : function(e)

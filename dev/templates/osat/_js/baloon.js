@@ -1,5 +1,4 @@
 var reposBalloons = function() {
-    console.log($('*[data-balloon]').length);
     var threshold_left = 100,
         threshold_right = $(document).width() - 100;
 

@@ -133,7 +133,6 @@ var osatstats = {
     activateAssessment : function()
     {
         var gid = $(this).attr('data-gid');
-        console.log("activate " + gid);
 
         $(".is--active[data-gid]").removeClass('is--active');
         $('[data-gid="' + gid + '"]').addClass('is--active');

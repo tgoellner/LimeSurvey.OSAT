@@ -33,4 +33,11 @@
                 {QUESTIONHELP}
             </div>
         </div>
+
+        <!-- Question help -->
+        <div class="row question-wrapper question-help-container" id="save-progress">
+            <div class="col-sm-12 question-help simple--text">
+                <a href="{LOGOUT_URL}">{{Save progess and finish later}}</a>
+            </div>
+        </div>
     </div>

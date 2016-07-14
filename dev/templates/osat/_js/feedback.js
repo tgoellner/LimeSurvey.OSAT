@@ -9,7 +9,6 @@ var osatfeedback = {
         content = typeof content == 'undefined' ? $('body') : content;
 
         $(content).find('#osat-feedback-form').on('submit.osatfeedback', osatfeedback.submitForm);
-        console.log("EVENT ADDED");
     },
 
     submitForm : function() {

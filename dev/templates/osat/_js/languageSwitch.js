@@ -17,7 +17,6 @@ $(document).on('ready', function()
             var label = $('label[for="' + $(this).attr('id') + '"]');
             var value = this.options[this.selectedIndex].value;
             value = value[0].toUpperCase() + value.slice(1);
-            console.log(value);
             $(label).text(value);
         }
     }, '.languagechanger');

@@ -4056,6 +4056,17 @@ html body {
 .no-touchevents *[data-toggle]:hover {
   text-decoration: none;
 }
+#save-progress .simple--text {
+  padding-top: 20px;
+}
+#save-progress a {
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.44444444em;
+  letter-spacing: 0.05em;
+}
 body.survey-start,
 body.survey-save,
 body.register-attributes,

@@ -17,6 +17,42 @@
         </div>
     </div>
 </div>
+<div id="confirm-logout" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="min-height:40px;">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{Logout}}</h4>
+            </div>
+            <div class="modal-body">
+                <p>{{Do you really want to logout from this survey?}}</p>
+                <p>{{You can login later at any time. If you have not completed the survey yet your answers are stored and you can finish later after a re-login.}}</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" data-dismiss="modal" class="btn btn-default">{{Cancel}}</a>
+                <a href="#" class="btn btn-danger btn-ok">{{Logout}}</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="confirm-leave" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="min-height:40px;">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{{Do you really want to leave?}}</h4>
+            </div>
+            <div class="modal-body">
+                <p>{{If you are logged in you should log out first to prevent others from using your account.}}</p>
+                <p>{{You can login later at any time. If you have not completed the survey yet your answers are stored and you can finish later after a re-login.}}</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" data-dismiss="modal" class="btn btn-default">{{Cancel}}</a>
+                <a href="#" class="btn btn-danger btn-ok">{{Leave}}</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <footer class="page-footer">
     <div class="center">
