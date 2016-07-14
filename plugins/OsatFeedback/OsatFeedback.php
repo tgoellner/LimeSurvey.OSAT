@@ -90,7 +90,6 @@ class OsatFeedback extends Osat {
                     'placeholder' => 'My feedback',
                     'title' => 'Feedback',
                     'label' => 'Please give us your feedback.',
-                    'required' => '1',
                     'value' => ''
                 ],
                 'testimonial' => [
