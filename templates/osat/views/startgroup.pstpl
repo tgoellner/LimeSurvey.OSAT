@@ -3,7 +3,7 @@
     <div class="group--header">
         <div class="center-min">
             <p class="group--header--title">
-                {GROUPNAME}
+                {GROUPINTRO}
             </p>
         </div>
     </div>

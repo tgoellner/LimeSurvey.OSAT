@@ -63,7 +63,7 @@
                 </p>
                 <p>
                     <span class="logo-erasmus-plus">Erasmus +</span>
-                    <span class="erasmus-plus-text">{{Dieses Projekt wurde mit Unterstützung der Europäischen Kommission  nanziert. Die Verantwortung für den Inhalt dieser Veröffentlichung (Mitteilung) trägt allein der Verfasser; die Kommission haftet nicht für die weitere Verwendung der darin enthaltenen Angaben.}}</span>
+                    <span class="erasmus-plus-text">{{This project is supported by the European Commission.}}</span>
                 </p>
             </div>
             <div class="page-footer--legal">
@@ -71,7 +71,7 @@
                     <span data-toggle="modal" data-target="#legal-notice">{{Legal notice}}</span>
                 </p>
                 <p>
-                    &copy; 2016 <a href="#" target="_blank">{{Copyright owner}}</a><br />
+                    &copy; 2016 {{Copyright owner}}<br />
                     {{All rights reserved}}
                 </p>
             </div>

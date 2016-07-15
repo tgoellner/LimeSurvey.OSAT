@@ -380,6 +380,7 @@ class OsatExpressions
         ];
 
         $description = null;
+        $group_name = null;
 
         $div = '---';
 
@@ -395,6 +396,7 @@ class OsatExpressions
                 if($group['gid'] == $gid)
                 {
                     $description = isset($group['description']) ? $group['description'] : null;
+                    $group_name = isset($group['group_name']) ? $group['group_name'] : null;
                 }
             }
     	}
@@ -404,6 +406,7 @@ class OsatExpressions
             if($group = QuestionGroup::model()->findByAttributes(array('sid' => $this->surveyId(), 'gid' => $gid, 'language' => App()->language)))
             {
                 $description = $group->description;
+                $group_name = $group->group_name;
             }
         }
 
@@ -417,13 +420,18 @@ class OsatExpressions
 
                 if (($pos = strpos($return['outro'] , $div)) !== false)
                 {
-                    $return['intro'] = $return['description'];
+                    $return['intro'] = strip_tags($return['description']);
                     $return['description'] = $this->validHtml(substr($return['outro'], 0, $pos));
                     $return['outro'] = $this->validHtml(substr($return['outro'], $pos + strlen($div)));
                 }
             }
         }
         unset($pos);
+
+        if(empty($return['intro']) && !empty($group_name))
+        {
+            $return['intro'] = $group_name;
+        }
 
         if(!empty($what))
         {

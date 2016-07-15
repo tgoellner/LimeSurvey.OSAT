@@ -24,6 +24,10 @@ body {
 			-webkit-tap-highlight-color: transparent; /* For some Androids */
 		}
 	}
+
+	*:focus {
+		outline: none;
+	}
 }
 .btn.btn-default {
 	color: @color_white;
@@ -56,10 +60,18 @@ a {
 	    	text-decoration: none;
 		}
     }
+
+	&:focus {
+		text-decoration: none;
+	}
 }
 abbr {
 	border-bottom: 1px dotted @color_text;
 	cursor: pointer;
+
+	&:focus {
+		border-bottom-style: solid;
+	}
 }
 
 .simple--text {

@@ -1,27 +1,31 @@
 $(document).on(
 {
     'click.osat' : function(e){
-        var thishost = window.location.hostname,
-            hrefhost = this.href.replace(/^(https?\:\/\/)?([^\/]+)(.*)?$/,"$2"),
-            islogout = this.href.match(/function\/logout/),
-            dialogue = null;
+        if(this.href.match(/^https?\:\/\//))
+        {
 
-        if(thishost != hrefhost)
-        {
-            dialogue = $('#confirm-leave');
-        }
-        else if(islogout)
-        {
-            dialogue = $('#confirm-logout');
-        }
+            var thishost = window.location.hostname,
+                hrefhost = this.href.replace(/^(https?\:\/\/)?([^\/]+)(.*)?$/,"$2"),
+                islogout = this.href.match(/function\/logout/),
+                dialogue = null;
 
-        if(dialogue != null)
-        {
-            // display logout dialogue
-            dialogue.find('.btn-ok').attr('href', $(this).attr('href'));
-            dialogue.find('.btn-ok').attr('target', $(this).attr('target'));
-            dialogue.modal('show');
-            return false;
+            if(thishost != hrefhost)
+            {
+                dialogue = $('#confirm-leave');
+            }
+            else if(islogout)
+            {
+                dialogue = $('#confirm-logout');
+            }
+
+            if(dialogue != null)
+            {
+                // display logout dialogue
+                dialogue.find('.btn-ok').attr('href', $(this).attr('href'));
+                dialogue.find('.btn-ok').attr('target', $(this).attr('target'));
+                dialogue.modal('show');
+                return false;
+            }
         }
     }
 }, 'a[href]:not(.btn-ok)');
