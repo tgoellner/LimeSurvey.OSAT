@@ -1271,7 +1271,7 @@ class OsatLogin extends Osat {
 
         $sFrom = "{$aSurveyInfo['adminname']} <{$aSurveyInfo['adminemail']}>";
         $sBounce = getBounceEmail($surveyId);
-        $sTo = $aSurveyInfo['adminemail'];
+        $sTo = $email;
         $sitename =  Yii::app()->getConfig('sitename');
 
         return SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename, false, $sBounce, null);
