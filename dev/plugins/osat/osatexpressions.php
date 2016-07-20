@@ -309,45 +309,49 @@ class OsatExpressions
     {
         if(!isset($this->questionNo))
         {
-            $this->questionNo = 0;
-            if($stepIndex = $this->getCurrentStepInfo())
-        	{
-        		$availableQuestions = LimeExpressionManager::GetStepIndexInfo();
-
-        		foreach($availableQuestions as $i => $question)
-        		{
-        			if(isset($question['qcode']) && $question['qcode'] == $this->questionCode())
-        			{
-        				$this->questionNo = $i+1;
-        			}
-        		}
-        	}
-        }
-        return !empty($this->questionNo) ? $this->questionNo : '';
-    }
-
-    public function _DOESNOTWORK_questionNo()
-    {
-#        print_r($_SESSION); die();
-        if(!isset($this->questionNo))
-        {
-            $this->questionNo = 0;
-            if($questions = $this->getAvailableQuestions())
+            if(class_exists('OsatUser'))
             {
+                if($user = OsatUser::getUserFromSession())
+                {
+                    if(($step = $this->getSurveySession('step')) !== null)
+                    {
+                        if(($finfo = $this->getSurveySession('fieldnamesInfo')) !== null)
+                        {
+                            $finfo = array_keys($finfo);
+                            $currentQuestion = $finfo[$step-1];
+
+                            if(($questions = $user->getQuestions()) !== null)
+                            {
+                                $questions = array_keys($questions);
+
+                                if(array_search($currentQuestion, $questions) !== false)
+                                {
+                                    $this->questionNo = array_search($currentQuestion, $questions) + 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!isset($this->questionNo))
+            {
+                $this->questionNo = 0;
+
                 if($stepIndex = $this->getCurrentStepInfo())
                 {
-                    foreach(array_keys($questions) as $i => $qid)
+                    $availableQuestions = LimeExpressionManager::GetStepIndexInfo();
+
+                    foreach($availableQuestions as $i => $question)
                     {
-                        if($stepIndex['qid'] == $qid)
+                        if(isset($question['qcode']) && $question['qcode'] == $this->questionCode())
                         {
                             $this->questionNo = $i+1;
-                            break;
                         }
                     }
                 }
             }
         }
-
         return !empty($this->questionNo) ? $this->questionNo : '';
     }
 

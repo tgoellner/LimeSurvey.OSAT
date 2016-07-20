@@ -915,6 +915,16 @@ class OsatUser
                         }
                         unset($attribute, $value);
                     }
+                    else if(preg_match('/TOKEN:ATTRIBUTE_([0-9]+) != "([^"]+)"/',$question['relevance']))
+                    {
+                        $attribute = preg_replace('/.*ATTRIBUTE_([0-9]+) !=.*/',"attribute_$1", $question['relevance']);
+                        $value = preg_replace('/.*TOKEN:ATTRIBUTE_([0-9]+) != "([^"]+).*/',"$2", $question['relevance']);
+                        if(!isset($this->$attribute) || ($this->$attribute != $value))
+                        {
+                            $this->questions[$qid] = null;
+                        }
+                        unset($attribute, $value);
+                    }
                 }
                 unset($question);
             }
