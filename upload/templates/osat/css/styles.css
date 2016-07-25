@@ -5744,29 +5744,6 @@ tfoot .osatstats-table--cell.is--label {
   .osatstats-text .question-index {
     display: none;
   }
-  .osatstats-text--assessments:before {
-    content: "Personal document";
-    font-family: 'Roboto', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 1.8rem;
-    line-height: 1.44444444em;
-    letter-spacing: 0.05em;
-    font-weight: bold;
-    color: #f1f1ef;
-    color: rgba(0, 0, 0, 0);
-    text-shadow: 0 0 0 #f1f1ef;
-    font-size: 130px;
-    line-height: 0.9em;
-    display: block;
-    position: fixed;
-    left: 0;
-    top: 1em;
-    width: 100%;
-    text-align: center;
-    transform: rotate(-10deg);
-    z-index: -1;
-  }
   .osatstats-text--assessments > * {
     position: relative;
     z-index: 2;
