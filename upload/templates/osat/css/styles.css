@@ -3757,18 +3757,22 @@ html body {
   transition-duration: 0.2s;
   transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
 }
-.question-index .open .dropdown-menu {
+.question-index .open .dropdown-menu,
+.question-index .openByDefault .dropdown-menu {
   max-height: 600px;
   list-style-type: none;
 }
-.question-index .open .dropdown-menu:after {
+.question-index .open .dropdown-menu:after,
+.question-index .openByDefault .dropdown-menu:after {
   opacity: 1;
 }
-.question-index .open .dropdown-toggle:before {
+.question-index .open .dropdown-toggle:before,
+.question-index .openByDefault .dropdown-toggle:before {
   opacity: 0;
   transform: rotate(180deg);
 }
-.question-index .open .dropdown-toggle:after {
+.question-index .open .dropdown-toggle:after,
+.question-index .openByDefault .dropdown-toggle:after {
   opacity: 1;
   transform: rotate(0deg);
 }
