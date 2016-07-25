@@ -318,15 +318,18 @@ class OsatExpressions
                         if(($finfo = $this->getSurveySession('fieldnamesInfo')) !== null)
                         {
                             $finfo = array_keys($finfo);
-                            $currentQuestion = $finfo[$step-1];
-
-                            if(($questions = $user->getQuestions()) !== null)
+                            if(isset($finfo[$step-1]))
                             {
-                                $questions = array_keys($questions);
+                                $currentQuestion = $finfo[$step-1];
 
-                                if(array_search($currentQuestion, $questions) !== false)
+                                if(($questions = $user->getQuestions()) !== null)
                                 {
-                                    $this->questionNo = array_search($currentQuestion, $questions) + 1;
+                                    $questions = array_keys($questions);
+
+                                    if(array_search($currentQuestion, $questions) !== false)
+                                    {
+                                        $this->questionNo = array_search($currentQuestion, $questions) + 1;
+                                    }
                                 }
                             }
                         }
