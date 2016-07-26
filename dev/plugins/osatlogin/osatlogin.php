@@ -11,7 +11,18 @@ class OsatLogin extends Osat {
 	static protected $label = 'osatlogin';
 
 	protected $menuLabel = "Login";
-	protected $settings = [];
+	protected $settings = [
+		'options_default' => array(
+            'type' => 'info',
+            'label' => '',
+			'content' => 'Login options'
+        ),
+		'use_double_optin' => array(
+            'type' => 'checkbox',
+            'label' => 'Use DoubleOptIn in registration',
+            'default' => false
+        ),
+	];
     protected $localeSettings = [
 		'translate' => [
 			'type' => 'text',
@@ -374,6 +385,9 @@ class OsatLogin extends Osat {
 			case 'reset_password' :
 				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'reset-password']));
 				break;
+			case 'send_confirmation' :
+				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'send-confirmation']));
+				break;
 			case 'login' :
 				return Yii::app()->createUrl("/survey/index/sid/{$surveyId}", array_replace($params, ['function' => 'login']));
 				break;
@@ -586,6 +600,7 @@ class OsatLogin extends Osat {
 				'url_register' => $this->getUrl('register', $surveyId, ['lang' => $sLanguage]),
 				'url_forgot_password' => $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage]),
 				'url_reset_password' => $this->getUrl('reset_password', $surveyId, ['lang' => $sLanguage]),
+				'url_send_confirmation' => $this->getUrl('send_confirmation', $surveyId, ['lang' => $sLanguage]),
 				'url_attributes' => $this->getUrl('url_attributes', $surveyId, ['lang' => $sLanguage]),
 
 				'urlAction' => $this->getUrl(null, $surveyId, ['lang' => $sLanguage]),
@@ -615,7 +630,7 @@ class OsatLogin extends Osat {
 			}
 
 			$registerform_vars['function'] = empty($registerform_vars['function']) ? Yii::app()->request->getParam('function') : $registerform_vars['function'];
-			if(!in_array($registerform_vars['function'], ['register', 'forgot-password', 'reset-password', 'logout', 'attributes', 'extraattributes', 'login']))
+			if(!in_array($registerform_vars['function'], ['register', 'forgot-password', 'reset-password', 'logout', 'attributes', 'extraattributes', 'send-confirmation', 'confirm', 'login']))
 			{
 				$registerform_vars['function'] = $this->indexaction;
 /*
@@ -694,27 +709,45 @@ class OsatLogin extends Osat {
 												// try to save the user
 												if($user->save())
 												{
-													// user saved - now let's log in the user!
-													// TODO: DoubleOptIn function!
-
-													$user->login($registerform_vars['register_password']);
-
-													if($sToken = $user->getToken())
+													if((bool) $this->getSettings('use_double_optin'))
 													{
-														if(count($attr = $user->getMissingAttributes()))
+														// we have a valid email
+														if($secret = OsatUser::getForgotPasswordSecret($registerform_vars['register_email']))
 														{
-															$registerform_vars['function'] = 'attributes';
-															$registerform_vars['missing_attributes'] = $attr;
-															$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/attributesForm.php', $registerform_vars, true);
+															// and the email could be found so we have a secret that we can send out via email
+															if($this->sendDoubleOptInEmail($registerform_vars['register_email'], $secret, $surveyId, $sLanguage))
+															{
+																// redirect and display notice!
+																$url = $this->getUrl('login', $surveyId, ['lang' => $sLanguage, 'secretsent' => 1]);
+																$this->redirectTo($url);
+															}
 														}
-														else {
-															$this->setToken($surveyId, $sToken);
-															return;
-														}
+														$registerform_vars['errors'][] = $this->getTranslator()->translate('Something went wrong trying to send you a confirmation link - please try again later or contact us if this error does not disappear.');
 													}
 													else
 													{
-														$registerform_vars['errors'][] = $this->getTranslator()->translate('Sorry, you are not allowed to view this survey.');
+														// user saved - now let's log in the user!
+														$this->confirmUser($user);
+
+														$user->login($registerform_vars['register_password']);
+
+														if($sToken = $user->getToken())
+														{
+															if(count($attr = $user->getMissingAttributes()))
+															{
+																$registerform_vars['function'] = 'attributes';
+																$registerform_vars['missing_attributes'] = $attr;
+																$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/attributesForm.php', $registerform_vars, true);
+															}
+															else {
+																$this->setToken($surveyId, $sToken);
+																return;
+															}
+														}
+														else
+														{
+															$registerform_vars['errors'][] = $this->getTranslator()->translate('Sorry, you are not allowed to view this survey.');
+														}
 													}
 												}
 												else
@@ -966,13 +999,91 @@ class OsatLogin extends Osat {
 
 					$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/' . $tf . '.php', $registerform_vars, true);
 					break;
+				case 'confirm' :
+					if($secret = Yii::app()->request->getParam('secret', null))
+					{
+						$secret = base64_decode($secret);
+						if(!preg_match('/[^a-z0-9]/i', $secret))
+						{
+							if($user = OsatUser::findByForgotPasswordSecret($secret, $surveyId, $this->getTranslator()))
+							{
+								if($user->email)
+								{
+									$this->confirmUser($user);
+									$registerform_vars['register_email'] = $user->email;
+									$registerform_vars['notices'][] = $this->getTranslator()->translate('Your registration has been confirmed, you can log in now.');
+								}
+							}
+						}
+
+						if(empty($registerform_vars['register_email']))
+						{
+							$registerform_vars['errors'][] = $this->getTranslator()->translate('Sorry, the confirmation link you provided is invalid, has expired or already been used. Try to login.');
+						}
+					}
+
+					if(empty($registerpage_vars['REGISTERFORM']))
+					{
+						$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/loginForm.php', $registerform_vars, true);
+					}
+
+					break;
+				case 'send-confirmation' :
+					if(!empty($registerform_vars['register_email']))
+					{
+						if($user = OsatUser::findByEmail($registerform_vars['register_email']))
+						{
+							if((bool) $this->getSettings('use_double_optin'))
+							{
+								if($secret = OsatUser::getForgotPasswordSecret($registerform_vars['register_email']))
+								{
+									// and the email could be found so we have a secret that we can send out via email
+									if($this->sendDoubleOptInEmail($registerform_vars['register_email'], $secret, $surveyId, $sLanguage))
+									{
+										// redirect and display notice!
+										$url = $this->getUrl('login', $surveyId, ['lang' => $sLanguage, 'secretsent' => 1]);
+										$this->redirectTo($url);
+									}
+								}
+								$registerform_vars['errors'][] = $this->getTranslator()->translate('Something went wrong trying to send you a confirmation link - please try again later or contact us if this error does not disappear.');
+							}
+							else
+							{
+								$this->confirmUser($user);
+								$registerform_vars['notices'][] = $this->getTranslator()->translate('Your registration has been confirmed, you can log in now.');
+							}
+						}
+						else
+						{
+							$registerform_vars['errors'][] = $this->getTranslator()->translate('We could not find an account related to the email address %1$s. Please register first.', $registerform_vars['register_email']);
+							$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/registerForm.php', $registerform_vars, true);
+						}
+					}
+
+					if(empty($registerpage_vars['REGISTERFORM']))
+					{
+						$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/loginForm.php', $registerform_vars, true);
+					}
+
+					break;
 				case 'login' :
 					if($registerform_vars['form_submitted'])
 					{
 						// try to find user email address in user database table
 						if($user = $this->getUserByEmail($registerform_vars['register_email'], $surveyId))
 						{
-							if($user->login($registerform_vars['register_password']))
+							if($user->sent == 'N')
+							{
+								$registerform_vars['errors'][] = $this->getTranslator()->translate(
+									'Sorry, you have to confirm your registration before you can login. Please check your mailbox for our confirmation email. If you did not receive any email from us, check your spam folder too. If you want us to resend you the confirmation email, <a href="%s">click here</a>.',
+									$this->getUrl('send_confirmation', $surveyId, ['lang' => $sLanguage, 'register_email' => $registerform_vars['register_email']])
+								);
+							}
+							else if(!empty($user->blacklisted))
+							{
+								$registerform_vars['errors'][] = $this->getTranslator()->translate('Sorry, you have been blacklisted from this survey.');
+							}
+							else if($user->login($registerform_vars['register_password']))
 							{
 								if($sToken = $user->getToken())
 								{
@@ -1020,6 +1131,10 @@ class OsatLogin extends Osat {
 					{
 						$registerform_vars['notices'][] = $this->getTranslator()->translate('Your password has been reset. Try to log in again. If you still have problems to login contact us!');
 					}
+					else if((bool) Yii::app()->request->getParam('secretsent', null))
+					{
+						$registerform_vars['notices'][] = $this->getTranslator()->translate('We have send you a link to confirm your registration - check your mailbox and follow the link. Note that this link will expire tomorrow midnight.');
+					}
 
 					if(empty($registerpage_vars['REGISTERFORM']))
 					{
@@ -1059,6 +1174,13 @@ class OsatLogin extends Osat {
 			ob_flush();
 			App()->end();
 		}
+	}
+
+	protected function confirmUser(OsatUser $user)
+	{
+		$user->sent = date('Y-m-d H:i', time());
+		$user->save();
+		return true;
 	}
 
 
@@ -1268,6 +1390,35 @@ class OsatLogin extends Osat {
 							) . "\n\n" .
 							$this->getTranslator()->translate('Note that this link will expire tomorrow midnight.') . "\n\n" .
 							$this->getTranslator()->translate('If you don\'t want to reset your password you can ignore this email.');
+
+        $sFrom = "{$aSurveyInfo['adminname']} <{$aSurveyInfo['adminemail']}>";
+        $sBounce = getBounceEmail($surveyId);
+        $sTo = $email;
+        $sitename =  Yii::app()->getConfig('sitename');
+
+        return SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename, false, $sBounce, null);
+    }
+
+	protected function sendDoubleOptInEmail($email, $secret, $surveyId, $sLanguage)
+	{
+        if(!($aSurveyInfo = getSurveyInfo($surveyId, $sLanguage)) || empty($email) || empty($secret))
+        {
+            return false;
+        }
+
+		$aMail['subject'] = $this->getTranslator()->translate('Your registration for »%s«', $aSurveyInfo['surveyls_title']);
+        $aMail['message'] = $this->getTranslator()->translate('We received your registration for our survey - to confirm you have to follow the link:') . "\n\n" .
+							App()->createAbsoluteUrl(
+								"/survey/index/sid/{$surveyId}", [
+									'action' => 'register',
+									'function' => 'confirm',
+									'lang' => $sLanguage,
+									'secret' => base64_encode($secret)
+								],
+								(!empty($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : 'http')
+							) . "\n\n" .
+							$this->getTranslator()->translate('Note that this link will expire tomorrow midnight.') . "\n\n" .
+							$this->getTranslator()->translate('If you don\'t want to proceed you can ignore this email.');
 
         $sFrom = "{$aSurveyInfo['adminname']} <{$aSurveyInfo['adminemail']}>";
         $sBounce = getBounceEmail($surveyId);

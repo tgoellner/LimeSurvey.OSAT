@@ -11,6 +11,8 @@ class OsatUser
         'lastname',
         'email',
         'language',
+        'blacklisted',
+        'sent',
         'blacklisted'
     ];
 
