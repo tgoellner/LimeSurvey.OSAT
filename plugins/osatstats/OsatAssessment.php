@@ -36,7 +36,6 @@ class OsatAssessment
         $this->sLanguage = empty($attributes['sLanguage']) ? App()->language : $attributes['sLanguage'];
         $this->requestedFilter = empty($attributes['filter']) || !is_array($attributes['filter']) ? [] : $attributes['filter'];
 
-        $this->exactMatch = empty($attributes['exactMatch']) || !((bool) $attributes['exactMatch']);
         $this->thisCountsInAverage = empty($attributes['thisCountsInAverage']) || !((bool) $attributes['thisCountsInAverage']);
 
         $this->init();
@@ -180,7 +179,7 @@ class OsatAssessment
 
     protected function getTokenCount()
     {
-        return $this->tokenCount + ($this->thisCountsInAverage ? 1 : 0);
+        return $this->tokenCount + ($this->_thisCountsInAverage() ? 1 : 0);
     }
 
     protected function initTokens()
@@ -192,9 +191,6 @@ class OsatAssessment
             return false;
         }
         $this->tokenData = $tokenData;
-
-        $answered = [];
-        $unanswered = [];
 
         if(!($this->getScores()))
         {
@@ -217,13 +213,10 @@ class OsatAssessment
                 $gid = preg_replace('/^\d+X(\d+)X\d+$/', "$1", $field);
                 $qid = preg_replace('/^\d+X\d+X(\d+)$/', "$1", $field);
 
-                if($this->exactMatch && ($value === null || $value === ''))
+                if($value === null || $value === '')
                 {
-                    $unanswered[] = $field;
                     continue;
                 }
-
-                $answered[] = $field;
 
                 $value = $this->getScoreForValue($field, $value);
 
@@ -257,14 +250,49 @@ class OsatAssessment
         }
         unset($field, $value, $query, $rows);
 
+        if(!empty($this->questions))
+        {
+            $query = "SELECT qid, gid, title FROM {{questions}} WHERE `qid` IN (" . join(", ", array_keys($this->questions)) . ")";
+            $rows = Yii::app()->db->createCommand($query)->query()->readAll();
+
+            if(!empty($rows))
+            {
+                foreach($rows as $row)
+                {
+                    $qid = $row['qid'];
+                    $gid = $row['gid'];
+                    $add = ['group' => 'a' . $row['gid'], 'question' => 'q' . $row['qid']];
+                    preg_match('/^(a[0-9]{1,})(q[0-9]{1,})/', $row['title'], $match);
+                    if(!empty($match))
+                    {
+                        $add['group'] = $match[1];
+                        $add['question'] = $match[2];
+                    }
+
+                    $this->questions[$qid]['code'] = $add['group'] . $add['question'];
+                    $this->groups[$gid]['code'] = $add['group'];
+
+                    unset($qid, $gid, $add, $match);
+                }
+                unset($row);
+            }
+            unset($rows, $query);
+        }
+
+        return true;
+    }
+
+    protected function initAverages()
+    {
+        $groups = [];
+        $questions = [];
+        $total = 0;
+
         $filter = $this->getActiveFilter();
 
-        // and now the answers of all the other tokens matching the answers of the current one (only )
         $query = "SELECT
             s.token,
-            t.completed,
-            " . join(", ", $answered) .
-            (!empty($unanswered) && empty($filter) ? ", CONCAT(" . join(", ", $unanswered) . ") AS empty" : "") . "
+            t.completed
         FROM
             {{survey_" . $this->surveyId . "}} s
         LEFT JOIN({{tokens_" . $this->surveyId . "}} t) ON (t.token = s.token)
@@ -280,8 +308,7 @@ class OsatAssessment
             }
         }
 
-        $query.= (!empty($unanswered && empty($filter)) ? " HAVING (empty = '' OR empty IS NULL)" : "") . "
-        ORDER BY t.completed ASC";
+        $query.= " ORDER BY t.completed ASC";
 
         unset($answered, $unanswered);
 
@@ -290,73 +317,126 @@ class OsatAssessment
 
         if(!empty($this->tokenCount))
         {
-            // other tokens found, let's count their results!
-            while($row = array_shift($rows))
+            foreach($rows as $row)
             {
-                foreach($row as $field => $value)
+                $tokenAssessment = new static([
+                    'surveyId' => $this->surveyId,
+                    'sToken' => $row['token'],
+                    'sLanguage' => $this->sLanguage
+                ]);
+
+                if(is_object($tokenAssessment))
                 {
-                    if(preg_match('/^\d+X\d+X\d+$/', $field))
+                    // totals
+                    $total+= $tokenAssessment->getTotal();
+
+                    // groups
+                    $tokenGroups = $tokenAssessment->getGroups();
+                    if(!empty($tokenGroups))
                     {
-                        $gid = preg_replace('/^\d+X(\d+)X\d+$/', "$1", $field);
-                        $qid = preg_replace('/^\d+X\d+X(\d+)$/', "$1", $field);
-
-                        $value = $this->getScoreForValue($field, $value);
-                        if(isset($this->questions[$qid]))
+                        foreach($tokenGroups as $gid => $group)
                         {
-                            $this->questions[$qid]['average']+= $value;
-
-                            if(isset($this->groups[$gid]))
+                            $group_id = $group['code'];
+                            if(!isset($groups[$group_id]))
                             {
-                                $this->groups[$gid]['average']+= $value;
+                                $groups[$group_id] = 0;
                             }
-                            $this->average+= $value;
+                            $groups[$group_id]+= $tokenAssessment->getGroupTotal($gid);
                         }
-
-                        unset($gid, $qid);
                     }
+                    unset($tokenGroups, $gid, $group, $group_id);
+
+                    // questions
+                    $tokenQuestions = $tokenAssessment->getQuestions();
+                    if(!empty($tokenQuestions))
+                    {
+                        foreach($tokenQuestions as $qid => $question)
+                        {
+                            $question_id = $question['code'];
+                            if(!isset($questions[$question_id]))
+                            {
+                                $questions[$question_id] = 0;
+                            }
+                            $questions[$question_id]+= $tokenAssessment->getQuestionTotal($qid);
+                        }
+                    }
+                    unset($tokenQuestions, $qid, $question, $question_id);
                 }
-                unset($field, $value);
+                unset($tokenAssessment);
             }
-            unset($row, $rows, $query);
+            unset($row);
         }
+        unset($rows, $query, $filter);
 
-        // now caluclate averages for questions
-        foreach($this->questions as $id => &$q)
+        // now calculate averages for the survey
+        if($this->_thisCountsInAverage())
         {
-            if($this->thisCountsInAverage)
-            {
-                $q['average'] = ($q['average'] + $q['total']) / $this->getTokenCount();
-            }
-            else if($this->getTokenCount())
-            {
-                $q['average']/= $this->getTokenCount();
-            }
-        }
-
-        // now caluclate averages for groups
-        foreach($this->groups as &$g)
-        {
-            if($this->thisCountsInAverage)
-            {
-                $g['average'] = ($g['average'] + $g['total']) / $this->getTokenCount();
-            }
-            else if($this->getTokenCount())
-            {
-                $g['average']/= $this->getTokenCount();
-            }
-        }
-
-        // and for the survey
-        if($this->thisCountsInAverage)
-        {
-            $this->average = ($this->average + $this->total) / $this->getTokenCount();
+            $this->average = ($total + $this->getTotal()) / $this->getTokenCount();
         }
         else if($this->getTokenCount())
         {
-            $this->average/= $this->getTokenCount();
+            $this->average = $total / $this->getTokenCount();
         }
+        unset($total);
+
+        // now calculate averages for the groups
+        foreach($this->groups as $gid => &$g)
+        {
+            $av = isset($groups[$g['code']]) ? $groups[$g['code']] : 0;
+
+            if($this->_thisCountsInAverage())
+            {
+                $g['average'] = ($av + $this->getGroupTotal($gid)) / $this->getTokenCount();
+            }
+            else if($this->getTokenCount())
+            {
+                $g['average'] = $av / $this->getTokenCount();
+            }
+        }
+        unset($gid, $av, $groups);
+
+        // now calculate averages for questions
+        foreach($this->questions as $qid => &$q)
+        {
+            $av = isset($questions[$q['code']]) ? $questions[$q['code']] : 0;
+            if($this->_thisCountsInAverage())
+            {
+                $q['average'] = ($av + $this->getQuestionTotal($qid)) / $this->getTokenCount();
+            }
+            else if($this->getTokenCount())
+            {
+                $q['average'] = $av / $this->getTokenCount();
+            }
+        }
+        unset($qid, $av, $questions);
 
         return true;
+    }
+
+    protected function _thisCountsInAverage()
+    {
+        if($this->thisCountsInAverage)
+        {
+            $counts = true;
+            $filter = $this->getActiveFilter();
+
+            if(!empty($filter))
+            {
+                foreach($filter as $field => $value)
+                {
+                    if(!in_array($this->tokenData->getAttribute($field), $value))
+                    {
+                        $counts = false;
+                        break;
+                    }
+                }
+            }
+            unset($filter, $field, $value);
+
+            return $counts;
+        }
+
+        return false;
     }
 
     protected function initMinMax()
@@ -482,9 +562,22 @@ class OsatAssessment
             $type = strtolower(preg_replace($reg, "$1", $name));
             $what = strtolower(preg_replace($reg, "$2", $name));
 
+            if($what == 'average')
+            {
+                // let's initialize averages...
+                $this->initAverages();
+            }
+
             if(empty($type) && isset($this->$what))
             {
-                return empty($this->max) ? 0 : ($this->$what / $this->max) * 100;
+                if($what == 'average')
+                {
+                    return $this->$what;
+                }
+                else
+                {
+                    return empty($this->max) ? 0 : ($this->$what / $this->max) * 100;
+                }
             }
             else
             {
@@ -495,7 +588,14 @@ class OsatAssessment
                     $data = $this->$type;
                     if(isset($data[$id][$what]))
                     {
-                        return empty($data[$id]['max']) ? 0 : ($data[$id][$what] / $data[$id]['max']) * 100;
+                        if($what == 'average')
+                        {
+                            return $data[$id][$what];
+                        }
+                        else
+                        {
+                            return empty($data[$id]['max']) ? 0 : ($data[$id][$what] / $data[$id]['max']) * 100;
+                        }
                     }
                 }
             }
