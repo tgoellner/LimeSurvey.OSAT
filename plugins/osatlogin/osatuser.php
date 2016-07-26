@@ -895,7 +895,7 @@ class OsatUser
 
         if($match)
         {
-            $attribute = $match[1];
+            $attribute = 'attribute_' . $match[1];
             $isEqual = $match[2] === '=';
             $value = $match[3];
 
@@ -903,7 +903,7 @@ class OsatUser
             {
                 return true;
             }
-            elseif((!$isEqual) && (!isset($this->$attribute) || $this->attribute != $value))
+            elseif((!$isEqual) && (!isset($this->$attribute) || $this->$attribute != $value))
             {
                 return true;
             }
@@ -930,7 +930,7 @@ class OsatUser
             $this->questions = [];
             $this->groups = [];
 
-            $groups = QuestionGroup::model()->getAllGroups(array("and", "sid=".$this->surveyId, "language='".$this->language."'"))->readAll();
+            $groups = QuestionGroup::model()->getAllGroups(array("and", "sid=".$this->surveyId, "language='".$this->language."'"), 'group_order asc')->readAll();
             if(!empty($groups))
             {
                 foreach($groups as $group)
@@ -940,7 +940,7 @@ class OsatUser
                         $this->groups[$group['gid']] = $group;
 
                         // get all Questions of that group
-                        $questions = Question::model()->getQuestions($group['sid'], $group['gid'], $group['language']);
+                        $questions = Question::model()->getQuestions($group['sid'], $group['gid'], $group['language'])->readAll();
                         if(!empty($questions))
                         {
                             foreach($questions as $question)

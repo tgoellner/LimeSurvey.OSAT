@@ -76,7 +76,7 @@ class OsatExpressions
         $GLOBALS = json_decode($this->GLOBALS, true);
     }
 
-    protected function getAvailableGroups($surveyId = null)
+    protected function _getAvailableGroups($surveyId = null)
     {
         if(!isset($this->availableGroups))
         {
@@ -138,7 +138,7 @@ class OsatExpressions
     	return $this->availableGroups;
     }
 
-    protected function getAvailableQuestions()
+    protected function _getAvailableQuestions()
     {
         if(!isset($this->availableQuestions))
         {
@@ -148,7 +148,7 @@ class OsatExpressions
         return $this->availableQuestions;
     }
 
-    protected function getAllQuestions()
+    protected function _getAllQuestions()
     {
         if(!isset($this->allQuestions))
         {
@@ -231,7 +231,7 @@ class OsatExpressions
     	{
     		$css[] = 'step-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
     	}
-    	if($t = $this->questionNo())
+    	if($t = $this->currentStep())
     	{
     		$css[] = 'question-no-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
     	}
@@ -305,9 +305,207 @@ class OsatExpressions
     	return '';
     }
 
-    public function questionNo()
+    protected function getAvailableGroups()
     {
-        if(!isset($this->questionNo))
+        if(!isset($this->availableGroups))
+        {
+            if(class_exists('OsatUser'))
+            {
+                if($user = OsatUser::getUserFromSession())
+                {
+                    $this->availableGroups = [];
+
+                    if(($groups = $user->getGroups()) !== null)
+                    {
+                        $this->availableGroups = $groups;
+                    }
+                }
+            }
+
+            if(!isset($this->availableGroups))
+            {
+                $this->availableGroups = [];
+                $grouplist = $this->getSurveySession('grouplist');
+
+                if(!empty($grouplist))
+                {
+                    $relevanceStatus = $this->getSurveySession('relevanceStatus');
+
+                    foreach($grouplist as $i => $group)
+                    {
+                        if(!is_array($relevanceStatus) || !isset($relevanceStatus['G'.$i]) || !empty($relevanceStatus['G'.$i]))
+                        {
+                            $this->availableGroups[$group['gid']] = $group;
+                        }
+                    }
+                    unset($relevanceStatus, $i, $group);
+                }
+
+                unset($grouplist);
+            }
+        }
+
+        return $this->availableGroups;
+    }
+
+    public function totalGroups()
+    {
+        return count($this->getAvailableGroups());
+    }
+
+    public function currentGroup()
+    {
+        if(!isset($this->currentGroup))
+        {
+            $this->currentGroup = 0;
+            $totalGroups = $this->getAvailableGroups();
+            $currentStep = $this->getCurrentStepInfo();
+
+            if(!empty($totalGroups) && !empty($currentStep))
+            {
+                $this->currentGroup = 1;
+                foreach(array_keys($totalGroups) as $i => $gid)
+                {
+                    if($currentStep['gid'] == $gid)
+                    {
+                        $this->currentGroup+= $i;
+                        break;
+                    }
+                }
+                unset($i, $gid);
+            }
+            unset($totalGroups, $currentStep);
+        }
+
+        return $this->currentGroup;
+    }
+
+    public function moveprevbutton()
+    {
+        return $this->currentStep() > 1 ? '<button type="submit" id="moveprevbtn" value="moveprev" name="moveprev" accesskey="p" class="submit button btn btn-lg btn-default">'.gT('Previous').'</button>' : '';
+    }
+
+    public function movenextbutton()
+    {
+        return '<button type="submit" id="movenextbtn" value="movenext" name="movenext" accesskey="n" class="submit button btn btn-primary btn-lg ">'.gT($this->currentStep() >= $this->totalSteps() ? 'Submit' : 'Next').'</button>';
+    }
+
+    public function questionIndexMenu()
+    {
+        // Button will be shown inside the form. Not handled by replacement.
+        $htmlButtons = array();
+        $html = '';
+        $html .=  "\n\n<!-- PRESENT THE INDEX MENU (full) -->\n";
+        $html .=  CHtml::openTag('nav', array('id' => 'index-menu', 'class'=>'dropdown index-menu-incremental-full'));
+        $html .=  CHtml::link(gT("Question index").'&nbsp;<span class="caret"></span>', array('#'), array('class'=>'dropdown-toggle', 'data-toggle'=>"dropdown", 'role'=>"button", 'aria-haspopup'=>"true", 'aria-expanded'=>"false"));
+        $html .=  CHtml::openTag('ul', array('class'=>'dropdown-menu'));
+
+        $counter = 0;
+
+        $stepIndex = LimeExpressionManager::GetStepIndexInfo();
+        $currentStep = $this->getSurveySession('step');
+        $currentStep = !empty($currentStep) ? $currentStep - 1 : null;
+        $availableGroups = [];
+        $currentGroup = null;
+        foreach($stepIndex as $step => $stepInfo)
+        {
+            $availableGroups[] = $stepInfo['gid'];
+            if($currentStep != null && $currentStep == $step)
+            {
+                $currentGroup = $stepInfo['gid'];
+            }
+        }
+        $availableGroups = array_unique($availableGroups);
+        unset($step, $stepInfo);
+
+        foreach ($this->getAvailableGroups() as $gid => $group)
+        {
+            $counter++;
+
+            $li_css = [
+                'group-' . $group['gid'],
+                'group-step-' . $counter
+            ];
+
+            if($counter == $this->currentGroup())
+            {
+                $li_css[] = 'current';
+                $li_css[] = 'active';
+            }
+
+            if (!in_array('active', $li_css) && !in_array($group['gid'], $availableGroups))
+            {
+                $li_css[] = 'disabled';
+            }
+
+            $classes = ' linkToButton ';
+
+            $html .= CHtml::openTag('li', array('class'=>join(' ', $li_css)));
+            $linktxt = '<span class="count">' . str_pad($counter, 2, '0', STR_PAD_LEFT) . '</span> <span class="name">' . $group['group_name'] . '</span>';
+            if(in_array('disabled', $li_css))
+            {
+                $html .=  '<span class="' . $classes . '">' . $linktxt. '</span>';
+            }
+            else
+            {
+                $html .=  CHtml::link($linktxt, array('#'), array('class'=>$classes, 'data-button-to-click'=>'#button-'.$group['gid'], ));
+            }
+            $html .= CHtml::closeTag('li');
+        }
+
+        $html .= CHtml::closeTag('ul');
+        $html .= CHtml::closeTag('nav');
+
+        return $html;
+    }
+
+    public function percentcomplete()
+    {
+        global $thissurvey;
+        $currentstep = $this->currentStep();
+        $total = $this->totalSteps();
+
+        Yii::app()->getClientScript()->registerCssFile(Yii::app()->getConfig('publicstyleurl') . 'lime-progress.css');
+        $size = intval(($currentstep-1)/$total*100);
+
+        $graph='
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="'.$size.'" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: '.$size.'%;">
+                '.$size.'%
+            </div>
+        </div>';
+
+        return $graph;
+    }
+
+    public function totalSteps()
+    {
+        if(!isset($this->totalSteps))
+        {
+            if(class_exists('OsatUser'))
+            {
+                if($user = OsatUser::getUserFromSession())
+                {
+                    $this->totalSteps = 0;
+
+                    if(($questions = $user->getQuestions()) !== null)
+                    {
+                        $this->totalSteps = count($questions);
+                    }
+                }
+            }
+
+            if(!isset($this->totalSteps))
+            {
+                $this->totalSteps = $this->getSurveySession('totalsteps');
+            }
+        }
+        return $this->totalSteps;
+    }
+
+    public function currentStep()
+    {
+        if(!isset($this->currentStep))
         {
             if(class_exists('OsatUser'))
             {
@@ -328,7 +526,7 @@ class OsatExpressions
 
                                     if(array_search($currentQuestion, $questions) !== false)
                                     {
-                                        $this->questionNo = array_search($currentQuestion, $questions) + 1;
+                                        $this->currentStep = array_search($currentQuestion, $questions) + 1;
                                     }
                                 }
                             }
@@ -337,9 +535,9 @@ class OsatExpressions
                 }
             }
 
-            if(!isset($this->questionNo))
+            if(!isset($this->currentStep))
             {
-                $this->questionNo = 0;
+                $this->currentStep = 0;
 
                 if($stepIndex = $this->getCurrentStepInfo())
                 {
@@ -349,13 +547,13 @@ class OsatExpressions
                     {
                         if(isset($question['qcode']) && $question['qcode'] == $this->questionCode())
                         {
-                            $this->questionNo = $i+1;
+                            $this->currentStep = $i+1;
                         }
                     }
                 }
             }
         }
-        return !empty($this->questionNo) ? $this->questionNo : '';
+        return !empty($this->currentStep) ? $this->currentStep : '';
     }
 
     public function questionCode()
