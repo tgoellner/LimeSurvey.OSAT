@@ -227,10 +227,6 @@ class OsatExpressions
             $css[] = $osatbodycss;
         }
 
-    	if($t = $this->stepIndex())
-    	{
-    		$css[] = 'step-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
-    	}
     	if($t = $this->currentStep())
     	{
     		$css[] = 'question-no-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
@@ -239,7 +235,7 @@ class OsatExpressions
     	{
     		$css[] = 'question-code-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
     	}
-    	if($t = $this->groupNo())
+    	if($t = $this->currentGroup())
     	{
     		$css[] = 'group-no-' . preg_replace('/[^a-z0-9\_\-]/', '', $t);
     	}
