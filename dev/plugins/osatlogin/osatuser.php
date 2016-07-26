@@ -889,48 +889,74 @@ class OsatUser
         return count($this->getMissingExtraAttributes()) > 0;
     }
 
+    protected function matchesRelevance($relevance)
+    {
+        preg_match('/TOKEN:ATTRIBUTE_([0-9]+) (!|=)= "([^"]+)"/', $relevance, $match);
+
+        if($match)
+        {
+            $attribute = $match[1];
+            $isEqual = $match[2] === '=';
+            $value = $match[3];
+
+            if($isEqual && isset($this->$attribute) && $this->$attribute == $value)
+            {
+                return true;
+            }
+            elseif((!$isEqual) && (!isset($this->$attribute) || $this->attribute != $value))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getGroups()
+    {
+        $this->getQuestions();
+        return $this->groups;
+    }
+
+
     public function getQuestions()
     {
         if(!is_array($this->questions))
         {
             $this->questions = [];
+            $this->groups = [];
 
-            $questions = Question::model()->getQuestionsWithSubQuestions($this->surveyId, $this->language);
-            if(!empty($questions))
+            $groups = QuestionGroup::model()->getAllGroups(array("and", "sid=".$this->surveyId, "language='".$this->language."'"))->readAll();
+            if(!empty($groups))
             {
-                foreach($questions as $question)
+                foreach($groups as $group)
                 {
-                    $qid = $question['sid'] . 'X' . $question['gid'] . "X" . $question['qid'];
-                    if($question['relevance'] == '1')
+                    if($this->matchesRelevance($group['grelevance']))
                     {
-                        $this->questions[$qid] = null;
-                    }
-                    else if(preg_match('/TOKEN:ATTRIBUTE_([0-9]+) == "([^"]+)"/',$question['relevance']))
-                    {
-                        $attribute = preg_replace('/.*ATTRIBUTE_([0-9]+) ==.*/',"attribute_$1", $question['relevance']);
-                        $value = preg_replace('/.*TOKEN:ATTRIBUTE_([0-9]+) == "([^"]+).*/',"$2", $question['relevance']);
-                        if(!isset($this->$attribute) || ($this->$attribute == $value))
+                        $this->groups[$group['gid']] = $group;
+
+                        // get all Questions of that group
+                        $questions = Question::model()->getQuestions($group['sid'], $group['gid'], $group['language']);
+                        if(!empty($questions))
                         {
-                            $this->questions[$qid] = null;
+                            foreach($questions as $question)
+                            {
+                                $qid = $question['sid'] . 'X' . $question['gid'] . "X" . $question['qid'];
+                                if($this->matchesRelevance($question['relevance']))
+                                {
+                                    $this->questions[$qid] = null;
+                                }
+                            }
                         }
-                        unset($attribute, $value);
-                    }
-                    else if(preg_match('/TOKEN:ATTRIBUTE_([0-9]+) != "([^"]+)"/',$question['relevance']))
-                    {
-                        $attribute = preg_replace('/.*ATTRIBUTE_([0-9]+) !=.*/',"attribute_$1", $question['relevance']);
-                        $value = preg_replace('/.*TOKEN:ATTRIBUTE_([0-9]+) != "([^"]+).*/',"$2", $question['relevance']);
-                        if(!isset($this->$attribute) || ($this->$attribute != $value))
-                        {
-                            $this->questions[$qid] = null;
-                        }
-                        unset($attribute, $value);
                     }
                 }
-                unset($question);
             }
-            unset($questions);
 
-            if(tableExists("{{survey_{$this->surveyId}}}"))
+            if(!empty($this->questions) && tableExists("{{survey_{$this->surveyId}}}"))
             {
                 $query = "SELECT * FROM `{{survey_{$this->surveyId}}}` WHERE `token` = '{$this->token}'";
                 $rows = Yii::app()->db->createCommand($query)->query()->readAll();
