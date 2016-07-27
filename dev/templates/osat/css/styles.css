@@ -2447,7 +2447,7 @@ input[type=button] {
   box-sizing: border-box;
   display: inline-block;
   padding: 10px;
-  min-width: 196.66666667px;
+  min-width: 233.33333333px;
   max-width: 100%;
   min-height: 20px;
   text-align: center;
@@ -2875,7 +2875,7 @@ body *:focus {
   border: none !important;
 }
 .center {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -2896,7 +2896,7 @@ body *:focus {
   }
 }
 .center-min {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -2958,7 +2958,7 @@ abbr:focus {
   color: #ff6479;
 }
 .outerframe {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -2991,7 +2991,7 @@ abbr:focus {
   }
 }
 .outerframe > .row {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -3598,7 +3598,7 @@ html body {
   .question-index {
     position: absolute;
     left: 0;
-    max-width: 263px;
+    max-width: 373px;
     padding: 20px;
     padding-top: 10px;
     background-color: #fff;
@@ -3777,7 +3777,7 @@ html body {
   transform: rotate(0deg);
 }
 .question-container .col-sm-12 {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -3909,7 +3909,7 @@ html body {
   color: #333;
 }
 .question--navigator {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -3934,7 +3934,7 @@ html body {
   display: none;
 }
 .question--navigator > .row {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -4462,7 +4462,7 @@ body.survey-is-just-completed .page-footer {
   margin-top: -40px;
 }
 .osatstats-table {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -4483,7 +4483,7 @@ body.survey-is-just-completed .page-footer {
   }
 }
 .osatstats-table--wrapper {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -4509,7 +4509,7 @@ body.survey-is-just-completed .page-footer {
 }
 .osatstats-table--filter {
   text-align: center;
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -5611,7 +5611,7 @@ tfoot .osatstats-table--cell.is--label {
   transform-origin: 50% 50%;
 }
 .osat-feedback .inner {
-  max-width: 1180px;
+  max-width: 1400px;
   padding: 0 10px;
   display: block;
   position: relative;
@@ -5829,6 +5829,9 @@ tfoot .osatstats-table--cell.is--label {
   html body {
     padding-bottom: 0;
     min-height: none;
+    margin-left: 2cm;
+    margin-right: 2cm;
+    width: auto;
   }
   .page-footer {
     position: relative;
@@ -5836,6 +5839,14 @@ tfoot .osatstats-table--cell.is--label {
     bottom: auto;
     left: auto;
     height: auto;
+  }
+  .osatstats-table,
+  .page-footer {
+    page-break-inside: avoid;
+  }
+  @page {
+    margin-top: 2cm;
+    margin-bottom: 2cm;
   }
 }
 /*# sourceMappingURL=./styles.css.map */

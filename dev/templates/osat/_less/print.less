@@ -146,6 +146,9 @@
         body {
             padding-bottom: 0;
             min-height: none;
+            margin-left: 2cm;
+            margin-right: 2cm;
+            width: auto;
         }
     }
 
@@ -155,5 +158,14 @@
         bottom: auto;
         left: auto;
         height: auto;
+    }
+
+    .osatstats-table,
+    .page-footer {
+        page-break-inside: avoid;
+    }
+    @page {
+        margin-top: 2cm;
+        margin-bottom: 2cm;
     }
 }
