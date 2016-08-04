@@ -2917,6 +2917,11 @@ body *:focus {
     padding: 0 20px;
   }
 }
+@media all and (min-width: 1400px) {
+  .center-min {
+    max-width: 750px;
+  }
+}
 .center .center-min {
   padding: 0;
 }
@@ -3012,6 +3017,11 @@ abbr:focus {
 @media all and (min-width: 640px) {
   .outerframe > .row {
     padding: 0 20px;
+  }
+}
+@media all and (min-width: 1400px) {
+  .outerframe > .row {
+    max-width: 750px;
   }
 }
 .center .outerframe > .row {
@@ -3598,10 +3608,15 @@ html body {
   .question-index {
     position: absolute;
     left: 0;
-    max-width: 373px;
+    max-width: 260px;
     padding: 20px;
     padding-top: 10px;
     background-color: #fff;
+  }
+}
+@media all and (min-width: 1400px) {
+  .question-index {
+    max-width: 323px;
   }
 }
 .question-index .count,
@@ -3799,6 +3814,11 @@ html body {
     padding: 0 20px;
   }
 }
+@media all and (min-width: 1400px) {
+  .question-container .col-sm-12 {
+    max-width: 750px;
+  }
+}
 .center .question-container .col-sm-12 {
   padding: 0;
 }
@@ -3954,6 +3974,11 @@ html body {
 @media all and (min-width: 640px) {
   .question--navigator > .row {
     padding: 0 20px;
+  }
+}
+@media all and (min-width: 1400px) {
+  .question--navigator > .row {
+    max-width: 750px;
   }
 }
 .center .question--navigator > .row {
@@ -4504,6 +4529,11 @@ body.survey-is-just-completed .page-footer {
     padding: 0 20px;
   }
 }
+@media all and (min-width: 1400px) {
+  .osatstats-table--wrapper {
+    max-width: 750px;
+  }
+}
 .center .osatstats-table--wrapper {
   padding: 0;
 }
@@ -4528,6 +4558,11 @@ body.survey-is-just-completed .page-footer {
 @media all and (min-width: 640px) {
   .osatstats-table--filter {
     padding: 0 20px;
+  }
+}
+@media all and (min-width: 1400px) {
+  .osatstats-table--filter {
+    max-width: 750px;
   }
 }
 .center .osatstats-table--filter {
@@ -5630,6 +5665,11 @@ tfoot .osatstats-table--cell.is--label {
 @media all and (min-width: 640px) {
   .osat-feedback .inner {
     padding: 0 20px;
+  }
+}
+@media all and (min-width: 1400px) {
+  .osat-feedback .inner {
+    max-width: 750px;
   }
 }
 .center .osat-feedback .inner {

@@ -6,10 +6,14 @@
     @media @minwidth_xxl {
         position: absolute;
         left: 0;
-        max-width: (@max_width - @content_width - 4) / 2;
+        max-width: 260px;
         padding: @gutter_width;
         padding-top: @gutter;
         background-color: @color_white;
+    }
+
+    @media @minwidth_max {
+        max-width: (@max_width - @content_width - 4) / 2;
     }
 
     .count,

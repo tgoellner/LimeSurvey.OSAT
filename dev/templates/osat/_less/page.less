@@ -47,7 +47,10 @@ body {
 }
 .center-min {
 	.center();
-	max-width: @content_width;
+	max-width: @content_width - 100;
+	@media @minwidth_max {
+		max-width: @content_width;
+	}
 	.center & {
 		padding: 0;
 	}
