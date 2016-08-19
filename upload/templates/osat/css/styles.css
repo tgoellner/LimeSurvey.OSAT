@@ -3462,12 +3462,18 @@ html body {
   background-color: #7a4f96;
   background-image: url(../files/illustrations/group-01.svg);
 }
+.group-id-20 #group-0 .group--header {
+  background-image: url(../files/illustrations/group-01-b.svg);
+}
 #group-0 .group--header--title:before {
   content: "01";
 }
 #group-1 .group--header {
   background-color: #189947;
   background-image: url(../files/illustrations/group-02.svg);
+}
+.group-id-20 #group-1 .group--header {
+  background-image: url(../files/illustrations/group-02-b.svg);
 }
 #group-1 .group--header--title:before {
   content: "02";
@@ -3476,12 +3482,18 @@ html body {
   background-color: #c8abbc;
   background-image: url(../files/illustrations/group-03.svg);
 }
+.group-id-20 #group-2 .group--header {
+  background-image: url(../files/illustrations/group-03-b.svg);
+}
 #group-2 .group--header--title:before {
   content: "03";
 }
 #group-3 .group--header {
   background-color: #ff6479;
   background-image: url(../files/illustrations/group-04.svg);
+}
+.group-id-20 #group-3 .group--header {
+  background-image: url(../files/illustrations/group-04-b.svg);
 }
 #group-3 .group--header--title:before {
   content: "04";
@@ -3490,6 +3502,9 @@ html body {
   background-color: #92c1d3;
   background-image: url(../files/illustrations/group-05.svg);
 }
+.group-id-20 #group-4 .group--header {
+  background-image: url(../files/illustrations/group-05-b.svg);
+}
 #group-4 .group--header--title:before {
   content: "05";
 }
@@ -3497,12 +3512,18 @@ html body {
   background-color: #6bca9b;
   background-image: url(../files/illustrations/group-06.svg);
 }
+.group-id-20 #group-5 .group--header {
+  background-image: url(../files/illustrations/group-06-b.svg);
+}
 #group-5 .group--header--title:before {
   content: "06";
 }
 #group-6 .group--header {
   background-color: #e0c54b;
   background-image: url(../files/illustrations/group-07.svg);
+}
+.group-id-20 #group-6 .group--header {
+  background-image: url(../files/illustrations/group-07-b.svg);
 }
 #group-6 .group--header--title:before {
   content: "07";

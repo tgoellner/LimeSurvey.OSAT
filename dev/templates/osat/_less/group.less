@@ -29,6 +29,10 @@
             #group-@{c} & {
                 background-color: @color;
                 background-image: ~"url(../files/illustrations/group-0@{i}.svg)";
+                .group-id-20 & {
+                    // group7 is devided in two different groups - group-id-20 is group 7b
+                    background-image: ~"url(../files/illustrations/group-0@{i}-b.svg)";
+                }
                 &--title {
                     &:before {
                         content: "0@{i}";
@@ -39,7 +43,7 @@
         } .-;
         #group-5 & {
             background-image: ~"url(../files/illustrations/group-06.png)";
-        }    
+        }
 
 /*
         #group-0 & {
