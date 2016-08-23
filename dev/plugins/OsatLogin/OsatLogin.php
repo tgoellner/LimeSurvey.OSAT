@@ -22,6 +22,11 @@ class OsatLogin extends Osat {
             'label' => 'Use DoubleOptIn in registration',
             'default' => false
         ),
+		'display_optin' => array(
+            'type' => 'checkbox',
+            'label' => 'Display checkbox for users to confirm they can be contacted via email.',
+            'default' => true
+        ),
 	];
     protected $localeSettings = [
 		'translate' => [
@@ -450,6 +455,17 @@ class OsatLogin extends Osat {
 		{
 			if(count($attr = $user->getMissingExtraAttributes()))
 			{
+
+				$attr = [];
+				foreach($user->getAttributes() as $id => $options)
+				{
+					if($options['label'] != 'password' && $options['attribute_type']== 'TB')
+					{
+						$attr[$id] = $options;
+					}
+				}
+
+
 				// the registration is not completed yet, show attributes
 				$this->createRegisterPage([
 				   'missing_attributes' => $attr,
@@ -528,9 +544,27 @@ class OsatLogin extends Osat {
 		 			]);
 					$resetToken = true;
 				 }
-				 else
+				 /* elseif((Yii::app()->request->getParam('function', false) == 'extraattributes') && $surveyId && !empty($sToken))
 				 {
+					 $attr = [];
+					 foreach($user->getAttributes() as $id => $options)
+					 {
+						 if($options['label'] != 'password' && $options['attribute_type']== 'TB')
+			             {
+							 $attr[$id] = $options;
+						 }
+					 }
 
+					 $this->createRegisterPage([
+		 				'missing_attributes' => $attr,
+		 				'function' => 'extraattributes',
+		 				'surveyId' => $surveyId,
+		 				'sToken' => $sToken
+		 			]);
+					$resetToken = true;
+				} */
+				else
+				 {
 					 $this->isCompleted($user);
 					 $resetToken = true;
 				 }
@@ -585,14 +619,17 @@ class OsatLogin extends Osat {
 				'allow_password_reset' => true,
 				'require_terms_of_service' => true,
 				'register_termsaccepted' => false,
+				'display_optin' => (bool) $this->getSettings('display_optin'),
 				'form_submitted' => false,
 
 				'register_firstname' => '',
 				'register_lastname' => '',
+				'register_organisation' => '',
 				'register_email' => '',
 				'register_password' => '',
 				'register_password_confirm' => '',
 				'register_secret' => '',
+				'register_optin' => false,
 
 				'missing_attributes' => [],
 
@@ -606,6 +643,7 @@ class OsatLogin extends Osat {
 				'urlAction' => $this->getUrl(null, $surveyId, ['lang' => $sLanguage]),
 				'backUrl' => $this->getUrl('survey', $surveyId, ['lang' => $sLanguage]),
 				'bCaptcha' => function_exists("ImageCreate") && isCaptchaEnabled('registrationscreen', $aSurveyInfo['usecaptcha']),
+				'secret_sent' => (bool) Yii::app()->request->getParam('secretsent', false),
 
 				'errors' => []
 			];
@@ -677,7 +715,8 @@ class OsatLogin extends Osat {
 									{
 										// let's set up the valuas
 										$values = [
-											'surveyId' => $registerform_vars['surveyId']
+											'surveyId' => $registerform_vars['surveyId'],
+											'emailstatus' => !((bool) $this->getSettings('display_optin')) || !empty($registerform_vars['register_optin']) ? 'OK' : 'OptOut'
 										];
 
 										foreach($registerform_vars as $k => $v)
@@ -957,7 +996,6 @@ class OsatLogin extends Osat {
 								}
 							}
 
-
 							if(!empty($values) && empty($registerform_vars['errors']))
 							{
 								$user->fill($values);
@@ -1003,7 +1041,7 @@ class OsatLogin extends Osat {
 					if($secret = Yii::app()->request->getParam('secret', null))
 					{
 						$secret = base64_decode($secret);
-						if(!preg_match('/[^a-z0-9]/i', $secret))
+						if(!empty($secret))
 						{
 							if($user = OsatUser::findByForgotPasswordSecret($secret, $surveyId, $this->getTranslator()))
 							{

@@ -54,6 +54,83 @@ class OsatStats extends Osat {
 			http_response_code(404);
 			exit();
 		}
+
+		if(Yii::app()->request->getParam('action') == 'statspdf') {
+			if($html = $_POST['html'])
+			{
+				$html = urldecode($html);
+
+				if(!empty($html)) {
+				    if(!mb_check_encoding ($html, 'UTF-8' )) {
+					    $html = utf8_encode($html);
+					}
+
+					if(mb_check_encoding ($html, 'UTF-8' )) {
+
+						if($assessment = $this->getAssessment())
+						{
+							$this->createStatsPdf($html);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public function createStatsPdf($html)
+	{
+		// everything looks nice - create a PDF!
+
+		$options = [
+			'title' => 'Personal document',
+			'author' => Yii::app()->getConfig('sitename')
+		];
+
+		preg_match('/<h1>([^<]+)<\/h1>/', $html, $h1);
+		preg_match('/<h2>([^<]+)<\/h2>/', $html, $h2);
+
+		if($h1[1] && $h2[1])
+		{
+			$options['title'] = $h1[1] . ' ' . $h2[1];
+		}
+
+		require_once __DIR__ . '/mpdf/mpdf/mpdf.php';
+
+		$mpdf = new Mpdf();
+		$mpdf->setTitle($options['title']);
+		$mpdf->setAuthor($options['author']);
+
+		$mpdf->SetDisplayMode('fullpage');
+
+		// LOAD a stylesheet
+		$stylesheet = file_get_contents(__DIR__ . '/mpdf/style.css');
+
+		$html = '<htmlpagefooter name="myFooter" id="myFooter">' .
+				'<table width="100%" class="footer-table">' .
+					'<tr>' .
+						'<td width="30%" style="text-align: left;vertical-align: top;">' . $options['title'] . '</td>' .
+						'<td width="20%" style="text-align: right;vertical-align: top;">{PAGENO}</td>' .
+					'</tr>' .
+				'</table>' .
+				'</htmlpagefooter>' . $html;
+
+		$html.= $image;
+		$mpdf->SetWatermarkText('Personal document');
+		$mpdf->watermark_font = 'roboto';
+		$mpdf->watermarkTextAlpha = 0.1;
+		$mpdf->showWatermarkText = true;
+
+		$mpdf->WriteHTML($stylesheet,1);
+
+		$mpdf->WriteHTML($html);
+
+		$filename = preg_replace('/[^0-9a-z\_\-]/i', '_', $options['title']);
+		$filename = preg_replace('/_{2,}/', '_', $filename);
+		$filename = strtolower($filename);
+
+		$mpdf->Output($filename . '.pdf', 'I');
+
+		exit;
 	}
 
     public function beforeSurveyPageOsatLate()

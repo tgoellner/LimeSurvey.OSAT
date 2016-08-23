@@ -11,7 +11,7 @@ $(document).on(
 
             if(thishost != hrefhost)
             {
-                dialogue = $('#confirm-leave');
+                // dialogue = $('#confirm-leave');
             }
             else if(islogout)
             {

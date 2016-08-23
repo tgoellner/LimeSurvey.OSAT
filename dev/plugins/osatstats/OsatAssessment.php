@@ -103,6 +103,14 @@ class OsatAssessment
                 {
                     foreach($surveyInfo['attributedescriptions'] as $label => $options)
                     {
+                        // map to an existing attribute
+                        if(!empty($options['cpdbmap']) && ($gAttribute =  ParticipantAttributeName::model()->getAttribute($options['cpdbmap'])))
+                        {
+                            if($gAttribute['attribute_type'] != 'DD')
+                            {
+                                continue;
+                            }
+                        }
                         if($options['mandatory'] != 'Y')
                         {
                             continue;

@@ -14,6 +14,8 @@
             <?php echo nl2br(join("\n", $errors)); ?>
         </div><?php endif; ?>
 
+        <?php if(empty($secret_sent)): ?>
+
         <?php echo CHtml::form($urlAction,'post',array('id'=>'osatregister', 'role' => 'form')); ?>
             <input type="hidden" name="lang" value="<?php echo $sLanguage; ?>" id="register_lang" />
             <input type="hidden" name="function" value="login" />
@@ -33,5 +35,7 @@
                 <button type="submit" id="register" value="login" name="register" accesskey="n" class="submit btn btn-lg btn-primary">{{Log in}}</button>
             </div>
         <?php echo CHtml::endForm(); ?>
+
+    <?php endif; ?>
     </div>
 </div>

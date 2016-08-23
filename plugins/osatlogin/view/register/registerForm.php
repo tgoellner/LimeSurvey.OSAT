@@ -14,23 +14,23 @@
             <input type="hidden" name="lang" value="<?php echo $sLanguage; ?>" id="register_lang" />
             <input type="hidden" name="function" value="register" />
 
-            <div class='form-group'>
+            <div class="form-group">
                 <input aria-label="{{Email address}}" required type="email" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}" />
             </div>
 
-            <div class='form-group'>
+            <div class="form-group">
                 <input aria-label="{{First name}}" required type="text" name="register_firstname" value="<?php echo $register_firstname; ?>" class="form-control" placeholder="{{First name}}" />
             </div>
 
-            <div class='form-group'>
+            <div class="form-group">
                 <input aria-label="{{Last name}}" required type="text" name="register_lastname" value="<?php echo $register_lastname; ?>" class="form-control" placeholder="{{Last name}}" />
             </div>
 
-            <div class='form-group'>
+            <div class="form-group">
                 <input aria-label="{{Password}}" required type="password" name="register_password" class="form-control" placeholder="{{Password}}" />
             </div>
 
-            <div class='form-group'>
+            <div class="form-group">
                 <input aria-label="{{Confirm Password}}" required type="password" name="register_password_confirm" class="form-control" placeholder="{{Confirm Password}}" />
             </div>
 
@@ -38,15 +38,23 @@
                 * {{are obligatory fields}}
             </p>
 
-            <?php if(!empty($require_terms_of_service)): ?><div class="checkbox register--terms-of-service">
+            <?php if(!empty($display_optin)): ?><div class="form-group"><div class="checkbox register--optin">
+                <input type="checkbox" id="register_optin" name="register_optin" value="1" aria-describedby="register_optin_info"<?php echo (bool) $register_optin ? ' checked="checked"' : ''; ?> />
+                <label for="register_optin"></label>
+                <span id="register_optin_info">
+                    {{I agree that I may be contacted by e-mail for further information.}}
+                </span>
+            </div></div><?php endif; ?>
+
+            <?php if(!empty($require_terms_of_service)): ?><div class="form-group"><div class="checkbox register--terms-of-service">
                 <input type="checkbox" required id="register_termsaccepted" name="register_termsaccepted" value="1" aria-describedby="register_termsaccepted_info"<?php echo (bool) $register_termsaccepted ? ' checked="checked"' : ''; ?> />
                 <label for="register_termsaccepted"></label>
                 <span id="register_termsaccepted_info">
                     {{By clicking here you accept the <span data-toggle="modal" data-target="#terms-of-service">Terms of use</span> and the <span data-toggle="modal" data-target="#privacy-policy">Privacy Policy</span>|raw}}
                 </span>
-            </div><?php endif; ?>
+            </div></div><?php endif; ?>
 
-            <div class='form-group'>
+            <div class="form-group">
                 <button type="submit" id="register" value="register" name="register" accesskey="n" class="btn btn-lg btn-primary">{{Register}}</button>
             </div>
         <?php echo CHtml::endForm(); ?>

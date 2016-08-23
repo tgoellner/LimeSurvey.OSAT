@@ -9,8 +9,12 @@
 
 <!-- The following line includes jquery.js, jquery-ui.js, survey_runtime.js , template.js and needed specific js file for survey -->
 {TEMPLATEJS}
-<link rel="shortcut icon" href="{TEMPLATEURL}favicon.ico" />
+<link rel="shortcut icon" href="{TEMPLATEURL}favicon.png" />
 {GOOGLE_ANALYTICS_JAVASCRIPT}
+
+<script type="text/javascript">
+startPopups=[];
+</script>
 </head>
 <body class="default lang-{SURVEYLANGUAGE} {SURVEYFORMAT} {OSAT_PAGE_CSS}" id="osat" role="application">
     <header class="page-header">

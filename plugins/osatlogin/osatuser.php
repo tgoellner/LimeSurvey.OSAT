@@ -13,13 +13,14 @@ class OsatUser
         'language',
         'blacklisted',
         'sent',
-        'blacklisted'
+        'emailstatus'
     ];
 
     protected $validate = [
         'firstname' => 'required',
         'lastname' => 'required',
-        'email' => 'required|email|unique'
+        'email' => 'required|email|unique',
+        'organisation' => 'required'
     ];
 
     protected $original;
@@ -365,7 +366,7 @@ class OsatUser
                 $oToken->firstname = $attributes['firstname'];
                 $oToken->lastname = $attributes['lastname'];
                 $oToken->email = $attributes['email'];
-                $oToken->emailstatus = 'OK'; // should be changed when DoubleOptIn
+                $oToken->emailstatus = empty($attributes['emailstatus']) ? 'OK' : $attributes['emailstatus']; // should be changed when DoubleOptIn
                 $oToken->language = $sLanguage;
 
                 // get all attributes...
@@ -810,7 +811,7 @@ class OsatUser
         return $this->errors;
     }
 
-    protected function getAttributesByManatory($mandatory = true)
+    protected function getAttributesByMandatory($mandatory = true)
     {
         $attributes = [];
         $mandatory = (bool) $mandatory ? 'Y' : 'N';
@@ -829,12 +830,12 @@ class OsatUser
 
     public function getMandatoryAttributes()
     {
-        return $this->getAttributesByManatory(true);
+        return $this->getAttributesByMandatory(true);
     }
 
     public function getOptionalAttributes()
     {
-        return $this->getAttributesByManatory(false);
+        return $this->getAttributesByMandatory(false);
     }
 
 

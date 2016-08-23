@@ -18,6 +18,14 @@ var reposBalloons = function() {
         {
             $(el).attr('data-balloon-pos', null);
         }
+
+        $(el).on('click.osatballoon', function(e){
+            try {
+                e.preventDefault();
+            }
+            catch(ev) {}
+            return false;
+        })
     });
 };
 

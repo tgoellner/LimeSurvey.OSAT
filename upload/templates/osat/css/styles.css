@@ -4203,7 +4203,8 @@ body.register-login,
 body.register-logout,
 body.register-register,
 body.register-forgot-password,
-body.register-reset-password {
+body.register-reset-password,
+body.register-confirm {
   background: url(../files/illustrations/login.svg) no-repeat right bottom;
   background-attachment: fixed;
   background-size: auto 90%;
@@ -4213,7 +4214,8 @@ body.register-login .outerframe,
 body.register-logout .outerframe,
 body.register-register .outerframe,
 body.register-forgot-password .outerframe,
-body.register-reset-password .outerframe {
+body.register-reset-password .outerframe,
+body.register-confirm .outerframe {
   padding-top: 40px;
   padding-bottom: 120px;
 }
@@ -4269,14 +4271,17 @@ body.register-register {
 .register--error {
   margin-top: 20px;
 }
-.register--terms-of-service {
+.register--terms-of-service,
+.register--optin {
   padding-left: 40px;
   margin-top: 20px;
 }
-.register--terms-of-service input {
+.register--terms-of-service input,
+.register--optin input {
   position: absolute;
 }
-.register--terms-of-service label {
+.register--terms-of-service label,
+.register--optin label {
   position: absolute;
   margin-left: -20px;
   margin-top: 5px;

@@ -1,7 +1,7 @@
 <!-- The Login form //-->
 <div class="register" id="register-<?php echo $function; ?>">
     <div class="inner">
-        <h2 class="register--title">{{Save your results}}</h2>
+        <h2 class="register--title">{{Please confirm your personal data!}}</h2>
 
         <div class="register--text optional-attributes-text simple--text">
             {OPTIONAL_ATTRIBUTES_TEXT}
@@ -16,35 +16,45 @@
             <input type="hidden" name="lang" value="<?php echo $sLanguage; ?>" id="register_lang" />
             <input type="hidden" name="function" value="extraattributes" />
 
-            <div class='form-group'>
-                <input aria-label="{{Email address}}" required type="email" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}" />
+            <input aria-label="{{Email address}}" required type="hidden" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}" />
+
+            <div class="form-group-wrapper">
+                <p class="form-group--caption">
+                    {{First name}}*
+                </p>
+                <div class='form-group'>
+                    <input aria-label="{{First name}}" required type="text" name="register_firstname" value="<?php echo $register_firstname; ?>" class="form-control" placeholder="{{First name}}" />
+                </div>
             </div>
 
-            <div class='form-group'>
-                <input aria-label="{{First name}}" required type="text" name="register_firstname" value="<?php echo $register_firstname; ?>" class="form-control" placeholder="{{First name}}" />
+            <div class="form-group-wrapper">
+                <p class="form-group--caption">
+                    {{Last name}}*
+                </p>
+                <div class='form-group'>
+                    <input aria-label="{{Last name}}" required type="text" name="register_lastname" value="<?php echo $register_lastname; ?>" class="form-control" placeholder="{{Last name}}" />
+                </div>
             </div>
 
-            <div class='form-group'>
-                <input aria-label="{{Last name}}" required type="text" name="register_lastname" value="<?php echo $register_lastname; ?>" class="form-control" placeholder="{{Last name}}" />
-            </div>
-
-            <div class='form-group'>
+            <!-- div class='form-group'>
                 <input aria-label="{{Password}}" type="password" name="register_password" class="form-control" placeholder="{{Password}}" />
             </div>
 
             <div class='form-group'>
                 <input aria-label="{{Confirm Password}}" type="password" name="register_password_confirm" class="form-control" placeholder="{{Confirm Password}}" />
-            </div>
+            </div //-->
 
             <?php foreach($missing_attributes as $label => $options): ?>
                 <?php $n = 'register_' . $label; $value = isset($$n) ? $$n : $options['value']; unset($n); ?>
                 <?php $type = 'text'; if($options['attribute_type'] == 'DD') { $type = count($options['options']) > 3 ? 'select' : 'checkbox'; } ?>
 
+            <?php if($options['label'] == 'personaldataconfirmed'): ?>
+            <input aria-label="{{<?php echo $options['caption']; ?>}}" type="hidden" name="register_<?php echo $label; ?>" value="1" />
+            <?php else: ?>
             <div class="form-group-wrapper">
-                <?php if($type != 'text'): ?><p class="form-group--caption">
-                    <?php echo htmlspecialchars($options['caption']); ?>
-
-                </p><?php endif; ?>
+                <p class="form-group--caption">
+                    <?php echo htmlspecialchars($options['caption']); ?>*
+                </p>
                 <div class="form-group is-<?php echo $type; ?>">
                 <?php if($options['attribute_type'] == 'DD'): // a dropdown element ?>
                     <?php if($type == 'checkbox'): // just a view options? display a radio list ?>
@@ -78,6 +88,7 @@
                 <?php endif; ?>
                 </div>
             </div>
+            <?php endif; ?>
 
             <?php endforeach; ?>
 

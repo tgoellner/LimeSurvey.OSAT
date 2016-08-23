@@ -21,10 +21,9 @@
                 <?php $type = 'text'; if($options['attribute_type'] == 'DD') { $type = count($options['options']) > 3 ? 'select' : 'checkbox'; } ?>
 
             <div class="form-group-wrapper">
-                <?php if($type != 'text'): ?><p class="form-group--caption">
+                <p class="form-group--caption">
                     <?php echo htmlspecialchars($options['caption']); ?>
-
-                </p><?php endif; ?>
+                </p>
                 <div class="form-group is-<?php echo $type; ?>">
                 <?php if($options['attribute_type'] == 'DD'): // a dropdown element ?>
                     <?php if($type == 'checkbox'): // just a view options? display a radio list ?>
@@ -54,7 +53,7 @@
                     <?php endif; ?>
                 <?php else: ?>
 
-                    <input aria-label="{{<?php echo $options['caption']; ?>}}" required type="text" name="register_<?php echo $label; ?>" value="<?php echo htmlspecialchars($value); ?>" class="form-control" placeholder="{{<?php echo $options['caption']; ?>}}" />
+                    <input aria-label="{{<?php echo $options['caption']; ?>}}" required type="text" name="register_<?php echo $label; ?>" value="<?php echo htmlspecialchars($value); ?>" class="form-control" />
                 <?php endif; ?>
                 </div>
             </div>
