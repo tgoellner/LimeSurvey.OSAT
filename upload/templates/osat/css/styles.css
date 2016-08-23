@@ -3462,7 +3462,7 @@ html body {
   background-color: #7a4f96;
   background-image: url(../files/illustrations/group-01.svg);
 }
-.group-id-20 #group-0 .group--header {
+.group-id-21 #group-0 .group--header {
   background-image: url(../files/illustrations/group-01-b.svg);
 }
 #group-0 .group--header--title:before {
@@ -3472,7 +3472,7 @@ html body {
   background-color: #189947;
   background-image: url(../files/illustrations/group-02.svg);
 }
-.group-id-20 #group-1 .group--header {
+.group-id-21 #group-1 .group--header {
   background-image: url(../files/illustrations/group-02-b.svg);
 }
 #group-1 .group--header--title:before {
@@ -3482,7 +3482,7 @@ html body {
   background-color: #c8abbc;
   background-image: url(../files/illustrations/group-03.svg);
 }
-.group-id-20 #group-2 .group--header {
+.group-id-21 #group-2 .group--header {
   background-image: url(../files/illustrations/group-03-b.svg);
 }
 #group-2 .group--header--title:before {
@@ -3492,7 +3492,7 @@ html body {
   background-color: #ff6479;
   background-image: url(../files/illustrations/group-04.svg);
 }
-.group-id-20 #group-3 .group--header {
+.group-id-21 #group-3 .group--header {
   background-image: url(../files/illustrations/group-04-b.svg);
 }
 #group-3 .group--header--title:before {
@@ -3502,7 +3502,7 @@ html body {
   background-color: #92c1d3;
   background-image: url(../files/illustrations/group-05.svg);
 }
-.group-id-20 #group-4 .group--header {
+.group-id-21 #group-4 .group--header {
   background-image: url(../files/illustrations/group-05-b.svg);
 }
 #group-4 .group--header--title:before {
@@ -3512,7 +3512,7 @@ html body {
   background-color: #6bca9b;
   background-image: url(../files/illustrations/group-06.svg);
 }
-.group-id-20 #group-5 .group--header {
+.group-id-21 #group-5 .group--header {
   background-image: url(../files/illustrations/group-06-b.svg);
 }
 #group-5 .group--header--title:before {
@@ -3522,7 +3522,7 @@ html body {
   background-color: #e0c54b;
   background-image: url(../files/illustrations/group-07.svg);
 }
-.group-id-20 #group-6 .group--header {
+.group-id-21 #group-6 .group--header {
   background-image: url(../files/illustrations/group-07-b.svg);
 }
 #group-6 .group--header--title:before {
@@ -4645,6 +4645,13 @@ body.survey-is-just-completed .page-footer {
   max-width: 480px;
   margin: 0 auto;
   padding-bottom: 20px;
+}
+@media all and (min-width: 768px) {
+  .osatstats-table--filter form {
+    float: right;
+    width: 100%;
+    margin: 0;
+  }
 }
 .osatstats-table--filter .form-group {
   position: relative;
