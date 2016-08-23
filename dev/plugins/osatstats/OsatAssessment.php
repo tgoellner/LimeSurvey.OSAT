@@ -122,8 +122,9 @@ class OsatAssessment
                             continue;
                         }
 
+                        $minimum_found = 3;
                         // let's check if the attribute contains md5 or sha1 strings - we don't want to allow filtering against those!
-                        $query = "SELECT `$label`, COUNT(*) AS count FROM {{tokens_$this->surveyId}} WHERE $label NOT REGEXP '^[0-9a-f]{32}$' AND $label NOT REGEXP '^[0-9a-f]{40}$' AND $label <> '' GROUP BY $label ORDER BY $label ASC";
+                        $query = "SELECT `$label`, COUNT(*) AS count FROM {{tokens_$this->surveyId}} WHERE $label NOT REGEXP '^[0-9a-f]{32}$' AND $label NOT REGEXP '^[0-9a-f]{40}$' AND $label <> '' GROUP BY $label HAVING `count` >= $minimum_found ORDER BY $label ASC";
                         $rows = Yii::app()->db->createCommand($query)->query()->readAll();
                         if(empty($rows))
                         {
