@@ -3338,73 +3338,6 @@ html body {
   background-position: top center;
   background-repeat: no-repeat;
   background-size: auto 140px;
-  /*
-        #group-0 & {
-            .color(extra1, background);
-            background-image: url(../files/illustrations/group-01.png);
-            &--title {
-                &:before {
-                    content: "01";
-                }
-            }
-        }
-
-        #group-1 & {
-            .color(extra2, background);
-            background-image: url(../files/illustrations/group-02.png);
-            &--title {
-                &:before {
-                    content: "02";
-                }
-            }
-        }
-
-        #group-2 & {
-            .color(extra3, background);
-            background-image: url(../files/illustrations/group-03.png);
-            &--title {
-                &:before {
-                    content: "03";
-                }
-            }
-        }
-
-        #group-3 & {
-            .color(extra4, background);
-            &--title {
-                &:before {
-                    content: "04";
-                }
-            }
-        }
-
-        #group-4 & {
-            .color(extra5, background);
-            &--title {
-                &:before {
-                    content: "05";
-                }
-            }
-        }
-
-        #group-5 & {
-            .color(extra6, background);
-            &--title {
-                &:before {
-                    content: "06";
-                }
-            }
-        }
-
-        #group-6 & {
-            .color(extra7, background);
-            &--title {
-                &:before {
-                    content: "07";
-                }
-            }
-        }
-        */
 }
 @media all and (min-width: 640px) {
 }
@@ -3458,78 +3391,60 @@ html body {
     line-height: 1.14285714em;
   }
 }
-#group-0 .group--header {
+body.group-no-1 .group--header {
   background-color: #7a4f96;
   background-image: url(../files/illustrations/group-01.svg);
 }
-.group-id-21 #group-0 .group--header {
-  background-image: url(../files/illustrations/group-01-b.svg);
-}
-#group-0 .group--header--title:before {
+body.group-no-1 .group--header--title:before {
   content: "01";
 }
-#group-1 .group--header {
+body.group-no-2 .group--header {
   background-color: #189947;
   background-image: url(../files/illustrations/group-02.svg);
 }
-.group-id-21 #group-1 .group--header {
-  background-image: url(../files/illustrations/group-02-b.svg);
-}
-#group-1 .group--header--title:before {
+body.group-no-2 .group--header--title:before {
   content: "02";
 }
-#group-2 .group--header {
+body.group-no-3 .group--header {
   background-color: #c8abbc;
   background-image: url(../files/illustrations/group-03.svg);
 }
-.group-id-21 #group-2 .group--header {
-  background-image: url(../files/illustrations/group-03-b.svg);
-}
-#group-2 .group--header--title:before {
+body.group-no-3 .group--header--title:before {
   content: "03";
 }
-#group-3 .group--header {
+body.group-no-4 .group--header {
   background-color: #ff6479;
   background-image: url(../files/illustrations/group-04.svg);
 }
-.group-id-21 #group-3 .group--header {
-  background-image: url(../files/illustrations/group-04-b.svg);
-}
-#group-3 .group--header--title:before {
+body.group-no-4 .group--header--title:before {
   content: "04";
 }
-#group-4 .group--header {
+body.group-no-5 .group--header {
   background-color: #92c1d3;
   background-image: url(../files/illustrations/group-05.svg);
 }
-.group-id-21 #group-4 .group--header {
-  background-image: url(../files/illustrations/group-05-b.svg);
-}
-#group-4 .group--header--title:before {
+body.group-no-5 .group--header--title:before {
   content: "05";
 }
-#group-5 .group--header {
+body.group-no-6 .group--header {
   background-color: #6bca9b;
   background-image: url(../files/illustrations/group-06.svg);
 }
-.group-id-21 #group-5 .group--header {
-  background-image: url(../files/illustrations/group-06-b.svg);
-}
-#group-5 .group--header--title:before {
+body.group-no-6 .group--header--title:before {
   content: "06";
 }
-#group-6 .group--header {
+body.group-no-7 .group--header {
   background-color: #e0c54b;
   background-image: url(../files/illustrations/group-07.svg);
 }
-.group-id-21 #group-6 .group--header {
-  background-image: url(../files/illustrations/group-07-b.svg);
-}
-#group-6 .group--header--title:before {
+body.group-no-7 .group--header--title:before {
   content: "07";
 }
-#group-5 .group--header {
+body.group-no-6 .group--header {
   background-image: url(../files/illustrations/group-06.png);
+}
+body.group-no-7.group-id-21 .group--header {
+  background-image: url(../files/illustrations/group-07-b.svg);
 }
 .group--intro {
   padding-top: 10px;

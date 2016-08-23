@@ -21,18 +21,13 @@
                 display: block;
             }
         }
-
         .-(@i: 1) when (@i < 8) {
             @color:		~"@{color_extra@{i}}";
             @c: @i - 1;
 
-            #group-@{c} & {
+            body.group-no-@{i} & {
                 background-color: @color;
                 background-image: ~"url(../files/illustrations/group-0@{i}.svg)";
-                .group-id-21 & {
-                    // group7 is devided in two different groups - group-id-20 is group 7b
-                    background-image: ~"url(../files/illustrations/group-0@{i}-b.svg)";
-                }
                 &--title {
                     &:before {
                         content: "0@{i}";
@@ -41,77 +36,12 @@
             }
             .-((@i + 1));
         } .-;
-        #group-5 & {
+        body.group-no-6 & {
             background-image: ~"url(../files/illustrations/group-06.png)";
         }
-
-/*
-        #group-0 & {
-            .color(extra1, background);
-            background-image: url(../files/illustrations/group-01.png);
-            &--title {
-                &:before {
-                    content: "01";
-                }
-            }
+        body.group-no-7.group-id-21 & {
+            background-image: ~"url(../files/illustrations/group-07-b.svg)";
         }
-
-        #group-1 & {
-            .color(extra2, background);
-            background-image: url(../files/illustrations/group-02.png);
-            &--title {
-                &:before {
-                    content: "02";
-                }
-            }
-        }
-
-        #group-2 & {
-            .color(extra3, background);
-            background-image: url(../files/illustrations/group-03.png);
-            &--title {
-                &:before {
-                    content: "03";
-                }
-            }
-        }
-
-        #group-3 & {
-            .color(extra4, background);
-            &--title {
-                &:before {
-                    content: "04";
-                }
-            }
-        }
-
-        #group-4 & {
-            .color(extra5, background);
-            &--title {
-                &:before {
-                    content: "05";
-                }
-            }
-        }
-
-        #group-5 & {
-            .color(extra6, background);
-            &--title {
-                &:before {
-                    content: "06";
-                }
-            }
-        }
-
-        #group-6 & {
-            .color(extra7, background);
-            &--title {
-                &:before {
-                    content: "07";
-                }
-            }
-        }
-        */
     }
 
     &--intro {

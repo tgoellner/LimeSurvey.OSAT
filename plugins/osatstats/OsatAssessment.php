@@ -24,6 +24,9 @@ class OsatAssessment
 
     protected $questions;
 
+    protected $survey_assessment_by_percentage = false;
+    protected $group_assessments_by_percentage = false;
+
     public function __construct(array $attributes = [])
     {
         if(empty($attributes['surveyId']) || empty($attributes['sToken']))
@@ -37,6 +40,9 @@ class OsatAssessment
         $this->requestedFilter = empty($attributes['filter']) || !is_array($attributes['filter']) ? [] : $attributes['filter'];
 
         $this->thisCountsInAverage = empty($attributes['thisCountsInAverage']) || !((bool) $attributes['thisCountsInAverage']);
+
+        $this->survey_assessment_by_percentage = isset($attributes['survey_assessment_by_percentage']) && (bool) $attributes['survey_assessment_by_percentage'];
+        $this->group_assessment_by_percentage = isset($attributes['group_assessment_by_percentage']) && (bool) $attributes['group_assessment_by_percentage'];
 
         $this->init();
     }
@@ -646,9 +652,10 @@ class OsatAssessment
 
     protected function getAssessments($gid = null)
     {
+        $plugin =
         $assessments = [];
         $scope = "scope = 'T'";
-        $total = $this->total;
+        $total = $this->survey_assessment_by_percentage ? $this->getTotal() : $this->total;
 
         if($gid === null)
         {
@@ -668,7 +675,7 @@ class OsatAssessment
                 }
 
                 $scope = "scope = 'G' AND gid = $gid";
-                $total = $this->groups[$gid]['total'];
+                $total = $this->group_assessment_by_percentage ? $this->getGroupTotal($gid) : $this->groups[$gid]['total'];
             }
         }
 
@@ -680,7 +687,7 @@ class OsatAssessment
         $languages = array_unique([$this->sLanguage, $this->surveyLanguage]);
 
         $query = "SELECT
-            id, name, message
+            id, name, message, relevance
         FROM
             {{assessments}}
         WHERE
@@ -695,11 +702,43 @@ class OsatAssessment
             language IN('" . join("', '", $languages) . "')
         ORDER BY FIELD(language, '" . join("', '", $languages) . "')";
 
+        $user = null;
+
+
         $rows = Yii::app()->db->createCommand($query)->query()->readAll();
         if(count($rows))
         {
             while($row = array_shift($rows))
             {
+
+                if(!empty($row['relevance']))
+                {
+                    // check relevance
+                    if($user === null && class_exists('OsatUser'))
+                    {
+                        // user could be set up...
+                        $user = OsatUser::findByToken($this->sToken, $this->surveyId);
+                        if(!$user->exists())
+                        {
+                            // ... and does exist
+                            $user = false;
+                        }
+                    }
+
+                    if($user)
+                    {
+                        // user is set up
+                        if($user->matchesRelevance($row['relevance']))
+                        {
+                            // and matches relevance
+                        }
+                        else {
+                            // does not match relevance
+                            continue;
+                        }
+                    }
+                }
+
                 $aid = $row['id'];
                 if(!isset($assessments[$aid]))
                 {

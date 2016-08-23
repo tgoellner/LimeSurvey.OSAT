@@ -668,19 +668,28 @@ class OsatLogin extends Osat {
 			}
 
 			$registerform_vars['function'] = empty($registerform_vars['function']) ? Yii::app()->request->getParam('function') : $registerform_vars['function'];
+
 			if(!in_array($registerform_vars['function'], ['register', 'forgot-password', 'reset-password', 'logout', 'attributes', 'extraattributes', 'send-confirmation', 'confirm', 'login']))
 			{
 				$registerform_vars['function'] = $this->indexaction;
-/*
-				if($urlToken = Yii::app()->request->getParam('token'))
+			}
+			else if(in_array($registerform_vars['function'], ['logout', 'attributes', 'extraattributes']))
+			{
+				$valid = false;
+				// do not show these pages when not logged in
+				if($user = $this->getUserFromSession())
 				{
-					if($user = OsatUser::findByToken($urlToken))
+					if($user->isLoggedIn())
 					{
-						if($sessionUser = OsatUser::findByToken($urlToken))
+						$valid = true;
 					}
 				}
-*/
 
+				if(!$valid)
+				{
+					$this->setToken($surveyId, $sToken);
+					return;
+				}
 			}
 
 			switch($registerform_vars['function'])

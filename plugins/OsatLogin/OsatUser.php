@@ -892,23 +892,27 @@ class OsatUser
         return count($this->getMissingExtraAttributes()) > 0;
     }
 
-    protected function matchesRelevance($relevance)
+    public function matchesRelevance($relevance)
     {
-        preg_match('/TOKEN:ATTRIBUTE_([0-9]+) (!|=)= "([^"]+)"/', $relevance, $match);
 
-        if($match)
+        preg_match_all('/TOKEN:ATTRIBUTE_([0-9]+) (!|=)= "([^"]+)"/', $relevance, $matches);
+
+        if(!empty($matches[0]))
         {
-            $attribute = 'attribute_' . $match[1];
-            $isEqual = $match[2] === '=';
-            $value = $match[3];
+            foreach($matches[0] as $i=> $match)
+            {
+                $attribute = 'attribute_' . $matches[1][$i];
+                $isEqual = $matches[2][$i] === '=';
+                $value = $matches[3][$i];
 
-            if($isEqual && isset($this->$attribute) && $this->$attribute == $value)
-            {
-                return true;
-            }
-            elseif((!$isEqual) && (!isset($this->$attribute) || $this->$attribute != $value))
-            {
-                return true;
+                if($isEqual && isset($this->$attribute) && $this->$attribute == $value)
+                {
+                    return true;
+                }
+                elseif((!$isEqual) && (!isset($this->$attribute) || $this->$attribute != $value))
+                {
+                    return true;
+                }
             }
         }
         else

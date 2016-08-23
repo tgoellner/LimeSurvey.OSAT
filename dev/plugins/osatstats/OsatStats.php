@@ -10,6 +10,23 @@ class OsatStats extends Osat {
 	static protected $label = 'osatstats';
 
 	protected $menuLabel = "Stats";
+	protected $settings = [
+		'options_default' => array(
+            'type' => 'info',
+            'label' => '',
+			'content' => 'Plugin options'
+        ),
+		'survey_assessment_by_percentage' => array(
+            'type' => 'checkbox',
+            'label' => 'Calculate survey assessments by percentages',
+            'default' => false
+        ),
+		'group_assessment_by_percentage' => array(
+            'type' => 'checkbox',
+            'label' => 'Calculate group assessments by percentages',
+            'default' => false
+        ),
+	];
     protected $localeSettings = [
 		'translate' => [
 			'type' => 'text',
@@ -21,7 +38,7 @@ class OsatStats extends Osat {
 	public function __construct(PluginManager $manager, $id)
     {
 		parent::__construct($manager, $id);
-# 
+#
         $this->_registerEvents();
 	}
 
@@ -55,7 +72,7 @@ class OsatStats extends Osat {
 			exit();
 		}
 
-		if(Yii::app()->request->getParam('action') == 'statspdf') {
+		if(!empty($_POST['action']) && $_POST['action'] == 'statspdf') {
 			if($html = $_POST['html'])
 			{
 				$html = base64_decode($html);
@@ -416,7 +433,9 @@ class OsatStats extends Osat {
 		$data = [
 			'surveyId' => $surveyId,
 			'sToken' => $sToken,
-			'hasAverages' => false
+			'hasAverages' => false,
+			'survey_assessment_by_percentage' => (bool) $this->getSettings('survey_assessment_by_percentage'),
+			'group_assessment_by_percentage' => (bool) $this->getSettings('group_assessment_by_percentage')
 		];
 
 		$filter = $this->getRequest('filter');

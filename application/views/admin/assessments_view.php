@@ -179,6 +179,15 @@
                 <div class='col-sm-6'></div>
             </div>
 
+            <!-- Relevance -->
+            <div class='form-group'>
+                <label class='control-label col-sm-2' for='relevance'><?php eT("Relevance:");?></label>
+                <div class='col-sm-4'>
+                    <input class='form-control' type='text' id='relevance' name='relevance' <?php if (isset($editdata)) {echo " value='{$editdata['relevance']}' ";} ?>/>
+                </div>
+                <div class='col-sm-6'></div>
+            </div>
+
         <!-- Languages tabs -->
         <div id="languagetabs">
             <ul class="nav nav-tabs" id="edit-survey-text-element-language-selection">
