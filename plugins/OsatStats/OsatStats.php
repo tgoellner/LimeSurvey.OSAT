@@ -21,7 +21,7 @@ class OsatStats extends Osat {
 	public function __construct(PluginManager $manager, $id)
     {
 		parent::__construct($manager, $id);
-# print_r($_SESSION); die();
+# 
         $this->_registerEvents();
 	}
 
@@ -58,23 +58,133 @@ class OsatStats extends Osat {
 		if(Yii::app()->request->getParam('action') == 'statspdf') {
 			if($html = $_POST['html'])
 			{
-				$html = urldecode($html);
+				$html = base64_decode($html);
 
 				if(!empty($html)) {
-				    if(!mb_check_encoding ($html, 'UTF-8' )) {
-					    $html = utf8_encode($html);
-					}
-
-					if(mb_check_encoding ($html, 'UTF-8' )) {
-
-						if($assessment = $this->getAssessment())
+					if($assessment = $this->getAssessment())
+					{
+						// create data
+						if($data = $_POST['data'])
 						{
-							$this->createStatsPdf($html);
+							$data = base64_decode($data);
+							$data = json_decode($data, true);
+
+							if(!empty($data)) {
+								$html = $this->replaceDiagram($html, $data);
+							}
 						}
+
+						$this->createStatsPdf($html);
 					}
 				}
 			}
 		}
+	}
+
+	public function replaceDiagram($html, $bars, $width = 140, $height = 85, $prec = 2) {
+		// let's split the HTML to extract the diagram
+
+		if(($pos = strpos($html, '<div class="diagram"')) !== false)
+		{
+			$new_html = [];
+			$new_html['top'] = substr($html, 0, $pos);
+			$new_html['diagram'] = substr($html, strlen($new_html['top']), strpos($html, '<div class="wrapper"', strlen($new_html['top'])) - strlen($new_html['top']));
+			$new_html['bottom'] = substr($html, strlen($new_html['top']) + strlen($new_html['diagram']));
+
+			$svg = [
+				'<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+				'<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">',
+				'<svg width="100%" height="100%" viewBox="0 0 ' . $width .' ' . $height .'" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">'
+			];
+
+			$rect = '<rect x="{x}" y="{y}" width="{w}" height="{h}" style="fill:{f}"/>';
+
+			$textheight = 5;
+			$gap = 2;
+			$lastgap = 5;
+			$padding = 5;
+
+			$_width = round(($width - (count($bars) - 2) * $gap - $lastgap - $padding * 2) / count($bars), $prec);
+			$_height = $height - $textheight;
+
+			// the grid lines
+			$line = '<path d="M 0 {y} h ' . $width . '} {y}" fill="none" stroke-width="0.5" style="stroke-dasharray:0.5,1,0,0;stroke:rgb(21, 65, 148);" />';
+			foreach([0, round($_height / 2, 2), $_height] as $y) {
+				$svg[] = str_replace('{y}', $y, $line);
+			}
+
+			$lastpos = $padding;
+
+			foreach($bars as $i => $bar)
+			{
+				$aw = round($_width * 0.25, $prec);
+				$tw = $_width - (empty($bar['average']) ? 0 : $aw);
+
+				// first the total bar
+				$replace = [
+					'x' => $lastpos,
+					'h' => round($bar['total']['height'] * $_height, $prec),
+					'w' => $tw,
+					'f' => $bar['total']['color']
+				];
+				$replace['y'] = round($_height - $replace['h'], $prec);
+
+				$_rect = $rect;
+				foreach($replace as $k=>$v)
+				{
+					$_rect = str_replace('{' . $k . '}', $v, $_rect);
+				}
+				$svg[] = $_rect;
+
+				// add the label
+				$svg[] = '<text x="' . round($lastpos + ($_width / 2), $prec) . '" y="' . round($_height + ($textheight*0.75), 2) . '" style="font-family:\'roboto\', sans-serif;font-size:' . ($textheight * 0.75) . ';fill:rgb(21, 65, 148);" text-anchor="middle">' . $bar['label'] . '</text>';
+
+				// add x to lastpos
+				$lastpos+=$replace['w'];
+
+				// then the average bar
+				if(!empty($bar['average']))
+				{
+					$replace = [
+						'x' => $lastpos,
+						'h' => round($bar['average']['height'] * $_height, $prec),
+						'w' => $aw,
+						'f' => $bar['average']['color']
+					];
+					$replace['y'] = round($_height - $replace['h'], $prec);
+
+					$_rect = $rect;
+					foreach($replace as $k=>$v)
+					{
+						$_rect = str_replace('{' . $k . '}', $v, $_rect);
+					}
+					$svg[] = $_rect;
+					$lastpos+=$replace['w'];
+				}
+
+				if($i == count($bars) - 2)
+				{
+					$lastpos+= $lastgap;
+				}
+				else if($i < count($bars) - 2)
+				{
+					$lastpos+= $gap;
+				}
+			}
+
+			$svg[] = '</svg>';
+
+			$svg = join("\n", $svg);
+
+			$new_html['diagram'] = '<div class="wrapper">
+				<div class="diagram" style="width:' . $width . 'mm;height' . $height . 'mm;">' .
+				'<img src="data:image/svg+xml;charset=UTF-8,' . rawurlencode($svg) . '" style="width:' . $width . 'mm;height' . $height . 'mm;" />' .
+				'</div></div>';
+
+			$html = join("", $new_html);
+		}
+
+		return $html;
 	}
 
 	public function createStatsPdf($html)

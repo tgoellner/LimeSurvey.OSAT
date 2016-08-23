@@ -17,18 +17,24 @@ var osat_statspdf = {
     },
 
     print : function() {
-        var html =  '<div class="wrapper">' + this.getH1() + this.getH2() + '</div>' +
-                    this.getDiagram() +
+        var html =  '<div><div class="wrapper">' + this.getH1() + this.getH2() + '</div>' +
+                    '<div class="diagram"></div>' + // this.getDiagram() +
                     this.getTexts() +
-                    this.getFooter();
+                    this.getFooter() +
+                    '</div>';
 
-        url = window.location.href + '/action/statspdf';
+        html = $(html).get(0).innerHTML;
+
+        html = window.btoa(unescape(encodeURIComponent(html)));
+
+        url = window.location.href;
 
         // html = this.insertInlineStyles(html);
         var form = $('<form style="display:none" action="' + url + '" target="_blank" method="post" enctype="multipart/form-data" />');
         $('input[name="YII_CSRF_TOKEN"]').first().clone().appendTo(form);
-        $('<input type="hidden" name="html" value="' + escape(html) + '" />').appendTo(form);
-        $('<input type="hidden" name="title" value="' + escape($(this.getH2()).text()) + '" />').appendTo(form);
+        $('<input type="hidden" name="action" value="statspdf" />').appendTo(form);
+        $('<input type="hidden" name="html" value="' + html + '" />').appendTo(form);
+        $('<input type="hidden" name="data" value="' + window.btoa(JSON.stringify(this.getDiagramData())) + '" />').appendTo(form);
         $('<input type="submit" />').appendTo(form);
 
         form.appendTo($(('body')));
@@ -159,15 +165,10 @@ var osat_statspdf = {
         return h2;
     },
 
-    getDiagram : function() {
-        var width = typeof(arguments[0]) != 'undefined' ? parseInt(arguments[0]) : 180,
-            height = typeof(arguments[1]) != 'undefined' ? parseInt(arguments[1]) : Math.round((width * 0.5) * 100) / 100,
-            unit = 'mm',
-            diagram = '';
-
+    getDiagramData : function() {
         var bars = [];
 
-        $('#osatstats-chart table .osatstats-table--group').each(function(i, group){
+        $('#' + this.html_prefix.substr(1) + '-chart table ' + this.html_prefix + '-table--group').each(function(i, group){
             var bar = {};
 
             if($(group).find('.is--total button').length)
@@ -175,7 +176,7 @@ var osat_statspdf = {
                 var el = $(group).find('.is--total button').get(0);
 
                 bar.total = {
-                    height: parseFloat(el.style.height) / 100, // window.getComputedStyle(el, null).getPropertyValue("height"),
+                    height: parseFloat(el.style.height) / 100,
                     color: window.getComputedStyle(el, null).getPropertyValue("background-color")
                 }
             }
@@ -198,6 +199,16 @@ var osat_statspdf = {
                 bars.push(bar);
             }
         });
+
+        return bars;
+    },
+
+    getDiagram : function() {
+        var width = typeof(arguments[0]) != 'undefined' ? parseInt(arguments[0]) : 180,
+            height = typeof(arguments[1]) != 'undefined' ? parseInt(arguments[1]) : Math.round((width * 0.5) * 100) / 100,
+            unit = 'mm',
+            diagram = '',
+            bars = this.getDiagramData();
 
         if(bars.length) {
             var bar_padding = 0.05,
