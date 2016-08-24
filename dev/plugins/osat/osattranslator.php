@@ -25,6 +25,7 @@ class OsatTranslator
         {
             $this->setFolder($attributes['folder']); # sets the folder
         }
+
         $this->reload(); # loads the strings
     }
 
@@ -333,6 +334,7 @@ class OsatTranslator
         $return = [];
         if(!empty($languages))
         {
+            Yii::app()->loadHelper('surveytranslator');
             $allLanguages = getLanguageData(false, Yii::app()->session['adminlang']);
             foreach($languages as $lang)
             {
@@ -344,7 +346,4 @@ class OsatTranslator
 
         return $return;
     }
-
-
-
 }

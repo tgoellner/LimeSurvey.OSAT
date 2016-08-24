@@ -521,7 +521,8 @@ class Osat extends \ls\pluginmanager\PluginBase
 						'label' => $name . (empty($count) ? ' (default)' : ''),
 						'type' => !empty($options['type']) ? $options['type'] : 'text',
 						'current' => $this->get($prefix . '_' . $code, null, null, null ),
-						'help' => !empty($options['help']) ? $options['help'] : null
+						'help' => !empty($options['help']) ? $options['help'] : null,
+						'default' => !empty($options['default']) ? $options['default'] : null,
 					];
 					$count++;
 				}

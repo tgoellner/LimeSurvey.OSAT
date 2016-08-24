@@ -651,6 +651,10 @@ class OsatUser
                     'token' => $this->getToken(),
                     'expires' => time() + ($this->expires * 60)
                 ];
+
+                // update SENT field in database so we can check when the user was logged in the last time
+                # $this->fill(['sent' => date('Y-m-d H:i', time())]);
+                # $this->save();
             }
             else
             {
