@@ -19,8 +19,7 @@ class OsatUser
     protected $validate = [
         'firstname' => 'required',
         'lastname' => 'required',
-        'email' => 'required|email|unique',
-        'organisation' => 'required'
+        'email' => 'required|email|unique'
     ];
 
     protected $original;
@@ -266,6 +265,31 @@ class OsatUser
             }
         }
 
+        return null;
+    }
+
+    public function getAttributeByLabel($label)
+    {
+        if(!empty($label) && is_string($label))
+        {
+            foreach($this->getAttributes() as $key => $attribute)
+            {
+                if($attribute['label'] == $label)
+                {
+                    return $attribute;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function getAttributeValueByLabel($label)
+    {
+        if($attribute = $this->getAttributeByLabel($label))
+        {
+            $key = $attribute['token_attribute_label'];
+            return $this->get($key);
+        }
         return null;
     }
 

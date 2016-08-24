@@ -18,6 +18,8 @@
                 <input aria-label="{{Email address}}" required type="email" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}" />
             </div>
 
+            <?php include(dirname(__FILE__) . '/_attributes.php'); ?>
+
             <div class="form-group">
                 <input aria-label="{{First name}}" required type="text" name="register_firstname" value="<?php echo $register_firstname; ?>" class="form-control" placeholder="{{First name}}" />
             </div>

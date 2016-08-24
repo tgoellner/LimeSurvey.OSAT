@@ -4169,15 +4169,18 @@ body.register-register {
 .register-form #osatregister {
   margin-top: 20px;
 }
-.register-form div.form-group {
+.register-form div.form-group,
+.register-form div.form-group-wrapper {
   margin-top: 10px;
 }
 @media all and (min-width: 640px) {
-  .register-form div.form-group {
+  .register-form div.form-group,
+  .register-form div.form-group-wrapper {
     margin-top: 20px;
   }
 }
-.register-form div.form-group:first-of-type {
+.register-form div.form-group:first-of-type,
+.register-form div.form-group-wrapper:first-of-type {
   margin-top: 0;
 }
 .register--hint {

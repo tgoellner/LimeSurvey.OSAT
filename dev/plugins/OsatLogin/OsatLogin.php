@@ -90,7 +90,6 @@ class OsatLogin extends Osat {
 
     }
 
-
 	public function _DEACT_beforeControllerAction()
 	{
 		$event = $this->event;
@@ -468,7 +467,7 @@ class OsatLogin extends Osat {
 
 				// the registration is not completed yet, show attributes
 				$this->createRegisterPage([
-				   'missing_attributes' => $attr,
+				   'attributes' => $attr,
 				   'optional_attributes' => true,
 				   'function' => 'extraattributes',
 				   'surveyId' => $user->get('surveyId'),
@@ -537,7 +536,7 @@ class OsatLogin extends Osat {
 				 if(count($attr = $user->getMissingAttributes()) && $surveyId && !empty($sToken))
 				 {
 					 $this->createRegisterPage([
-		 				'missing_attributes' => $attr,
+		 				'attributes' => $attr,
 		 				'function' => 'attributes',
 		 				'surveyId' => $surveyId,
 		 				'sToken' => $sToken
@@ -631,7 +630,7 @@ class OsatLogin extends Osat {
 				'register_secret' => '',
 				'register_optin' => false,
 
-				'missing_attributes' => [],
+				'attributes' => [],
 
 				'url_login' => $this->getUrl('login', $surveyId, ['lang' => $sLanguage]),
 				'url_register' => $this->getUrl('register', $surveyId, ['lang' => $sLanguage]),
@@ -784,7 +783,7 @@ class OsatLogin extends Osat {
 															if(count($attr = $user->getMissingAttributes()))
 															{
 																$registerform_vars['function'] = 'attributes';
-																$registerform_vars['missing_attributes'] = $attr;
+																$registerform_vars['attributes'] = $attr;
 																$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/attributesForm.php', $registerform_vars, true);
 															}
 															else {
@@ -820,7 +819,7 @@ class OsatLogin extends Osat {
 
 					if(empty($registerpage_vars['REGISTERFORM']))
 					{
-						$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/registerForm.php', $registerform_vars, true);
+						$registerpage_vars['REGISTERFORM'] = $this->renderRegisterForm($controller, $registerform_vars);
 					}
 
 					break;
@@ -1103,7 +1102,7 @@ class OsatLogin extends Osat {
 						else
 						{
 							$registerform_vars['errors'][] = $this->getTranslator()->translate('We could not find an account related to the email address %1$s. Please register first.', $registerform_vars['register_email']);
-							$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/registerForm.php', $registerform_vars, true);
+							$registerpage_vars['REGISTERFORM'] = $this->renderRegisterForm($controller, $registerform_vars);
 						}
 					}
 
@@ -1137,7 +1136,7 @@ class OsatLogin extends Osat {
 									if(count($attr = $user->getMissingAttributes()))
 									{
 										$registerform_vars['function'] = 'attributes';
-										$registerform_vars['missing_attributes'] = $attr;
+										$registerform_vars['attributes'] = $attr;
 										$registerpage_vars['REGISTERFORM'] = $controller->renderFile(dirname(__FILE__) . '/view/register/attributesForm.php', $registerform_vars, true);
 									}
 									elseif($this->continueSurvey($user))
@@ -1221,6 +1220,23 @@ class OsatLogin extends Osat {
 			ob_flush();
 			App()->end();
 		}
+	}
+
+	protected function renderRegisterForm(RegisterController $controller, array $registerform_vars = [])
+	{
+
+		// add attributes to form
+		if($user = new OsatUser())
+		{
+			if($attr = $user->getAttributeByLabel('organisation'))
+			{
+				$attr['placeholder'] = $attr['caption'];
+				unset($attr['caption']);
+				$registerform_vars['attributes'][$attr['token_attribute_label']] = $attr;
+			}
+		}
+
+		return $controller->renderFile(dirname(__FILE__) . '/view/register/registerForm.php', $registerform_vars, true);
 	}
 
 	protected function confirmUser(OsatUser $user)
