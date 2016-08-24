@@ -375,7 +375,27 @@ If you do not want to participate in this survey and don\'t want to receive any 
 
 		$filename = dirname(__FILE__) . '/logs/email.log';
 
-		@file_put_contents($filename, $text, FILE_APPEND);
+		// truncate file
+		$maxlines = 1000;
+
+		$text = explode("\n", trim($text));
+		if(file_exists($filename))
+		{
+			$lines = file_get_contents($filename);
+			$lines = explode("\n", trim($lines));
+			$text = array_merge($text, $lines);
+		}
+
+		if(count($text) > $maxlines)
+		{
+			$text = array_slice($text, 0, $maxlines);
+		}
+
+		unset($maxlines, $lines);
+
+		$text = join("\n", $text);
+
+		@file_put_contents($filename, $text);
 
 		return $text;
 	}
