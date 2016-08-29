@@ -5552,6 +5552,132 @@ tfoot .osatstats-table--cell.is--label {
 .osatstats-text--assessment--assessment ol:first-child {
   margin-top: 0;
 }
+.osatstats-text--assessment--navigation {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+}
+.osatstats-text--assessment--navigation-button {
+  display: block;
+  padding: 10px;
+  margin-top: 10px;
+}
+.osatstats-text--assessment--navigation-button:first-child {
+  margin-top: 0;
+}
+.osatstats-text--assessment--navigation-button.is--previous {
+  box-sizing: border-box;
+  display: inline-block;
+  padding: 10px;
+  min-width: 233.33333333px;
+  max-width: 100%;
+  min-height: 20px;
+  text-align: center;
+  border: none;
+  background-color: #0765a3;
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.44444444em;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  font-size: 2.0rem;
+  line-height: 1.4em;
+  width: 100%;
+  text-align: left;
+  padding: 20px;
+  padding-left: 92px;
+  position: relative;
+}
+@media all and (max-width: 480px) {
+  .osatstats-text--assessment--navigation-button.is--previous {
+    min-width: 0;
+  }
+}
+.no-touchevents .osatstats-text--assessment--navigation-button.is--previous:hover {
+  background-color: #7a4f96;
+}
+.csstransitions .osatstats-text--assessment--navigation-button.is--previous {
+  transition-property: background-color,color;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+  transition: background-color,color;
+}
+.osatstats-text--assessment--navigation-button.is--previous:before {
+  content: "";
+  display: block;
+  width: 32px;
+  height: 32px;
+  background: transparent no-repeat center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%20standalone%3D%22no%22%3F%3E%0A%3Csvg%20width%3D%2219px%22%20height%3D%2219px%22%20viewBox%3D%220%200%2019%2019%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3C!--%20Generator%3A%20Sketch%203.8.2%20(29753)%20-%20http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%20--%3E%0A%20%20%20%20%3Ctitle%3Eeufa_icon_dropdown%3C%2Ftitle%3E%0A%20%20%20%20%3Cdesc%3ECreated%20with%20Sketch.%3C%2Fdesc%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3Cpolygon%20id%3D%22path-1%22%20points%3D%2218.9848%20-0.0002%200%20-0.0002%200%2018.9847%2018.9848%2018.9847%2018.9848%20-0.0002%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22eufa_icon_dropdown%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Page-1%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cmask%20id%3D%22mask-2%22%20fill%3D%22white%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cuse%20xlink%3Ahref%3D%22%23path-1%22%3E%3C%2Fuse%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fmask%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Clip-2%22%3E%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M18.9848%2C9.5017%20L15.6198%2C6.1387%20L11.8748%2C9.8837%20L11.8748%2C-0.0003%20L7.1118%2C-0.0003%20L7.1118%2C9.8837%20L3.3648%2C6.1367%20L-0.0002%2C9.5017%20L9.4928%2C18.9847%20L18.9848%2C9.5017%20Z%22%20id%3D%22Fill-1%22%20fill%3D%22%23fff%22%20mask%3D%22url(%23mask-2)%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E%0A");
+  transform: rotate(-90deg);
+  position: absolute;
+  top: 50%;
+  margin-top: -16px;
+  left: 20px;
+}
+.osatstats-text--assessment--navigation-button.is--previous:before {
+  transform: rotate(90deg);
+}
+.osatstats-text--assessment--navigation-button.is--next {
+  box-sizing: border-box;
+  display: inline-block;
+  padding: 10px;
+  min-width: 233.33333333px;
+  max-width: 100%;
+  min-height: 20px;
+  text-align: center;
+  border: none;
+  background-color: #0765a3;
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.8rem;
+  line-height: 1.44444444em;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  font-size: 2.0rem;
+  line-height: 1.4em;
+  width: 100%;
+  text-align: left;
+  padding: 20px;
+  padding-left: 92px;
+  position: relative;
+}
+@media all and (max-width: 480px) {
+  .osatstats-text--assessment--navigation-button.is--next {
+    min-width: 0;
+  }
+}
+.no-touchevents .osatstats-text--assessment--navigation-button.is--next:hover {
+  background-color: #7a4f96;
+}
+.csstransitions .osatstats-text--assessment--navigation-button.is--next {
+  transition-property: background-color,color;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+  transition: background-color,color;
+}
+.osatstats-text--assessment--navigation-button.is--next:before {
+  content: "";
+  display: block;
+  width: 32px;
+  height: 32px;
+  background: transparent no-repeat center;
+  background-size: contain;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%20standalone%3D%22no%22%3F%3E%0A%3Csvg%20width%3D%2219px%22%20height%3D%2219px%22%20viewBox%3D%220%200%2019%2019%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3C!--%20Generator%3A%20Sketch%203.8.2%20(29753)%20-%20http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%20--%3E%0A%20%20%20%20%3Ctitle%3Eeufa_icon_dropdown%3C%2Ftitle%3E%0A%20%20%20%20%3Cdesc%3ECreated%20with%20Sketch.%3C%2Fdesc%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3Cpolygon%20id%3D%22path-1%22%20points%3D%2218.9848%20-0.0002%200%20-0.0002%200%2018.9847%2018.9848%2018.9847%2018.9848%20-0.0002%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22eufa_icon_dropdown%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Page-1%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cmask%20id%3D%22mask-2%22%20fill%3D%22white%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cuse%20xlink%3Ahref%3D%22%23path-1%22%3E%3C%2Fuse%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fmask%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Clip-2%22%3E%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M18.9848%2C9.5017%20L15.6198%2C6.1387%20L11.8748%2C9.8837%20L11.8748%2C-0.0003%20L7.1118%2C-0.0003%20L7.1118%2C9.8837%20L3.3648%2C6.1367%20L-0.0002%2C9.5017%20L9.4928%2C18.9847%20L18.9848%2C9.5017%20Z%22%20id%3D%22Fill-1%22%20fill%3D%22%23fff%22%20mask%3D%22url(%23mask-2)%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E%0A");
+  transform: rotate(-90deg);
+  position: absolute;
+  top: 50%;
+  margin-top: -16px;
+  left: 20px;
+}
 .osatstats {
   position: relative;
   z-index: 20;

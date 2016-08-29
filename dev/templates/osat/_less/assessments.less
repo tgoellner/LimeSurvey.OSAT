@@ -674,5 +674,28 @@ body.survey-is-just-completed {
                 }
             }
         }
+
+        &--navigation {
+            display: block;
+            margin-top: @gutter_width;
+            text-align: center;
+        }
+        &--navigation-button {
+            display: block;
+            padding: @gutter;
+            margin-top: @gutter;
+            &:first-child {
+                margin-top: 0;
+            }
+
+            &.is--previous {
+                .btn();
+                .previous(l);
+            }
+            &.is--next {
+                .btn();
+                .forward(l);
+            }
+        }
     }
 }

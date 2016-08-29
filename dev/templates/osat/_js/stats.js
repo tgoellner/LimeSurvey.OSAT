@@ -21,10 +21,11 @@ var osatstats = {
 
         osatstats.addSubmitEvent();
 
-
         $(document).on({
             'click.osatstats' : osatstats.activateAssessment
-        }, '*[data-gid]');
+        }, '*[data-gid]:not(.osatstats-text--assessment)');
+
+        osatstats.addPrevNextButtons();
     },
 
     toggleQuestions : function(e)
@@ -130,12 +131,54 @@ var osatstats = {
         return false;
     },
 
-    activateAssessment : function()
+    activateAssessment : function(e)
     {
         var gid = $(this).attr('data-gid');
 
         $(".is--active[data-gid]").removeClass('is--active');
         $('[data-gid="' + gid + '"]').addClass('is--active');
+
+        var url = location.href,
+            id = $('.osatstats-text--assessment.is--active').attr('id');
+
+        location.href = "#"+id;                 //Go to the target element.
+    },
+
+    addPrevNextButtons : function()
+    {
+        var elements = $('.osatstats-text--assessment[data-gid]'),
+            length = elements.length;
+
+        if(length > 1)
+        {
+            for(var i = 0; i < length; i++)
+            {
+                var navigation = $('<div class="osatstats-text--assessment--navigation" />').appendTo($(elements[i])),
+                    types = {
+                        'previous' : typeof(elements[i-1]) != 'undefined' ? $(elements[i-1]) : null,
+                        'next' : typeof(elements[i+1]) != 'undefined' ? $(elements[i+1]) : null
+                    };
+
+                for(var p in types)
+                {
+                    if(types[p])
+                    {
+                        var title = [];
+                        if(types[p].find('.osatstats-text--assessment--label').length)
+                        {
+                            title.push(types[p].find('.osatstats-text--assessment--label').text());
+                        }
+                        if(types[p].find('.osatstats-text--assessment--groupname').length)
+                        {
+                            title.push(types[p].find('.osatstats-text--assessment--groupname').text());
+                        }
+                        title = title.join(': ');
+
+                        navigation.append('<a href="#' + types[p].attr('id') + '" class="osatstats-text--assessment--navigation-button is--' + p + '" data-gid="' + types[p].attr('data-gid') + '">' + title + '</a>');
+                    }
+                }
+            }
+        }
     }
 }
 

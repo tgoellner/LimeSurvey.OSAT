@@ -87,9 +87,9 @@
 	}
 }
 
-.forward() {
+.forward(@size: xl) {
 	@s: 32px;
-    .font(strong, xl);
+    .font(strong, @size);
     width: 100%;
     text-align: left;
     padding: @gutter_width;
@@ -108,5 +108,13 @@
         position: absolute;
         top: 50%; margin-top: round(@s/-2);
         left: @gutter_width * 1;
+    }
+}
+
+
+.previous(@size: xl) {
+	.forward(@size);
+    &:before {
+        .rotate(90deg);
     }
 }

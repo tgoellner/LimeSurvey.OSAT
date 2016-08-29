@@ -20,11 +20,14 @@ var reposBalloons = function() {
         }
 
         $(el).on('click.osatballoon', function(e){
-            try {
-                e.preventDefault();
+            if($(this).parents('.answer-item').length)
+            {
+                try {
+                    e.preventDefault();
+                }
+                catch(ev) {}
+                return false;
             }
-            catch(ev) {}
-            return false;
         })
     });
 };
