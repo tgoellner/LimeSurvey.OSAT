@@ -72,6 +72,24 @@
                         </div>
                     </div>
 
+                    <!--BLacklisted status -->
+                    <div class=" form-group control-group" data-name="blackliststatus">
+                        <label class="default control-label col-lg-2 col-sm-5 col-md-2" for="blackliststatus">
+                            <?php eT('Blacklist status:'); ?>
+                        </label>
+                        <div class="default col-lg-4 col-sm-5 col-md-7 controls">
+                            <?php $this->widget('yiiwheels.widgets.buttongroup.WhButtonGroup', array(
+                                'name' => 'blackliststatus',
+                                'value'=> 0 ,
+                                'selectOptions'=>array(
+                                    "0"=>gT("All",'unescaped'),
+                                    "1"=>gT("Blacklisted",'unescaped'),
+                                    "2"=>gT("Not blacklisted",'unescaped')
+                                )
+                            ));?>
+                        </div>
+                    </div>
+
                     <!--Filter by email address -->
                     <div class=" form-group control-group" data-name="filteremail">
 

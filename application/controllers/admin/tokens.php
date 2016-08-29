@@ -370,7 +370,7 @@ class tokens extends Survey_Common_Action
         $model =  TokenDynamic::model($iSurveyId);
         if(isset($_GET['TokenDynamic']))
         {
-            $model->setAttributes($_GET['TokenDynamic'],false);
+            $model->setAttributes($_GET['TokenDynamic'], false);
         }
 
         $aData['model'] = $model;
@@ -647,6 +647,7 @@ class tokens extends Survey_Common_Action
             'lastname' => Yii::app()->request->getPost('lastname'),
             'email' => Yii::app()->request->getPost('email'),
             'emailstatus' => Yii::app()->request->getPost('emailstatus'),
+            'blacklisted' => Yii::app()->request->getPost('blacklisted'),
             'token' => Yii::app()->request->getPost('token'),
             'language' => Yii::app()->request->getPost('language'),
             'sent' => Yii::app()->request->getPost('sent'),
@@ -885,6 +886,7 @@ class tokens extends Survey_Common_Action
             $aTokenData['lastname'] = Yii::app()->request->getPost('lastname');
             $aTokenData['email'] = Yii::app()->request->getPost('email');
             $aTokenData['emailstatus'] = Yii::app()->request->getPost('emailstatus');
+            $aTokenData['blacklisted'] = Yii::app()->request->getPost('blacklisted');
             $santitizedtoken = sanitize_token(Yii::app()->request->getPost('token'));
             $aTokenData['token'] = $santitizedtoken;
             $aTokenData['language'] = sanitize_languagecode(Yii::app()->request->getPost('language'));
@@ -1826,6 +1828,15 @@ class tokens extends Survey_Common_Action
                     'type'=>'select',
                     'label'=>gT('Filter by language:'),
                     'options'=>$aFilterByLanguage,
+                ),
+                'blackliststatus'=>array(
+                    'type'=>'select',
+                    'label'=>gT('Blacklist status:'),
+                    'options'=>array(
+                        '0'=>gT('All'),
+                        '1'=>gT('Blacklisted'),
+                        '2'=>gT('Not blacklisted'),
+                    ),
                 ),
                 'filteremail'=>array(
                     'type'=>'string',

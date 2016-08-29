@@ -638,6 +638,14 @@ class TokenDynamic extends LSActiveRecord
             ),
 
             array(
+                'header' => gT('Blacklisted'),
+                'name' => 'blacklisted',
+                'value'=>'$data->blacklisted',
+                'headerHtmlOptions'=>array('class' => 'hidden-xs'),
+                'htmlOptions' => array('class' => 'hidden-xs'),
+            ),
+
+            array(
                 'header' => gT('Token'),
                 'name' => 'token',
                 'value'=>'$data->token',
@@ -934,6 +942,7 @@ class TokenDynamic extends LSActiveRecord
       $criteria->compare('lastname',$this->lastname,true);
       $criteria->compare('email',$this->email,true);
       $criteria->compare('emailstatus',$this->emailstatus,true);
+      $criteria->compare('blacklisted',$this->blacklisted,true);
       $criteria->compare('token',$this->token,true);
       $criteria->compare('language',$this->language,true);
       $criteria->compare('sent',$this->sent,true);

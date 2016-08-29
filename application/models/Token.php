@@ -89,7 +89,7 @@
                 'emailstatus' => 'text',
                 'token' => "string(35) {$sCollation}",
                 'language' => 'string(25)',
-                'blacklisted' => 'string(17)',
+                'blacklisted' => "string(17) DEFAULT 'N'",
                 'sent' => "string(17) DEFAULT 'N'",
                 'remindersent' => "string(17) DEFAULT 'N'",
                 'remindercount' => 'integer DEFAULT 0',

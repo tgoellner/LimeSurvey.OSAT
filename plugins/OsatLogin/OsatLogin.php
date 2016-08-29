@@ -1125,7 +1125,7 @@ class OsatLogin extends Osat {
 									$this->getUrl('send_confirmation', $surveyId, ['lang' => $sLanguage, 'register_email' => $registerform_vars['register_email']])
 								);
 							}
-							else if(!empty($user->blacklisted))
+							else if(!empty($user->blacklisted) && $user->blacklisted == 'Y')
 							{
 								$registerform_vars['errors'][] = $this->getTranslator()->translate('Sorry, you have been blacklisted from this survey.');
 							}

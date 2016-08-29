@@ -1697,6 +1697,7 @@ function tokensExport($iSurveyID)
     $iTokenStatus=App()->request->getPost('tokenstatus');
     $iInvitationStatus=App()->request->getPost('invitationstatus');
     $iReminderStatus=App()->request->getPost('reminderstatus');
+    $iBlacklistStatus=App()->request->getPost('blackliststatus');
     $sTokenLanguage=App()->request->getPost('tokenlanguage');
 
     $oSurvey=Survey::model()->findByPk($iSurveyID);
@@ -1741,6 +1742,16 @@ function tokensExport($iSurveyID)
     {
         $oRecordSet->andWhere("sent='N'");
     }
+
+    if ($iBlacklistStatus==1)
+    {
+        $oRecordSet->andWhere("blacklisted='Y'");
+    }
+    if ($iBlacklistStatus==2)
+    {
+        $oRecordSet->andWhere("blacklisted<>'Y'");
+    }
+
 
     if ($iReminderStatus==1)
     {

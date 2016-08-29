@@ -162,7 +162,7 @@
 
 
 
-                    <!-- Email, Email Status  -->
+                    <!-- Email, Email Status, Blacklist  -->
                     <div class="form-group">
                         <label class="col-sm-2 control-label"  for='email'><?php eT("Email"); ?>:</label>
                         <div class="col-sm-4">
@@ -171,13 +171,21 @@
 
                         <!-- Email Status -->
 
-                            <label class="col-sm-2 control-label"  for='emailstatus'><?php eT("Email Status"); ?>:</label>
-                            <div class="col-sm-4">
-                                <input class='form-control' type='text' maxlength='320' size='50' id='emailstatus' name='emailstatus' placeholder='OK' value="<?php if (isset($emailstatus)){echo $emailstatus;}else{echo "OK";}?>" />
+                        <label class="col-sm-2 control-label"  for='emailstatus'><?php eT("Email Status"); ?>:</label>
+                        <div class="col-sm-1">
+                            <input class='form-control' type='text' maxlength='320' size='50' id='emailstatus' name='emailstatus' placeholder='OK' value="<?php if (isset($emailstatus)){echo $emailstatus;}else{echo "OK";}?>" />
+                        </div>
+
+                        <!-- Email Blacklist  -->
+                        <label class="col-sm-2 control-label"  for='blacklisted'><?php eT("Blacklist"); ?>:</label>
+                        <div class="col-sm-1">
+                            <div class="checkbox">
+                                <!-- input type='hidden' name='blacklisted' value="N" //-->
+                                <input class='checkboxbtn' type='checkbox' id='blacklisted' name='blacklisted' value="Y"<?php if (!empty($blacklisted) && $blacklisted == 'Y'){ echo ' checked="checked"'; } ?> />
                             </div>
+                        </div>
 
                     </div>
-
 
 
                     <!-- Invitation sent, Reminder sent -->

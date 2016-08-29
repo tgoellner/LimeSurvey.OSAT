@@ -5190,6 +5190,11 @@ function getTokenFieldsAndNames($surveyid, $bOnlyAttributes = false)
             'mandatory'=>'N',
             'showregister'=>'N'
         ),
+        'blacklisted'=>array(
+            'description'=>gT("Blacklisted"),
+            'mandatory'=>'N',
+            'showregister'=>'N'
+        ),
         'token'=>array(
             'description'=>gT('Token'),
             'mandatory'=>'N',

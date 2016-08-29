@@ -118,6 +118,7 @@
     { "name":"lastname", "index":"lastname", "sorttype":"string", "sortable": true,"width":100, "align":"left", "editable":true},
     { "name":"email", "index":"email","align":"left","width":170, "sorttype":"string", "sortable": true, "editable":true},
     { "name":"emailstatus", "index":"emailstatus","align":"left","width": 80,"sorttype":"string", "sortable": true, "editable":true},
+    { "name":"blacklisted", "index":"blacklisted","align":"center","width":80,"sorttype":"string", "sortable": true, "editable":true, "edittype":"checkbox", "editoptions":{ "value":"Y:N"}},
     { "name":"token", "index":"token","align":"left", "sorttype":"int", "sortable": true,"width":150,"editable":true},
     { "name":"language", "index":"language","align":"left", "sorttype":"int", "sortable": true,"width":100,"editable":true, "formatter":'select', "edittype":"select", "editoptions":{"value":"<?php echo $aLanguageNames; ?>"}},
     { "name":"sent", "index":"sent","align":"left", "sorttype":"int", "sortable": true,"width":80,"editable":true},
@@ -158,6 +159,7 @@
         <div class="row">
             <div class="content-right scrolling-wrapper"    >
                 <?php
+
                     $this->widget('bootstrap.widgets.TbGridView', array(
                         'dataProvider' => $model->search(),
                         'filter'=>$model,

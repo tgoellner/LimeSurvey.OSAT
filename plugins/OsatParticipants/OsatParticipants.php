@@ -38,7 +38,7 @@ class OsatParticipants extends Osat {
 		'show_logs' => array(
             'type'=>'info',
             'label'=>'',
-            'help' => 'You can <a href="../../../../../../plugins/OsatParticipants/logs/email.log" target="_blank">view the logfile</a> or start the automatic jobs manually <a href="?osatparticipantsaction=cron">here</a>',
+            'help' => 'You can <a href="../../../../../../plugins/OsatParticipants/logs/email.log" target="_blank">view the logfile</a> or start the automatic jobs manually <a href="?osatparticipantsaction=cron" target="_blank">here</a>',
             'default'=>'0',
         )
 	];
@@ -634,7 +634,9 @@ If you do not want to participate in this survey and don\'t want to receive any 
         Yii::app()->loadHelper('surveytranslator');
         Yii::app()->loadHelper('/admin/htmleditor');
         Yii::app()->loadHelper('replacements');
-        Yii::app()->loadHelper('/expressions/em_manager');
+        if(!function_exists('cmpQuestionSeq')) {
+			Yii::app()->loadHelper('/expressions/em_manager');
+		}
         Yii::app()->loadHelper('globalsettings');
 
         $token = Token::model($iSurveyId)->find();
