@@ -739,16 +739,15 @@ class tokens extends Survey_Common_Action
 
         $dateformatdetails = getDateFormatData(Yii::app()->session['dateformat']);
 
-
         $surveyinfo = Survey::model()->findByPk($iSurveyId)->surveyinfo;
         $aData["surveyinfo"] = $surveyinfo;
         $aData['title_bar']['title'] = $surveyinfo['surveyls_title']."(".gT("ID").":".$iSurveyId.")";
         $aData['sidemenu']["token_menu"]=TRUE;
         $aData['token_bar']['buttons']['view']=TRUE;
         $this->registerScriptFile( 'ADMIN_SCRIPT_PATH', 'tokens.js');
+
         if (Yii::app()->request->getPost('subaction') == 'inserttoken')
         {
-
             Yii::import('application.libraries.Date_Time_Converter');
             //Fix up dates and match to database format
             if (trim(Yii::app()->request->getPost('validfrom')) == '')
@@ -777,6 +776,7 @@ class tokens extends Survey_Common_Action
             'lastname' => Yii::app()->request->getPost('lastname'),
             'email' => Yii::app()->request->getPost('email'),
             'emailstatus' => Yii::app()->request->getPost('emailstatus'),
+            'blacklisted' => Yii::app()->request->getPost('blacklisted', 'N'),
             'token' => $sanitizedtoken,
             'language' => sanitize_languagecode(Yii::app()->request->getPost('language')),
             'sent' => Yii::app()->request->getPost('sent'),
@@ -907,7 +907,10 @@ class tokens extends Survey_Common_Action
 
                     $value = Yii::app()->request->getPost($attr_name);
                     if ($desc['mandatory'] == 'Y' && trim($value) == '')
+                    {
+                        header("HTTP/1.1 400 Bad request");
                         $this->getController()->error(sprintf(gT('%s cannot be left empty'), $desc['description']));
+                    }
                     $aTokenData[$attr_name] = Yii::app()->request->getPost($attr_name);
                 }
 

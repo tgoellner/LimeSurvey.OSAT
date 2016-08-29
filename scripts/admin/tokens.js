@@ -168,10 +168,15 @@ $(document).ready(function(){
                 }, 200);
 
             },
-            error :  function(html, statut){
+            error :  function(response, statut){
                 $ajaxLoader.hide();
+                var html = $('<div>' + response.responseText + '</div>');
+                if($(html).find('.messagebox').length)
+                {
+                    html = $(html).find('.messagebox').first();
+                }
                 $('#modal-content').empty().append(html);
-                console.log(html);
+                console.log(response);
             }
         });
     });
@@ -202,10 +207,15 @@ $(document).ready(function(){
                 $.fn.yiiGridView.update('token-grid');                   // Update the surveys list
                 $modal.modal('hide');
             },
-            error :  function(html, statut){
+            error :  function(response, statut){
                 $ajaxLoader.hide();
+                var html = $('<div>' + response.responseText + '</div>');
+                if($(html).find('.messagebox').length)
+                {
+                    html = $(html).find('.messagebox').first();
+                }
                 $('#modal-content').empty().append(html);
-                console.log(html);
+                console.log(response);
             }
         });
 
