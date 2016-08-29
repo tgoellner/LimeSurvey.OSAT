@@ -261,7 +261,6 @@ If you do not want to participate in this survey and don\'t want to receive any 
 
 	        $values[] = "(" . implode(",",$temp) . ")";
 	    }
-	    $num = $result->num_rows;
 
 	    return "INSERT `{$table}` (" . implode(",",$fields) . ") VALUES \n" . implode(",\n", $values) . ";";
 	}

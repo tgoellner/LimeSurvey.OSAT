@@ -647,7 +647,7 @@ class tokens extends Survey_Common_Action
             'lastname' => Yii::app()->request->getPost('lastname'),
             'email' => Yii::app()->request->getPost('email'),
             'emailstatus' => Yii::app()->request->getPost('emailstatus'),
-            'blacklisted' => Yii::app()->request->getPost('blacklisted'),
+            'blacklisted' => Yii::app()->request->getPost('blacklisted','N'),
             'token' => Yii::app()->request->getPost('token'),
             'language' => Yii::app()->request->getPost('language'),
             'sent' => Yii::app()->request->getPost('sent'),
@@ -886,7 +886,7 @@ class tokens extends Survey_Common_Action
             $aTokenData['lastname'] = Yii::app()->request->getPost('lastname');
             $aTokenData['email'] = Yii::app()->request->getPost('email');
             $aTokenData['emailstatus'] = Yii::app()->request->getPost('emailstatus');
-            $aTokenData['blacklisted'] = Yii::app()->request->getPost('blacklisted');
+            $aTokenData['blacklisted'] = Yii::app()->request->getPost('blacklisted', 'N');
             $santitizedtoken = sanitize_token(Yii::app()->request->getPost('token'));
             $aTokenData['token'] = $santitizedtoken;
             $aTokenData['language'] = sanitize_languagecode(Yii::app()->request->getPost('language'));
@@ -904,19 +904,25 @@ class tokens extends Survey_Common_Action
                 $attrfieldnames = Survey::model()->findByPk($iSurveyId)->tokenAttributes;
                 foreach ($attrfieldnames as $attr_name => $desc)
                 {
-
                     $value = Yii::app()->request->getPost($attr_name);
-                    if ($desc['mandatory'] == 'Y' && trim($value) == '')
-                    {
-                        header("HTTP/1.1 400 Bad request");
-                        $this->getController()->error(sprintf(gT('%s cannot be left empty'), $desc['description']));
-                    }
+#                    if ($desc['mandatory'] == 'Y' && trim($value) == '')
+#                    {
+#                        header("HTTP/1.1 400 Bad request");
+#                        $this->getController()->error(sprintf(gT('%s cannot be left empty'), $desc['description']));
+#                    }
                     $aTokenData[$attr_name] = Yii::app()->request->getPost($attr_name);
                 }
 
                 $token = Token::model($iSurveyId)->findByPk($iTokenId);
                 foreach ($aTokenData as $k => $v)
+                {
+                    if($v != 'N' && in_array($k, ['sent','remindersent','completed']))
+                    {
+                        $v = strtotime($v);
+                        $v = date('Y-m-d H:i', $v);
+                    }
                     $token->$k = $v;
+                }
                 $token->save();
 
                 $aData['sidemenu']['state'] = false;
