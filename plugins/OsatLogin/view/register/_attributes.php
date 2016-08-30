@@ -12,6 +12,20 @@ if(!empty($attributes) && is_array($attributes)):
         {
             $type = count($options['options']) > 3 ? 'select' : 'checkbox';
         }
+
+        $required = !empty($options['mandatory']) && $options['mandatory'] == 'Y';
+
+        if($required)
+        {
+            if(!empty($options['caption']))
+            {
+                $options['caption'].='*';
+            }
+            if(!empty($options['placeholder']))
+            {
+                $options['placeholder'].='*';
+            }
+        }
 ?>
 
             <?php if($options['label'] == 'personaldataconfirmed'): ?>
@@ -20,7 +34,6 @@ if(!empty($attributes) && is_array($attributes)):
             <?php else: ?><div class="form-group-wrapper">
                 <?php if(!empty($options['caption'])): ?><p class="form-group--caption">
                     <?php echo htmlspecialchars($options['caption']); ?>
-
                 </p><?php endif; ?>
 
                 <div class="form-group is-<?php echo $type; ?>">
@@ -30,7 +43,7 @@ if(!empty($attributes) && is_array($attributes)):
                         <?php foreach($options['options'] as $i => $opt): ?>
 
                     <div class="checkbox">
-                        <input type="radio" required id="<?php echo $label . '_' . $i; ?>" value="<?php echo htmlspecialchars($opt); ?>" name="register_<?php echo $label; ?>"<?php if($value == $opt): ?> checked="checked"<?php endif; ?> />
+                        <input type="radio"<?php echo $required ? ' required' : ''; ?> id="<?php echo $label . '_' . $i; ?>" value="<?php echo htmlspecialchars($opt); ?>" name="register_<?php echo $label; ?>"<?php if($value == $opt): ?> checked="checked"<?php endif; ?> />
                         <label for="<?php echo $label . '_' . $i; ?>">
                             {{<?php echo $opt; ?>}}
                         </label>
@@ -41,7 +54,7 @@ if(!empty($attributes) && is_array($attributes)):
                     <label for="<?php echo $label; ?>" class="control-label" data-title="{{Choose %s|<?php echo $options['description']; ?>}}"></label>
 
                     <div>
-                        <select id="<?php echo $label; ?>" aria-label="{{<?php echo $options['description']; ?>}}" required name="register_<?php echo $label; ?>" class="form-control<?php echo $label == 'attribute_4' ? ' sort-options' : ''; ?>">
+                        <select id="<?php echo $label; ?>" aria-label="{{<?php echo $options['description']; ?>}}"<?php echo $required ? ' required' : ''; ?> name="register_<?php echo $label; ?>" class="form-control<?php echo $label == 'attribute_4' ? ' sort-options' : ''; ?>">
                             <option value="">{{Choose %s|<?php echo $options['description']; ?>}}</option>
                         <?php foreach($options['options'] as $opt): ?>
 
@@ -54,7 +67,7 @@ if(!empty($attributes) && is_array($attributes)):
                 <?php endif; ?>
             <?php else: ?>
 
-                    <input aria-label="{{<?php echo !empty($options['caption']) ? $options['caption'] : $options['description']; ?>}}" required type="text" name="register_<?php echo $label; ?>" value="<?php echo htmlspecialchars($value); ?>"<?php echo !empty($options['placeholder']) ? ' placeholder="' . htmlspecialchars($options['placeholder']) . '"' : ''; ?> class="form-control" />
+                    <input aria-label="{{<?php echo !empty($options['caption']) ? $options['caption'] : $options['description']; ?>}}"<?php echo $required ? ' required' : ''; ?> type="text" name="register_<?php echo $label; ?>" value="<?php echo htmlspecialchars($value); ?>"<?php echo !empty($options['placeholder']) ? ' placeholder="' . htmlspecialchars($options['placeholder']) . '"' : ''; ?> class="form-control" />
             <?php endif; ?>
                 </div>
             </div><?php endif; ?>

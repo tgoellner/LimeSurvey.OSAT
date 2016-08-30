@@ -15,25 +15,25 @@
             <input type="hidden" name="function" value="register" />
 
             <div class="form-group">
-                <input aria-label="{{Email address}}" required type="email" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}" />
+                <input aria-label="{{Email address}}" required type="email" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}*" />
             </div>
 
             <div class="form-group">
-                <input aria-label="{{First name}}" required type="text" name="register_firstname" value="<?php echo $register_firstname; ?>" class="form-control" placeholder="{{First name}}" />
+                <input aria-label="{{First name}}" required type="text" name="register_firstname" value="<?php echo $register_firstname; ?>" class="form-control" placeholder="{{First name}}*" />
             </div>
 
             <div class="form-group">
-                <input aria-label="{{Last name}}" required type="text" name="register_lastname" value="<?php echo $register_lastname; ?>" class="form-control" placeholder="{{Last name}}" />
+                <input aria-label="{{Last name}}" required type="text" name="register_lastname" value="<?php echo $register_lastname; ?>" class="form-control" placeholder="{{Last name}}*" />
             </div>
 
             <?php include(dirname(__FILE__) . '/_attributes.php'); ?>
 
             <div class="form-group">
-                <input aria-label="{{Password}}" required type="password" name="register_password" class="form-control" placeholder="{{Password}}" />
+                <input aria-label="{{Password}}" required type="password" name="register_password" class="form-control" placeholder="{{Password}}*" />
             </div>
 
             <div class="form-group">
-                <input aria-label="{{Confirm Password}}" required type="password" name="register_password_confirm" class="form-control" placeholder="{{Confirm Password}}" />
+                <input aria-label="{{Confirm Password}}" required type="password" name="register_password_confirm" class="form-control" placeholder="{{Confirm Password}}*" />
             </div>
 
             <p class="register--hint">
@@ -52,7 +52,7 @@
                 <input type="checkbox" required id="register_termsaccepted" name="register_termsaccepted" value="1" aria-describedby="register_termsaccepted_info"<?php echo (bool) $register_termsaccepted ? ' checked="checked"' : ''; ?> />
                 <label for="register_termsaccepted"></label>
                 <span id="register_termsaccepted_info">
-                    {{By clicking here you accept the <span data-toggle="modal" data-target="#terms-of-service">Terms of use</span> and the <span data-toggle="modal" data-target="#privacy-policy">Privacy Policy</span>|raw}}
+                    {{By clicking here you accept the <span data-toggle="modal" data-target="#terms-of-service">Terms of use</span> and the <span data-toggle="modal" data-target="#privacy-policy">Privacy Policy</span>|raw}}*
                 </span>
             </div></div><?php endif; ?>
 

@@ -21,11 +21,11 @@
             <input type="hidden" name="function" value="login" />
 
             <div class='form-group'>
-                <input aria-label="{{Email address}}" required type="email" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}" />
+                <input aria-label="{{Email address}}" required type="email" name="register_email" value="<?php echo $register_email; ?>" class="form-control" placeholder="{{Email address}}*" />
             </div>
 
             <div class='form-group'>
-                <input aria-label="{{Password}}" required type="password" name="register_password" class="form-control" placeholder="{{Password}}" />
+                <input aria-label="{{Password}}" required type="password" name="register_password" class="form-control" placeholder="{{Password}}*" />
             </div>
 
             <p class="register--hint">
