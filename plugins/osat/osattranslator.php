@@ -248,7 +248,7 @@ class OsatTranslator
         $csvdata = explode("\n", $csvdata); // split the lines....
         foreach($csvdata as $data)
         {
-            $data = str_getcsv($data); // parse each line
+            $data = strpos($data, "\t") ? str_getcsv($data, "\t", "") : str_getcsv($data);
             if(count($data)>1)
             {
                 $key = array_shift($data);
@@ -257,11 +257,16 @@ class OsatTranslator
                     $key = strtolower($key);
                 }
 
-                $return[$key] = $data;
-                foreach($return[$key] as $i => $r)
+                $key = trim($key);
+                if(!empty($key))
                 {
-                    $return[$key][$i] = stripslashes($r);
+                    $return[$key] = $data;
+                    foreach($return[$key] as $i => $r)
+                    {
+                        $return[$key][$i] = stripslashes($r);
+                    }
                 }
+
                 unset($key, $i, $r);
             }
         }
