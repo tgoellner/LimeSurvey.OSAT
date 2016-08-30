@@ -41,7 +41,7 @@ if(!empty($attributes) && is_array($attributes)):
                     <label for="<?php echo $label; ?>" class="control-label" data-title="{{Choose %s|<?php echo $options['description']; ?>}}"></label>
 
                     <div>
-                        <select id="<?php echo $label; ?>" aria-label="{{<?php echo $options['description']; ?>}}" required name="register_<?php echo $label; ?>" class="form-control">
+                        <select id="<?php echo $label; ?>" aria-label="{{<?php echo $options['description']; ?>}}" required name="register_<?php echo $label; ?>" class="form-control<?php echo $label == 'attribute_4' ? ' sort-options' : ''; ?>">
                             <option value="">{{Choose %s|<?php echo $options['description']; ?>}}</option>
                         <?php foreach($options['options'] as $opt): ?>
 
