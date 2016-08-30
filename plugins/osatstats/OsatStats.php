@@ -91,7 +91,18 @@ class OsatStats extends Osat {
 							}
 						}
 
-						$this->createStatsPdf($html);
+						$options = [];
+						if($tmp = $_POST['options'])
+						{
+							$tmp = base64_decode($tmp);
+							$tmp = json_decode($tmp, true);
+
+							if(!empty($tmp)) {
+								$options = $tmp;
+							}
+						}
+
+						$this->createStatsPdf($html, $options);
 					}
 				}
 			}
@@ -204,14 +215,15 @@ class OsatStats extends Osat {
 		return $html;
 	}
 
-	public function createStatsPdf($html)
+	public function createStatsPdf($html, array $options = [])
 	{
 		// everything looks nice - create a PDF!
 
-		$options = [
+		$options = array_replace([
 			'title' => 'Personal document',
-			'author' => Yii::app()->getConfig('sitename')
-		];
+			'author' => Yii::app()->getConfig('sitename'),
+			'watermarktext' => 'Some watermarktext'
+		], $options);
 
 		preg_match('/<h1>([^<]+)<\/h1>/', $html, $h1);
 		preg_match('/<h2>([^<]+)<\/h2>/', $html, $h2);
@@ -242,7 +254,7 @@ class OsatStats extends Osat {
 				'</htmlpagefooter>' . $html;
 
 		$html.= $image;
-		$mpdf->SetWatermarkText('Personal document');
+		$mpdf->SetWatermarkText($options['watermarktext']);
 		$mpdf->watermark_font = 'roboto';
 		$mpdf->watermarkTextAlpha = 0.1;
 		$mpdf->showWatermarkText = true;

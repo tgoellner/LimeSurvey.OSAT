@@ -7,7 +7,7 @@
             <?php if($t = $assessment->get('tokenData')->attribute_1): ?><br /><?php echo htmlspecialchars($t); ?><?php endif; ?>
         </p>
         <span class="osatstats--header--print">
-            <a href="javascript:window.print()" class="btn btn-default jspdf-print">{{Print}}</a>
+            <a href="javascript:window.print()" class="btn btn-default jspdf-print" data-jspdf-options="&#123;&#34;watermarktext&#34;:&#34;{{Individual document}}&#34;&#125;">{{Print}}</a>
         </span>
     </div>
 </div>

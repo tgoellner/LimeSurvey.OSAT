@@ -9,14 +9,16 @@ var osat_statspdf = {
                 }
                 catch(ev) {};
 
-                osat_statspdf.print();
+                var options = this.getAttribute('data-jspdf-options') ? JSON.parse(this.getAttribute('data-jspdf-options')) : {};
+
+                osat_statspdf.print(options);
 
                 return false;
             }
         }, '.jspdf-print');
     },
 
-    print : function() {
+    print : function(options) {
         var html =  '<div><div class="wrapper">' + this.getH1() + this.getH2() + '</div>' +
                     '<div class="diagram"></div>' + // this.getDiagram() +
                     this.getTexts() +
@@ -35,6 +37,7 @@ var osat_statspdf = {
         $('<input type="hidden" name="action" value="statspdf" />').appendTo(form);
         $('<input type="hidden" name="html" value="' + html + '" />').appendTo(form);
         $('<input type="hidden" name="data" value="' + window.btoa(JSON.stringify(this.getDiagramData())) + '" />').appendTo(form);
+        $('<input type="hidden" name="options" value="' + window.btoa(JSON.stringify(options)) + '" />').appendTo(form);
         $('<input type="submit" />').appendTo(form);
 
         form.appendTo($(('body')));
