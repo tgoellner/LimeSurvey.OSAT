@@ -46,8 +46,6 @@ $(document).on('ready', function()
                 var a_text = a.getAttribute('data-value'),
                     b_text = b.getAttribute('data-value');
 
-                // console.log(a.getAttribute('data-value') + " / " + b.getAttribute('data-value') + " | " + a_text + " / " + b_text);
-
                 return a_text == b_text ? 0 : a_text < b_text ? -1 : 1;
             }));
 

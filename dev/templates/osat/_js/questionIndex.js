@@ -31,7 +31,6 @@ var questionIndexByDefault = {
                 })
             }
 
-            console.log('state : ' + questionIndexByDefault.getStateFromSession(questionIndex));
             if(questionIndexByDefault.getStateFromSession(questionIndex) !== false)
             {
                 questionIndex.addClass('open openByDefault');
@@ -54,7 +53,6 @@ var questionIndexByDefault = {
     setStateToSession : function(qi, state)
     {
         var hash = questionIndexByDefault.getHashFromEl(qi);
-        console.log('Now save ' + hash + ' state to ' + state);
 
         localStorage['osat.questionIndex.' + hash] = state;
     }
