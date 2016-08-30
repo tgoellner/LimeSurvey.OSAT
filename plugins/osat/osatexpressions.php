@@ -616,15 +616,18 @@ class OsatExpressions
         {
             if (($pos = strpos($description, $div)) !== false)
             {
-                $return['description'] = $this->validHtml(substr($description, 0, $pos));
+                $return['intro'] = $this->validHtml(substr($description, 0, $pos));
                 $return['outro'] = $this->validHtml(substr($description, $pos + strlen($div)));
 
                 if (($pos = strpos($return['outro'] , $div)) !== false)
                 {
-                    $return['intro'] = strip_tags($return['description']);
                     $return['description'] = $this->validHtml(substr($return['outro'], 0, $pos));
                     $return['outro'] = $this->validHtml(substr($return['outro'], $pos + strlen($div)));
                 }
+            }
+            else
+            {
+                $return['intro'] = $description;
             }
         }
         unset($pos);
@@ -633,6 +636,8 @@ class OsatExpressions
         {
             $return['intro'] = $group_name;
         }
+
+        $return['intro'] = strip_tags($return['intro']);
 
         if(!empty($what))
         {

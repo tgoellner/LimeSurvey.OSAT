@@ -20,6 +20,11 @@
                 .h1();
                 display: block;
             }
+
+            abbr {
+                text-decoration: none;
+                border-bottom: none;
+            }
         }
         .-(@i: 1) when (@i < 8) {
             @color:		~"@{color_extra@{i}}";

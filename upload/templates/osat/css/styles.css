@@ -3391,6 +3391,10 @@ html body {
     line-height: 1.14285714em;
   }
 }
+.group--header--title abbr {
+  text-decoration: none;
+  border-bottom: none;
+}
 body.group-no-1 .group--header {
   background-color: #7a4f96;
   background-image: url(../files/illustrations/group-01.svg);
