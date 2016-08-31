@@ -4391,12 +4391,6 @@ body.survey-is-just-completed .page-footer {
     padding-top: 40px;
   }
 }
-.osatstats--assessment ul {
-  list-style-type: disc;
-}
-.osatstats--assessment ul > li {
-  margin-left: 1.5em;
-}
 .osatstats--header .center-min {
   position: static;
 }
@@ -5555,6 +5549,14 @@ tfoot .osatstats-table--cell.is--label {
 .osatstats-text--assessment--summary ol:first-child,
 .osatstats-text--assessment--assessment ol:first-child {
   margin-top: 0;
+}
+.osatstats-text--assessment--summary ul,
+.osatstats-text--assessment--assessment ul {
+  list-style-type: disc;
+}
+.osatstats-text--assessment--summary ul > li,
+.osatstats-text--assessment--assessment ul > li {
+  margin-left: 1.5em;
 }
 .osatstats-text--assessment--navigation {
   display: block;
