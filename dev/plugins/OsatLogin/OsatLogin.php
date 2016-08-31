@@ -53,7 +53,32 @@ class OsatLogin extends Osat {
 		'optional_attributes_text' => [
 			'type' => 'html',
 			'title' => 'Optional attributes text'
-		]
+		],
+		'password_email' => [
+				'type' => 'text',
+				'title' => 'Password email',
+				'help' => 'If you do not provide a text for this email a default text (from translations) will be used.<br />
+You can provide a subject line by deviding the email with a --- :<br />
+<pre>This is my email subject
+---
+And here goes the email body.
+</pre>
+It is also possible to use any placeholder that is available in the normal survey emails - the placeholder <span style="font-family:monospace;">{SURVEYURL}</span> will include the link to the password reset function.',
+'default' => 'Your password request for »{SURVEYNAME}
+---
+Dear {FIRSTNAME},
+we received a request for resetting your password - to proceed you have to follow the link:
+
+{SURVEYURL}
+
+Note that this link will expire tomorrow midnight.
+
+If you don\'t want to reset your password you can ignore this email.
+
+Sincerely,
+
+{ADMINNAME} ({ADMINEMAIL})'
+			]
     ];
 
 	protected $passwordLength = 5;
@@ -762,7 +787,7 @@ class OsatLogin extends Osat {
 														if($secret = OsatUser::getForgotPasswordSecret($registerform_vars['register_email']))
 														{
 															// and the email could be found so we have a secret that we can send out via email
-															if($this->sendDoubleOptInEmail($registerform_vars['register_email'], $secret, $surveyId, $sLanguage))
+															if($this->sendRegistrationEmail($surveyId, $user->getToken(), ['{SECRET}' => $secret]))
 															{
 																// redirect and display notice!
 																$url = $this->getUrl('login', $surveyId, ['lang' => $sLanguage, 'secretsent' => 1]);
@@ -831,8 +856,10 @@ class OsatLogin extends Osat {
 							// we have a valid email
 							if($secret = OsatUser::getForgotPasswordSecret($registerform_vars['register_email']))
 							{
+								$user = OsatUser::findByEmail($registerform_vars['register_email']);
+
 								// and the email could be found so we have a secret that we can send out via email
-								if($this->sendForgotPasswordEmail($registerform_vars['register_email'], $secret, $surveyId, $sLanguage))
+								if($this->sendResetPasswordEmail($surveyId, $user->getToken(), ['{SECRET}' => $secret]))
 								{
 									// redirect and display notice!
 									$url = $this->getUrl('forgot_password', $surveyId, ['lang' => $sLanguage, 'secretsent' => 1]);
@@ -1084,7 +1111,7 @@ class OsatLogin extends Osat {
 								if($secret = OsatUser::getForgotPasswordSecret($registerform_vars['register_email']))
 								{
 									// and the email could be found so we have a secret that we can send out via email
-									if($this->sendDoubleOptInEmail($registerform_vars['register_email'], $secret, $surveyId, $sLanguage))
+									if($this->sendRegistrationEmail($surveyId, $user->getToken(), ['{SECRET}' => $secret]))
 									{
 										// redirect and display notice!
 										$url = $this->getUrl('login', $surveyId, ['lang' => $sLanguage, 'secretsent' => 1]);
@@ -1462,7 +1489,7 @@ class OsatLogin extends Osat {
         return SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename, false, $sBounce, null);
     }
 
-	protected function sendDoubleOptInEmail($email, $secret, $surveyId, $sLanguage)
+	protected function sendDoubleOptInEmail($email, $secret, $surveyId, $sLanguage, $sToken)
 	{
         if(!($aSurveyInfo = getSurveyInfo($surveyId, $sLanguage)) || empty($email) || empty($secret))
         {
@@ -1489,5 +1516,162 @@ class OsatLogin extends Osat {
         $sitename =  Yii::app()->getConfig('sitename');
 
         return SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename, false, $sBounce, null);
+    }
+
+	protected function sendResetPasswordEmail($iSurveyId, $iTokenId, array $aReplacementFields = [])
+	{
+		$sLanguage=App()->language;
+		$subject = $this->getTranslator()->translate('Your password request for »%s«', $aSurveyInfo['surveyls_title']);
+		$body = $this->getTranslator()->translate('We received a request for resetting your password - to proceed you have to follow the link:') . "\n\n" .
+							'{SURVEYURL}' . "\n\n" .
+							$this->getTranslator()->translate('Note that this link will expire tomorrow midnight.') . "\n\n" .
+							$this->getTranslator()->translate('If you don\'t want to reset your password you can ignore this email.');
+
+		// gather email text from settings
+		if($body = $this->getSettings('password_email_' . $sLanguage))
+		{
+			if(($p = strpos($body, "\n---")) !== false)
+			{
+				$subject = trim(substr($body, 0, $p));
+				$body = trim(substr($body, $p + 4));
+			}
+			$body = trim($body);
+		}
+
+		if(!empty($aReplacementFields["{SECRET}"]))
+		{
+			$aReplacementFields["{SURVEYURL}"] = App()->createAbsoluteUrl(
+				"/survey/index/sid/{$iSurveyId}", [
+					'action' => 'register',
+					'function' => 'reset-password',
+					'lang' => $sLanguage,
+					'secret' => base64_encode($aReplacementFields["{SECRET}"])
+				]
+			);
+		}
+
+		return $this->_sendEmail($iSurveyId, $iTokenId, $aReplacementFields, $subject, $body);
+	}
+
+	protected function sendRegistrationEmail($iSurveyId, $iTokenId, array $aReplacementFields = [])
+	{
+        $sLanguage=App()->language;
+        $aSurveyInfo=getSurveyInfo($iSurveyId,$sLanguage);
+
+        $subject = $aSurveyInfo['email_register_subj'];
+        $body = $aSurveyInfo['email_register'];
+
+		if(!empty($aReplacementFields["{SECRET}"]))
+		{
+			$aReplacementFields["{SURVEYURL}"] = App()->createAbsoluteUrl(
+				"/survey/index/sid/{$iSurveyId}", [
+					'action' => 'register',
+					'function' => 'confirm',
+					'lang' => $sLanguage,
+					'secret' => base64_encode($aReplacementFields["{SECRET}"])
+				]
+			);
+		}
+
+		return $this->_sendEmail($iSurveyId, $iTokenId, $aReplacementFields, $subject, $body);
+	}
+
+	protected function _sendEmail($iSurveyId, $iTokenId, array $aReplacementFields = [], $subject, $body)
+	{
+        $sLanguage=App()->language;
+        $aSurveyInfo=getSurveyInfo($iSurveyId,$sLanguage);
+
+        $aMail['subject']=$subject;
+        $aMail['message']=$body;
+
+        $aReplacementFields["{ADMINNAME}"]=$aSurveyInfo['adminname'];
+        $aReplacementFields["{ADMINEMAIL}"]=$aSurveyInfo['adminemail'];
+        $aReplacementFields["{SURVEYNAME}"]=$aSurveyInfo['name'];
+        $aReplacementFields["{SURVEYDESCRIPTION}"]=$aSurveyInfo['description'];
+        $aReplacementFields["{EXPIRY}"]=$aSurveyInfo["expiry"];
+        $oToken = Token::model($iSurveyId)->findByAttributes(array('token' => $iTokenId)); // Reload the token (needed if just created)
+
+        foreach($oToken->attributes as $attribute=>$value){
+            $aReplacementFields["{".strtoupper($attribute)."}"]=$value;
+        }
+        $sToken=$oToken->token;
+        $useHtmlEmail = (getEmailFormat($iSurveyId) == 'html');
+        $aMail['subject']=preg_replace("/{TOKEN:([A-Z0-9_]+)}/","{"."$1"."}",$aMail['subject']);
+        $aMail['message']=preg_replace("/{TOKEN:([A-Z0-9_]+)}/","{"."$1"."}",$aMail['message']);
+
+		if(empty($aReplacementFields["{SURVEYURL}"]))
+		{
+			$aReplacementFields["{SURVEYURL}"] = App()->createAbsoluteUrl("/survey/index/sid/{$iSurveyId}",array('lang'=>$sLanguage,'token'=>$sToken));
+		}
+
+        $aReplacementFields["{OPTOUTURL}"] = App()->createAbsoluteUrl("/optout/tokens/surveyid/{$iSurveyId}",array('langcode'=>$sLanguage,'token'=>$sToken));
+        $aReplacementFields["{OPTINURL}"] = App()->createAbsoluteUrl("/optin/tokens/surveyid/{$iSurveyId}",array('langcode'=>$sLanguage,'token'=>$sToken));
+        foreach(array('OPTOUT', 'OPTIN', 'SURVEY') as $key)
+        {
+            $url = $aReplacementFields["{{$key}URL}"];
+            if ($useHtmlEmail)
+                $aReplacementFields["{{$key}URL}"] = "<a href='{$url}'>" . htmlspecialchars($url) . '</a>';
+            $aMail['subject'] = str_replace("@@{$key}URL@@", $url, $aMail['subject']);
+            $aMail['message'] = str_replace("@@{$key}URL@@", $url, $aMail['message']);
+        }
+        // Replace the fields
+        $aMail['subject']=ReplaceFields($aMail['subject'], $aReplacementFields);
+        $aMail['message']=ReplaceFields($aMail['message'], $aReplacementFields);
+        $sFrom = "{$aSurveyInfo['adminname']} <{$aSurveyInfo['adminemail']}>";
+        $sBounce=getBounceEmail($iSurveyId);
+        $sTo=$oToken->email;
+        $sitename =  Yii::app()->getConfig('sitename');
+        // Plugin event for email handling (Same than admin token but with register type)
+        $event = new PluginEvent('beforeTokenEmail');
+        $event->set('type', 'register');
+        $event->set('subject', $aMail['subject']);
+        $event->set('to', $sTo);
+        $event->set('body', $aMail['message']);
+        $event->set('from', $sFrom);
+        $event->set('bounce',$sBounce );
+        $event->set('token', $oToken->attributes);
+        App()->getPluginManager()->dispatchEvent($event);
+        $aMail['subject'] = $event->get('subject');
+        $aMail['message'] = $event->get('body');
+        $sTo = $event->get('to');
+        $sFrom = $event->get('from');
+        $sBounce = $event->get('bounce');
+
+        $aRelevantAttachments = array();
+        if (isset($aSurveyInfo['attachments']))
+        {
+            $aAttachments = unserialize($aSurveyInfo['attachments']);
+            if (!empty($aAttachments))
+            {
+                if (isset($aAttachments['registration']))
+                {
+                    LimeExpressionManager::singleton()->loadTokenInformation($aSurveyInfo['sid'], $sToken);
+
+                    foreach ($aAttachments['registration'] as $aAttachment)
+                    {
+                        if (LimeExpressionManager::singleton()->ProcessRelevance($aAttachment['relevance']))
+                        {
+                            $aRelevantAttachments[] = $aAttachment['url'];
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($event->get('send', true) == false)
+        {
+            $this->sMessage=$event->get('message', $this->sMailMessage); // event can send is own message
+            if($event->get('error')==null) // mimic core system, set send to today
+            {
+                return true;
+            }
+        }
+        elseif (SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename,$useHtmlEmail,$sBounce,$aRelevantAttachments))
+        {
+			return true;
+        }
+
+        // Allways return true : if we come here, we allways trye to send an email
+        return false;
     }
 }

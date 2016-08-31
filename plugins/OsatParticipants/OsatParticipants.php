@@ -15,7 +15,7 @@ class OsatParticipants extends Osat {
 		'options_default' => array(
             'type' => 'info',
             'label' => '',
-			'content' => 'Login options'
+			'content' => 'Reminder options'
         ),
 		'remind_after' => array(
             'type'=>'int',
