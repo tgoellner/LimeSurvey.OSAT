@@ -141,7 +141,10 @@ var osatstats = {
         var url = location.href,
             id = $('.osatstats-text--assessment.is--active').attr('id');
 
-        location.href = "#"+id;                 //Go to the target element.
+        if(this.nodeName.toLowerCase() != 'button')
+        {
+            location.href = "#"+id;                 //Go to the target element.
+        }
     },
 
     addPrevNextButtons : function()
