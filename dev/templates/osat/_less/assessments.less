@@ -48,9 +48,16 @@ body.survey-is-just-completed {
         text-align: center;
     }
     &--print {
-        position: absolute;
-        right: @gutter_width;
-        margin-top: @gutter_width * -2;
+        display: block;
+        text-align: center;
+        padding: @gutter_width 0 0 0;
+
+        @media @minwidth_xl {
+            padding: 0;
+            position: absolute;
+            right: @gutter_width;
+            margin-top: @gutter_width * -2;
+        }
     }
 }
 .osatstats-table {
@@ -77,7 +84,6 @@ body.survey-is-just-completed {
 
         &--title {
             .font(strong);
-            display: none;
 
             @media @minwidth_s {
                 display: block;

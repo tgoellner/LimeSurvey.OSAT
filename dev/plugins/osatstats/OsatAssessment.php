@@ -26,6 +26,8 @@ class OsatAssessment
 
     protected $survey_assessment_by_percentage = false;
     protected $group_assessments_by_percentage = false;
+    protected $group_assessment_valid_timing = 0;
+    protected $timing_filter = null;
 
     public function __construct(array $attributes = [])
     {
@@ -43,6 +45,7 @@ class OsatAssessment
 
         $this->survey_assessment_by_percentage = isset($attributes['survey_assessment_by_percentage']) && (bool) $attributes['survey_assessment_by_percentage'];
         $this->group_assessment_by_percentage = isset($attributes['group_assessment_by_percentage']) && (bool) $attributes['group_assessment_by_percentage'];
+        $this->group_assessment_valid_timing = isset($attributes['group_assessment_valid_timing']) && (int) $attributes['group_assessment_valid_timing'] > 0 ? (int) $attributes['group_assessment_valid_timing'] : 0;
 
         $this->init();
     }
@@ -98,6 +101,54 @@ class OsatAssessment
 		return $controller->createUrl("/survey/index/sid/" . $this->surveyId, $attributes);
     }
 
+    protected function addTimingFilter($query)
+    {
+        if(!isset($this->timing_filter))
+        {
+            $this->timing_filter = '';
+
+            $table = 'survey_' . $this->surveyId . '_timings';
+            $time = $this->group_assessment_valid_timing * 60;
+
+            if(tableExists($table) && $time > 0)
+            {
+                $q = "SELECT `s`.`token` ".
+                "FROM `{{survey_" . $this->surveyId . "}}` s ".
+                "LEFT JOIN {{" . $table ."}} timings ON (timings.id = s.id) ".
+                "LEFT JOIN `{{tokens_" . $this->surveyId . "}}` t ON (t.token = s.token) ".
+                "WHERE timings.interviewtime >= $time AND t.completed <> 'N'";
+
+                $rows = Yii::app()->db->createCommand($q)->query()->readAll();
+                if(!empty($rows))
+                {
+                    $tokens = [];
+                    foreach($rows as $row)
+                    {
+                        $tokens[] = $row['token'];
+                    }
+                    $tokens = array_unique($tokens);
+                }
+
+                if(!empty($tokens))
+                {
+                    $this->timing_filter = " (`t`.`token` IN ('" . join("', '", $tokens) . "'))";
+                }
+                else
+                {
+                    $this->timing_filter = " (`t`.`token` IN (NULL))";
+                }
+            }
+        }
+
+        if(!empty($this->timing_filter))
+        {
+            $pre = substr($query, 0 , strpos($query, 'WHERE'));
+            $suf = substr($query, strpos($query, 'WHERE') + 5);
+            $query = $pre . " WHERE " . $this->timing_filter . " AND " . $suf;
+        }
+        return $query;
+    }
+
     public function getAvailableFilter($key = null)
     {
         if(!isset($this->availableFilter))
@@ -124,7 +175,9 @@ class OsatAssessment
 
                         $minimum_found = 3;
                         // let's check if the attribute contains md5 or sha1 strings - we don't want to allow filtering against those!
-                        $query = "SELECT `$label`, COUNT(*) AS count FROM {{tokens_$this->surveyId}} WHERE $label NOT REGEXP '^[0-9a-f]{32}$' AND $label NOT REGEXP '^[0-9a-f]{40}$' AND $label <> '' GROUP BY $label HAVING `count` >= $minimum_found ORDER BY $label ASC";
+                        $query = "SELECT `$label`, COUNT(*) AS count FROM {{tokens_$this->surveyId}} t WHERE $label NOT REGEXP '^[0-9a-f]{32}$' AND $label NOT REGEXP '^[0-9a-f]{40}$' AND $label <> '' GROUP BY $label HAVING `count` >= $minimum_found ORDER BY $label ASC";
+                        $query = $this->addTimingFilter($query);
+
                         $rows = Yii::app()->db->createCommand($query)->query()->readAll();
                         if(empty($rows))
                         {
@@ -192,7 +245,7 @@ class OsatAssessment
         return $this->activeFilter;
     }
 
-    protected function getTokenCount()
+    public function getTokenCount()
     {
         return $this->tokenCount + ($this->_thisCountsInAverage() ? 1 : 0);
     }
@@ -313,6 +366,8 @@ class OsatAssessment
         LEFT JOIN({{tokens_" . $this->surveyId . "}} t) ON (t.token = s.token)
         WHERE t.completed != 'N'
         AND s.token <> '" . $this->sToken . "'";
+
+        $query = $this->addTimingFilter($query);
 
         // let's add the filters
         if(!empty($filter))

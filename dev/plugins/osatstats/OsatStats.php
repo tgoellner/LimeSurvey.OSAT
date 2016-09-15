@@ -26,6 +26,12 @@ class OsatStats extends Osat {
             'label' => 'Calculate group assessments by percentages',
             'default' => false
         ),
+		'group_assessment_valid_timing' => array(
+            'type'=>'int',
+            'label'=>'Minimum minutes for answers',
+            'help'=>'Minimum time a user has to need to fill out the complete survey. All surveys not matching this criteria will not be taken in account when assessment stats are calculated. Set to 0 to disabled.',
+            'default'=>'0',
+        ),
 	];
     protected $localeSettings = [
 		'translate' => [
@@ -447,7 +453,8 @@ class OsatStats extends Osat {
 			'sToken' => $sToken,
 			'hasAverages' => false,
 			'survey_assessment_by_percentage' => (bool) $this->getSettings('survey_assessment_by_percentage'),
-			'group_assessment_by_percentage' => (bool) $this->getSettings('group_assessment_by_percentage')
+			'group_assessment_by_percentage' => (bool) $this->getSettings('group_assessment_by_percentage'),
+			'group_assessment_valid_timing' => (int) $this->getSettings('group_assessment_valid_timing')
 		];
 
 		$filter = $this->getRequest('filter');
@@ -465,8 +472,7 @@ class OsatStats extends Osat {
             $data['assessment'] = $assessment;
 			$data['header'] = !empty($user) && !$user->hasJustCompletedSurvey() ? Yii::app()->getController()->renderFile(dirname(__FILE__) . '/view/assessment_header.php', $data, true) : '';
 
-
-            return Yii::app()->getController()->renderFile(dirname(__FILE__) . '/view/assessment.php', $data, true);
+			return Yii::app()->getController()->renderFile(dirname(__FILE__) . '/view/assessment.php', $data, true);
         }
         return '';
     }

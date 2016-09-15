@@ -4424,6 +4424,13 @@
 
             $result = $LEM->em->sProcessStringContainingExpressions($stringToParse,$qnum, $numRecursionLevels, $whichPrettyPrintIteration, $groupSeq, $questionSeq, $staticReplacement);
 
+            // start: define a custom event
+            $event = new PluginEvent('afterEmManagerHelperProcessString');
+            $event->set('stringToParse', $result);
+            App()->getPluginManager()->dispatchEvent($event);
+            $result = $event->get('stringToParse');
+            // end: definign our custom event
+
             if ($timeit) {
                 $LEM->runtimeTimings[] = array(__METHOD__,(microtime(true) - $now));
             }

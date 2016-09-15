@@ -112,12 +112,11 @@ class OsatFeedback extends Osat {
 Firstname : {firstname}
 Lastname : {lastname}
 
-Organisation: {attribute_5}
-Organisation URL: {attribute_6}
+Organisation: {attribute_1}
 
-Area of work: {attribute_1}
-Size of organisation: {attribute_2}
-Country: {attribute_2}
+Area of work: {attribute_2}
+Size of organisation: {attribute_3}
+Country: {attribute_4}
 
 Rating: {rating}
 Feedback: {feedback}

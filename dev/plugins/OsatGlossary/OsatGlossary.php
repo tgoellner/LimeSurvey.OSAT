@@ -29,7 +29,7 @@ class OsatGlossary extends Osat {
     protected function _registerEvents()
     {
 		$this->subscribe('beforeAdminMenuRender');
-        $this->subscribe('osatAddLocales');
+        $this->subscribe('afterEmManagerHelperProcessString');
     }
 
     public function getTranslator($pluginonly = false)
@@ -155,7 +155,7 @@ class OsatGlossary extends Osat {
 		return $string;
 	}
 
-    public function osatAddLocales()
+    public function afterEmManagerHelperProcessString()
     {
         $event = $this->event;
         $stringToParse = $event->get('stringToParse');

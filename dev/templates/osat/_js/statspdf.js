@@ -1,5 +1,6 @@
 var osat_statspdf = {
     'html_prefix' : '.osatstats',
+    'include_average' : false,
 
     init : function() {
         $(document).on({
@@ -187,7 +188,7 @@ var osat_statspdf = {
             if(bar.total) {
                 bar.label = $(group).find('.is--label').length ? $.trim($(group).find('.is--label').text()) : bars.length + 1;
 
-                if($(group).find('.is--average').length)
+                if($(group).find('.is--average').length && osat_statspdf.include_average === true)
                 {
                     var el = $(group).find('.is--average').get(0);
                     if(parseInt(window.getComputedStyle(el, null).getPropertyValue("height")) > 0)

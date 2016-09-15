@@ -123,10 +123,10 @@
 
         <div id="osatstats-chart" class="osatstats-table is--chart<?php echo $hasAverages ? ' has--averages' : ''; ?>">
 
-            <div class="osatstats-table--filter">
+            <?php if($assessment->getTokenCount() > 1): ?><div class="osatstats-table--filter">
                 <h3 class="osatstats-table--filter--title">{{Compare by:}}</h3>
                 <?php echo CHtml::form($assessment->getUrl(), 'post', array('id'=>'assessmentfilter')); ?>
-
+                    <input type="hidden" name="osatstats[filter][reset]" value="0" />
                     <div class="form-group">
                         <button type="submit" id="assessmentfilter_overall" value="1" name="osatstats[filter][reset]" class="btn">{{Overall}}</button>
                     </div>
@@ -145,7 +145,7 @@
                         </label>
                     </div><?php endforeach; ?>
                 <?php echo CHtml::endForm(); ?>
-            </div>
+            </div><?php endif; ?>
 
             <div class="osatstats-table--wrapper">
                 <table class="table osatstats-table--table">
