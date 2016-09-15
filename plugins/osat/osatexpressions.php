@@ -2,6 +2,7 @@
 
 class OsatExpressions
 {
+    protected $groupdata = [];
 
     public function __construct()
     {
@@ -576,7 +577,7 @@ class OsatExpressions
     {
         $return = [
             'description' => '',
-            'outtro' => '',
+            'outro' => '',
             'intro' => ''
         ];
 
@@ -590,6 +591,17 @@ class OsatExpressions
             $gid = $this->groupId();
         }
 
+        if(!isset($this->groupdata[$gid]))
+        {
+            $this->groupdata[$gid] = QuestionGroup::model()->findByAttributes(array('sid' => $this->surveyId(), 'gid' => $gid, 'language' => App()->language));
+        }
+
+        if(!empty($this->groupdata[$gid]))
+        {
+            $description = $this->groupdata[$gid]->description;
+            $group_name = $this->groupdata[$gid]->group_name;
+        }
+/*
         if(($grouplist = $this->getSurveySession('grouplist')) !== null)
     	{
             foreach($grouplist as $group)
@@ -602,7 +614,7 @@ class OsatExpressions
             }
     	}
 
-        if($description === null)
+        if(empty($description))
         {
             if($group = QuestionGroup::model()->findByAttributes(array('sid' => $this->surveyId(), 'gid' => $gid, 'language' => App()->language)))
             {
@@ -610,7 +622,7 @@ class OsatExpressions
                 $group_name = $group->group_name;
             }
         }
-
+*/
         // process the description: split into SUMMARY and FULL sections (if any marker is found)
         if (!empty($description))
         {
@@ -638,6 +650,7 @@ class OsatExpressions
         }
 
         $return['intro'] = strip_tags($return['intro']);
+
 
         if(!empty($what))
         {

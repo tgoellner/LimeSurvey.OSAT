@@ -29,7 +29,8 @@
                     'min' => $group['min'],
                     'max' => $group['max'],
                     'questions' => count($group['questions']),
-                    'assessment' => $assessment->getGroupAssessment($gid)
+                    'assessment' => $assessment->getGroupAssessment($gid),
+                    'long_title' => ''
                 ];
 
                 // and get the name!
@@ -37,16 +38,23 @@
                 {
                     $grouplist[$gid]['name'] = $sess[$gid]['group_name'];
                     $grouplist[$gid]['summary'] = !empty($exp) ? $exp->groupoutro($gid) : $sess[$gid]['description'];
+                    $grouplist[$gid]['long_title'] = !empty($exp) ? $exp->groupintro($gid) : '';
                 }
                 elseif($sGroup = QuestionGroup::model()->findByAttributes(array('sid' => $assessment->get('surveyId'), 'gid' => $gid, 'language' => $assessment->get('sLanguage'))))
                 {
                     $grouplist[$gid]['name'] = $sGroup->group_name;
                     $grouplist[$gid]['summary'] = !empty($exp) ? $exp->groupoutro($gid) : $sGroup->description;
+                    $grouplist[$gid]['long_title'] = !empty($exp) ? $exp->groupintro($gid) : '';
                 }
                 else
                 {
                     $grouplist[$gid]['name'] = $grouplist[$gid]['label'];
                     $grouplist[$gid]['summary'] = '';
+                }
+
+                if(empty($grouplist[$gid]['long_title']) && !empty($grouplist[$gid]['name']))
+                {
+                    $grouplist[$gid]['long_title'] = $grouplist[$gid]['name'];
                 }
                 unset($sGroup);
 
@@ -237,7 +245,7 @@
                 <div class="osatstats-text--assessments">
                     <?php $c = 0; foreach($grouplist as $gid => $group): ?><div id="summary-<?php echo $gid; ?>" class="osatstats-text--assessment<?php echo empty($c) ? ' is--active': '';?>" data-gid="<?php echo $gid; ?>">
                         <p class="osatstats-text--assessment--label"><?php echo $group['label']; ?></p>
-                        <h3 class="osatstats-text--assessment--groupname"><?php echo $group['name']; ?></h3>
+                        <h3 class="osatstats-text--assessment--groupname"><?php echo $group['long_title']; ?></h3>
                         <?php if(!empty($group['summary'])): ?><div class="osatstats-text--assessment--summary">
                             <?php echo $group['summary']; ?>
                         </div><?php endif; ?>
