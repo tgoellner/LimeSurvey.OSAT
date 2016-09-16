@@ -270,6 +270,16 @@
                                         />
                                         <?php eT("Full answers");?>
                                     </label>
+
+                                    <label class="btn btn-default">
+                                        <input
+                                            name="answers"
+                                            value="score"
+                                            type="radio"
+                                            id="answers-score"
+                                        />
+                                        <?php eT("Answer scores");?>
+                                    </label>
                                 </div>
 
                                 <!-- Responses  -->

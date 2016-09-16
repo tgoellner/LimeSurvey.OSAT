@@ -1776,7 +1776,7 @@ function tokensExport($iSurveyID)
 
     // Export UTF8 WITH BOM
     $tokenoutput = chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'));
-    $tokenoutput .= "tid,firstname,lastname,email,emailstatus,token,language,validfrom,validuntil,invited,reminded,remindercount,completed,usesleft";
+    $tokenoutput .= "tid,firstname,lastname,email,emailstatus,token,language,blacklisted,validfrom,validuntil,invited,reminded,remindercount,completed,usesleft";
     $attrfieldnames = getAttributeFieldNames($iSurveyID);
     $attrfielddescr = getTokenFieldsAndNames($iSurveyID, true);
     foreach ($attrfieldnames as $attr_name)
@@ -1812,6 +1812,7 @@ function tokensExport($iSurveyID)
         $tokenoutput .= '"'.trim($brow['emailstatus']).'",';
         $tokenoutput .= '"'.trim($brow['token']).'",';
         $tokenoutput .= '"'.trim($brow['language']).'",';
+        $tokenoutput .= '"'.trim($brow['blacklisted']).'",';
         $tokenoutput .= '"'.trim($brow['validfrom']).'",';
         $tokenoutput .= '"'.trim($brow['validuntil']).'",';
         $tokenoutput .= '"'.trim($brow['sent']).'",';

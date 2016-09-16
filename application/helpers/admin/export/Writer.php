@@ -335,6 +335,8 @@ abstract class Writer implements IWriter
                     $elementArray[]=$value;
                 }
             }
+
+            $elementArray = $this->codesToAssessments($headers, $elementArray, $oOptions, $oSurvey);
             if ($oOptions->output=='display')
             {
                 $this->outputRecord($headers, $elementArray, $oOptions);
@@ -343,6 +345,57 @@ abstract class Writer implements IWriter
             }
         }
         return $sFile;
+    }
+
+    protected function codesToAssessments($headers, $elementArray, $oOptions, $oSurvey)
+    {
+        if($oOptions->answerFormat == 'score')
+        {
+            if(!isset($this->scores))
+            {
+                $this->scores = [];
+
+                $query = "SELECT DISTINCT
+                    CONCAT(q.sid,'X',q.gid,'X',q.qid,'X',a.code) AS field,
+                    q.sid,
+                    q.gid,
+                    q.qid,
+                    a.assessment_value as score
+                FROM
+                    {{answers}} a
+                LEFT JOIN({{questions}} q) ON (a.qid = q.qid)
+                WHERE sid = '" . $oSurvey->id . "'
+                ORDER BY q.sid, q.qid";
+
+                $rows = Yii::app()->db->createCommand($query)->query()->readAll();
+                if(count($rows))
+                {
+                    while($row = array_shift($rows))
+                    {
+                        $this->scores[$row['field']] = (float) $row['score'];
+                    }
+                    unset($row);
+                }
+                unset($rows, $query);
+            }
+
+            foreach($oOptions->selectedColumns as $i => $column)
+            {
+                if(preg_match('/^[0-9]+X[0-9]+X[0-9]+$/', $column))
+                {
+                    $resultname = $column . 'X' . $elementArray[$i];
+                    if(isset($this->scores[$resultname]))
+                    {
+                        $elementArray[$i] = $this->scores[$resultname];
+                    }
+                    else
+                    {
+                        $elementArray[$i] = 0;
+                    }
+                }
+            }
+        }
+        return $elementArray;
     }
 
     protected function stripTagsFull($string)
