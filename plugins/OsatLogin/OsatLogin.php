@@ -1621,6 +1621,7 @@ Sincerely,
         $sBounce=getBounceEmail($iSurveyId);
         $sTo=$oToken->email;
         $sitename =  Yii::app()->getConfig('sitename');
+		$customHeaders = '';
         // Plugin event for email handling (Same than admin token but with register type)
         $event = new PluginEvent('beforeTokenEmail');
         $event->set('type', 'register');
@@ -1630,12 +1631,14 @@ Sincerely,
         $event->set('from', $sFrom);
         $event->set('bounce',$sBounce );
         $event->set('token', $oToken->attributes);
+        $event->set('customHeaders', $customHeaders);
         App()->getPluginManager()->dispatchEvent($event);
         $aMail['subject'] = $event->get('subject');
         $aMail['message'] = $event->get('body');
         $sTo = $event->get('to');
         $sFrom = $event->get('from');
         $sBounce = $event->get('bounce');
+        $customHeaders = $event->get('customHeaders');
 
         $aRelevantAttachments = array();
         if (isset($aSurveyInfo['attachments']))
@@ -1666,7 +1669,7 @@ Sincerely,
                 return true;
             }
         }
-        elseif (SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename,$useHtmlEmail,$sBounce,$aRelevantAttachments))
+        elseif (SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename,$useHtmlEmail,$sBounce,$aRelevantAttachments,$customHeaders))
         {
 			return true;
         }

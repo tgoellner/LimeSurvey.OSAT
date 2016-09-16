@@ -3959,55 +3959,41 @@ class statistics_helper {
     {
         if(empty($attributefilter))
         {
-            $attributefilter = isset($_POST['user_attribute']) ? (array) $_POST['user_attribute'] : array();
+            $attributefilter = isset($_POST['user_attributes']) ? (array) $_POST['user_attributes'] : array();
         }
 
         // filter by uer attributes
         if(!empty($attributefilter))
         {
-            $participant_ids = null;
+            $tokens = [];
 
-            foreach($attributefilter as $attribute_id => $option_ids)
+            $attr_query = [];
+
+            foreach($attributefilter as $attribute_id => $options)
             {
-                if(!empty($option_ids))
+                if(!empty($options))
                 {
-                    $attr_query = "SELECT participant_id FROM {{participant_attribute}} WHERE value IN (SELECT value FROM {{participant_attribute_values}} WHERE `attribute_id` = $attribute_id AND `value_id` IN (" . join(", ", $option_ids) . "))";
-                    $rows = Yii::app()->db->createCommand($attr_query)->query()->readAll();
-                    foreach($rows as $i => $r)
-                    {
-                        $rows[$i] = $r['participant_id'];
-                    }
+                    $options = (array) $options;
 
-                    if($participant_ids === null)
-                    {
-                        $participant_ids = $rows;
-                    }
-                    else
-                    {
-                        $participant_ids = array_intersect($participant_ids, $rows);
-                    }
+                    $attr_query[] = "`$attribute_id` IN ('" . join("', '", $options) . "')";
                 }
             }
-            unset($attr_query, $rows, $i, $r);
 
-            if($participant_ids !== null)
+            if(!empty($attr_query))
             {
-                $attr_query = "SELECT token FROM {{tokens_$surveyid}} WHERE `participant_id` IN (" . (!empty($participant_ids) ? "'" . join("', '", $participant_ids). "'" : "NULL" ) . ")";
-                $tokens = Yii::app()->db->createCommand($attr_query)->query()->readAll();
-                if(!empty($tokens))
+                $attr_query = "SELECT `token` FROM {{tokens_$surveyid}} WHERE " . join(" AND ", $attr_query);
+                $rows = Yii::app()->db->createCommand($attr_query)->query()->readAll();
+                foreach($rows as $r)
                 {
-                    foreach($tokens as $i => $r)
-                    {
-                        $tokens[$i] = $r['token'];
-                    }
+                    $tokens[] = $r['token'];
                 }
-                else {
-                    $tokens = ['NULL'];
-                }
+                unset($rows, $r, $attr_query);
+            }
+            unset($attribute_id, $options);
 
-                unset($attr_query, $i, $r);
-
-                return $tokens;
+            if(!empty($tokens))
+            {
+                return array_unique($tokens);
             }
         }
 

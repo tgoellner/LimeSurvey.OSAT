@@ -105,7 +105,7 @@ If you do not want to participate in this survey and don\'t want to receive any 
 
 		// $this->subscribe('beforeControllerAction');
 		$this->subscribe('beforeControllerAction');
-
+		# $this->subscribe('beforeTokenEmail');
     }
 
 	public function beforeControllerAction()
@@ -121,6 +121,19 @@ If you do not want to participate in this survey and don\'t want to receive any 
 				$this->$action($surveyId);
 			}
 		}
+	}
+
+	public function beforeTokenEmail()
+	{
+		if($this->event->get('type') == 'register')
+		{
+			$customHeaders = (array) $this->event->get('customHeaders');
+			$customHeaders[] = 'BCC: ' . $this->event->get('from');
+			$customHeaders = join("\n", $customHeaders);
+			$this->event->set('customHeaders', $customHeaders);
+		}
+
+		return $this->event;
 	}
 
 	protected function hasPermission($surveyId)
