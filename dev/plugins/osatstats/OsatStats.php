@@ -297,7 +297,7 @@ class OsatStats extends Osat {
 		}
 		unset($surveyId);
 
-		$segments[] = date('Y-m-d_H-i-s', time());
+		# $segments[] = date('Y-m-d_H-i-s', time());
 
 		return join('_', $segments) . '.pdf';
 	}

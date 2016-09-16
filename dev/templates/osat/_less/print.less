@@ -1,3 +1,9 @@
+@media screen {
+    .noprint {
+    	display: none;
+    }
+}
+
 @media print {
     html, body {
         background: @color_white;
@@ -8,18 +14,17 @@
         margin: 0 auto;
     }
 
-    body.survey-is-just-completed {
-        #outerframeContainer * {
-            display: none !important;
-            visibility: hidden !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
-            font-size: 0 !important;
-        }
+    body.survey-is-just-completed #outerframeContainer *,
+    .group {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        font-size: 0 !important;
     }
 
     .outerframe {

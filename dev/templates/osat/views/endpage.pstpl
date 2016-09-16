@@ -71,6 +71,7 @@
                     <span data-toggle="modal" data-target="#legal-notice">{{Legal notice}}</span>
                 </p>
                 <p>
+                    <span class="noprint">{{FUNDRASING_LINK}}<br /></span>
                     &copy; 2016 {{Copyright owner}}<br />
                     {{All rights reserved}}
                 </p>

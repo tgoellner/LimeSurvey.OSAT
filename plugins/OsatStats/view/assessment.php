@@ -245,7 +245,7 @@
                 <div class="osatstats-text--assessments">
                     <?php $c = 0; foreach($grouplist as $gid => $group): ?><div id="summary-<?php echo $gid; ?>" class="osatstats-text--assessment<?php echo empty($c) ? ' is--active': '';?>" data-gid="<?php echo $gid; ?>">
                         <p class="osatstats-text--assessment--label"><?php echo $group['label']; ?></p>
-                        <h3 class="osatstats-text--assessment--groupname"><?php echo $group['long_title']; ?></h3>
+                        <h3 class="osatstats-text--assessment--groupname"><?php echo !empty($group['long_title']) ? $group['long_title'] : $group['name']; ?></h3>
                         <?php if(!empty($group['summary'])): ?><div class="osatstats-text--assessment--summary">
                             <?php echo $group['summary']; ?>
                         </div><?php endif; ?>

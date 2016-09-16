@@ -4009,6 +4009,9 @@ body.group-no-7.group-id-21 .group--header {
 #index {
   display: none;
 }
+.osat--glossary {
+  text-indent: 0;
+}
 .checkbox input[type="checkbox"],
 .checkbox input[type="radio"] {
   outline: none !important;
@@ -5859,6 +5862,11 @@ tfoot .osatstats-table--cell.is--label {
   margin: 0 auto;
   display: block;
 }
+@media screen {
+  .noprint {
+    display: none;
+  }
+}
 @media print {
   html,
   body {
@@ -5868,7 +5876,8 @@ tfoot .osatstats-table--cell.is--label {
     overflow: hidden;
     margin: 0 auto;
   }
-  body.survey-is-just-completed #outerframeContainer * {
+  body.survey-is-just-completed #outerframeContainer *,
+  .group {
     display: none !important;
     visibility: hidden !important;
     position: absolute !important;
