@@ -9,6 +9,8 @@ class OsatStats extends Osat {
 	static protected $name = 'OSAT Stats';
 	static protected $label = 'osatstats';
 
+	protected $pdf_directory = '/assessment_pdfs';
+
 	protected $menuLabel = "Stats";
 	protected $settings = [
 		'options_default' => array(
@@ -221,6 +223,85 @@ class OsatStats extends Osat {
 		return $html;
 	}
 
+	protected function getStatSaveDirectory()
+	{
+		$segments = trim($this->pdf_directory, '/');
+		if(empty($segments))
+		{
+			return false;
+		}
+		$segments = explode('/', $segments);
+		$dir = ROOT;
+		$created = false;
+
+		do {
+			$segment = array_shift($segments);
+
+			$dir.= '/' . $segment;
+
+			if(!file_exists($dir))
+			{
+				if(!@mkdir($dir))
+				{
+					return false;
+				}
+				chmod($dir, 0755);
+				$created = true;
+			}
+		} while ($segments);
+
+		if($created)
+		{
+			// secure the folder
+			file_put_contents($dir . '/.htaccess', "order deny,allow\ndeny from all\n");
+		}
+
+		return $dir;
+	}
+
+	protected function getPdfSaveFilename($prefix)
+	{
+		$segments = [];
+
+		if(!empty($prefix))
+		{
+			$segments[] = $prefix;
+		}
+
+		$surveyId = Yii::app()->request->getParam('sid', Yii::app()->request->getParam('surveyid', 0));
+		if($surveyId)
+		{
+			$LEMsessid = 'survey_' . $surveyId;
+			$segments[] = $surveyId;
+
+			if(!empty($_SESSION[$LEMsessid]))
+			{
+				$surveySession = $_SESSION[$LEMsessid];
+				$token = $surveySession['token'];
+				$segments[] = $token;
+
+				if(!empty($token))
+				{
+					if($tokenData = Token::model($surveyId)->findByAttributes(['token' => $token]))
+					{
+						if(!empty($token->attributes['email']))
+						{
+							$segments[] = $token->attributes['email'];
+						}
+					}
+					unset($tokenData);
+				}
+				unset($token, $surveySession);
+			}
+			unset($LEMsessid);
+		}
+		unset($surveyId);
+
+		$segments[] = date('Y-m-d_H-i-s', time());
+
+		return join('_', $segments) . '.pdf';
+	}
+
 	public function createStatsPdf($html, array $options = [])
 	{
 		// everything looks nice - create a PDF!
@@ -273,7 +354,14 @@ class OsatStats extends Osat {
 		$filename = preg_replace('/_{2,}/', '_', $filename);
 		$filename = strtolower($filename);
 
+		// let's save the PDF
+		$save_filename = $this->getStatSaveDirectory() . '/' . $this->getPdfSaveFilename($filename);
+		$mpdf->Output($save_filename . '.pdf', 'F');
+
 		$mpdf->Output($filename . '.pdf', 'I');
+
+		// and return it!
+
 
 		exit;
 	}
