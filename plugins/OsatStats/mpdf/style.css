@@ -1,0 +1,168 @@
+@page {
+    margin: 2cm 1cm 2cm 2cm;
+    /* 21 - 4 = 17 */
+
+	footer: myFooter;
+}
+
+body {
+    font-family: roboto, sans-serif;
+    font-size: 12pt;
+    line-height: 18pt;
+    color: rgb(21, 65, 148);
+}
+.wrapper {
+    display: block;
+    width: auto;
+    margin-left: 2cm;
+    margin-right: 2cm;
+}
+p {
+    text-align: left;
+    margin-top: 6pt
+    margin-bottom: 6pt;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight:bold;
+    margin-top: 6pt
+    margin-bottom: 6pt;
+    text-align:center;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+}
+h1 {
+    font-size:35pt;
+    line-height:45pt;
+}
+h2 {
+
+}
+h3 {
+    font-size:20pt;
+    line-height:30pt;
+    margin-top: 54pt;
+}
+h4 {
+    font-size:18pt;
+    line-height:24pt;
+    margin-top: 36pt;
+}
+h5, h6 {
+    text-align: left;
+}
+
+hr {
+    width: 70%;
+    height: 1pt;
+    text-align: center;
+    color: #999999;
+    margin-top: 6pt
+    margin-bottom: 6pt;
+}
+
+a {
+    color: rgb(21, 65, 148);
+    color: #000066;
+    font-style: normal;
+    text-decoration: underline;
+    font-weight: normal;
+}
+
+pre {
+    font-family: Dmonospaced;
+    font-size: 12pt;
+    line-height: 18pt;
+    margin-top: 6pt;
+    margin-bottom: 6pt;
+}
+
+.diagram {
+    background: #eee;
+    width: 170mm;
+    height: 85mm;
+    margin: 5mm 0;
+}
+.bar-wrap,
+.bar-total,
+.bar-average {
+    display: block;
+    float: left;
+}
+.bar-legend {
+    width: 100%;
+    text-align: center;
+    clear: both;
+}
+
+.page-footer {
+    display: block;
+    border-top: 2pt solid rgb(21, 65, 148);
+    padding-top: 5mm;
+    position: fixed;
+    bottom: 0;
+    left: 2cm;
+    width: 140mm;
+}
+.page-footer--legal {
+    display: block;
+    width: 60mm;
+    float: left;
+    text-align: right;
+
+    font-size: 9pt;
+    line-height: 12pt;
+}
+.page-footer--legal p {
+    display: block;
+    text-align: right;
+}
+
+.page-footer--sponsors {
+    display: block;
+    width: 55mm;
+    float: right;
+    text-align: left;
+
+    font-size: 9pt;
+    line-height: 12pt;
+}
+.page-footer--sponsors .label {
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+.page-footer--sponsors img {
+    display: block;
+}
+.erasmus-plus-text {
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+.footer-table {
+    margin-left: 2cm;
+    margin-right: 2cm;
+    font-size: 9pt;
+
+    border-top: 1pt solid rgb(21, 65, 148);
+    padding-top: 2mm;
+    margin-top: 2mm;
+    color: rgb(21, 65, 148);
+
+}
+
+.breadcrumb {
+    text-align: right; font-size: 8pt; font-family: DejaVuSerifCondensed, serif; color: #666666;
+    font-weight: bold; font-style: normal; margin-bottom: 6pt; }
+
+.infobox { margin-top:10pt; background-color:#DDDDBB; text-align:center; border:1pt solid #880000; }
+
+.big { font-size: 1.5em; }
+.red { color: #880000; }
+.slanted { font-style: italic; }

@@ -1,0 +1,36 @@
+*[id^="pluginsettings-Osat"] {
+    .setting.control-group {
+        display: none;
+        &.is--open,
+        &.setting-info {
+            display: block;
+        }
+    }
+    .setting.control-group.setting-text,
+    .setting.control-group.setting-html {
+        .controls {
+            height: 10px;
+            overflow: hidden;
+            opacity: 0;
+            &.is--open {
+                opacity: 1;
+                overflow: visible;
+                height: auto;
+            }
+        }
+    }
+
+
+    .setting-info {
+        .clearfix();
+        border: 1px solid #ccc;
+        .radius(3px);
+        padding: 10px;
+        font-weight: bold;
+        font-size: 18px;
+
+        cursor: pointer;
+
+        position: relative;
+    }
+}
