@@ -308,10 +308,21 @@ class SurveyRuntimeHelper {
             if (LimeExpressionManager::GroupIsRelevant($group['gid']))
             {
                 $group['step'] = $key + 1;
-                $stepInfo = LimeExpressionManager::singleton()->_ValidateGroup($key);
+
+                $stepInfoClass = '';
+                if (isset($group['step']))
+                {
+                    if ( $group['step'] < $_SESSION[$LEMsessid]['step'])
+                    {
+                        $stepInfo = LimeExpressionManager::singleton()->_ValidateGroup($key);
+                        $stepInfoClass = $stepInfo['anyUnanswered'] ? 'missing' : '';
+                    }
+                }
+
+
                 $classes = implode(' ', array(
                     'row',
-                    $stepInfo['anyUnanswered'] ? 'missing' : '',
+                    $stepInfoClass,
                     $_SESSION[$LEMsessid]['step'] == $group['step'] ? 'current' : ''
 
                 ));
@@ -551,11 +562,11 @@ class SurveyRuntimeHelper {
                 $_SESSION[$LEMsessid]['maxstep'] = 0;
             }
 
-            if (isset($_SESSION[$LEMsessid]['LEMpostKey']) && App()->request->getPost('LEMpostKey') != $_SESSION[$LEMsessid]['LEMpostKey'])
+            if (isset($_SESSION[$LEMsessid]['LEMpostKey']) && App()->request->getPost('LEMpostKey',$_SESSION[$LEMsessid]['LEMpostKey']) != $_SESSION[$LEMsessid]['LEMpostKey'])
             {
                 // then trying to resubmit (e.g. Next, Previous, Submit) from a cached copy of the page
                 $moveResult = LimeExpressionManager::JumpTo($_SESSION[$LEMsessid]['step'], false, false, true);// We JumpTo current step without saving: see bug #11404
-                if (isset($moveResult['seq']) && App()->request->getPost('thisstep') == $moveResult['seq'])
+                if (isset($moveResult['seq']) &&  App()->request->getPost('thisstep',$moveResult['seq']) == $moveResult['seq'])
                 {
 
                     /* then pressing F5 or otherwise refreshing the current page, which is OK
@@ -1340,8 +1351,16 @@ class SurveyRuntimeHelper {
             echo templatereplace(file_get_contents($sTemplateViewPath."startgroup.pstpl"), array(), $redata);
             echo "\n";
 
+            $showgroupinfo_global_ = getGlobalSetting('showgroupinfo');
             $aSurveyinfo = getSurveyInfo($surveyid);
-            $showgroupinfo_ = $aSurveyinfo['showgroupinfo'];
+
+            // Look up if there is a global Setting to hide/show the Questiongroup => In that case Globals will override Local Settings
+            if(($aSurveyinfo['showgroupinfo'] == $showgroupinfo_global_) || ($showgroupinfo_global_ == 'choose')){
+                $showgroupinfo_ = $aSurveyinfo['showgroupinfo'];
+            } else {
+                $showgroupinfo_ = $showgroupinfo_global_;
+            }
+
             $showgroupdesc_ = $showgroupinfo_ == 'B' /* both */ || $showgroupinfo_ == 'D'; /* (group-) description */
 
             if (!$previewquestion && trim($redata['groupdescription'])!="" && $showgroupdesc_)
@@ -1452,6 +1471,7 @@ class SurveyRuntimeHelper {
                 $this->createFullQuestionIndexMenu($LEMsessid, $surveyMode);
             }
 
+            echo "<!-- generated in SurveyRuntimeHelper -->";
             echo "<input type='hidden' name='thisstep' value='{$_SESSION[$LEMsessid]['step']}' id='thisstep' />\n";
             echo "<input type='hidden' name='sid' value='$surveyid' id='sid' />\n";
             echo "<input type='hidden' name='start_time' value='" . time() . "' id='start_time' />\n";
@@ -1481,6 +1501,7 @@ class SurveyRuntimeHelper {
         doFooter();
 
     }
+
     /**
     * setJavascriptVar
     *
@@ -1497,6 +1518,15 @@ class SurveyRuntimeHelper {
             $aLSJavascriptVar['bNumRealValue']=(int)(bool)Yii::app()->getConfig('bNumRealValue',0);
             $aRadix=getRadixPointData($aSurveyinfo['surveyls_numberformat']);
             $aLSJavascriptVar['sLEMradix']=$aRadix['separator'];
+
+            /*
+            $aCfieldnameWithDependences = Condition::model()->getAllCfieldnameWithDependenciesForOneSurvey($iSurveyId);
+            foreach($aCfieldnameWithDependences as $sCfieldname)
+            {
+                $aLSJavascriptVar['aFieldWithDependencies'][] = $sCfieldname;
+            }
+            */
+
             $sLSJavascriptVar="LSvar=".json_encode($aLSJavascriptVar) . ';';
             App()->clientScript->registerScript('sLSJavascriptVar',$sLSJavascriptVar,CClientScript::POS_HEAD);
         }
@@ -1553,38 +1583,36 @@ class SurveyRuntimeHelper {
         $aReplacement['QUESTION_CODE']=$aReplacement['QUESTION_NUMBER']="";
         $sCode=$aQuestionQanda[5];
         $iNumber=$aQuestionQanda[0]['number'];
-        switch (Yii::app()->getConfig('showqnumcode'))
+
+        $showqnumcode_global_ = getGlobalSetting('showqnumcode');
+        $aSurveyinfo = getSurveyInfo($iSurveyId);
+        // Look up if there is a global Setting to hide/show the Questiongroup => In that case Globals will override Local Settings
+        if(($aSurveyinfo['showqnumcode'] == $showqnumcode_global_) || ($showqnumcode_global_ == 'choose')){
+            $showqnumcode_ = $aSurveyinfo['showqnumcode'];
+        } else {
+            $showqnumcode_ = $showqnumcode_global_;
+        }
+
+        switch ($showqnumcode_)
         {
             case 'both':
+            case 'B': // Both
                 $aReplacement['QUESTION_CODE']=$sCode;
                 $aReplacement['QUESTION_NUMBER']=$iNumber;
                 break;
             case 'number':
+            case 'N':
                 $aReplacement['QUESTION_NUMBER']=$iNumber;
                 break;
             case 'number':
                 $aReplacement['QUESTION_CODE']=$sCode;
                 break;
             case 'choose':
+            case 'C':
             default:
-                switch($oSurveyId->showqnumcode)
-                {
-                    case 'B': // Both
-                        $aReplacement['QUESTION_CODE']=$sCode;
-                        $aReplacement['QUESTION_NUMBER']=$iNumber;
-                        break;
-                    case 'N':
-                        $aReplacement['QUESTION_NUMBER']=$iNumber;
-                        break;
-                    case 'C':
-                        $aReplacement['QUESTION_CODE']=$sCode;
-                        break;
-                    case 'X':
-                    default:
-                        break;
-                }
                 break;
         }
+
         $aReplacement['QUESTION']=$aQuestionQanda[0]['all'] ; // Deprecated : only used in old template (very old)
         // Core value : user text
         $aReplacement['QUESTION_TEXT'] = $aQuestionQanda[0]['text'];

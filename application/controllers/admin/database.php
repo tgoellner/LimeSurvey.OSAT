@@ -103,9 +103,8 @@ class database extends Survey_Common_Action
                         /// value for all langs
                         if (Yii::app()->request->getPost('samedefault') == 1){
                             $sLanguage = $aSurveyLanguages[0];   // turn
-                        }else{
-                            $sCurrentLang = $sLanguage; // edit the next lines
                         }
+
                         if ( Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage) == 'EM')  { // Case EM, write expression to database
                             $this->_updateDefaultValues($iQuestionID,0,0,'',$sLanguage,Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage.'_EM'),true);
                         }
@@ -153,19 +152,18 @@ class database extends Survey_Common_Action
             /* @todo : add it to upgrage DB system, and see for the lsa */
             if($sQuestionType=="R" && Survey::model()->findByPk($iSurveyID)->active=="Y")
             {
-                $oQuestionAttributeMaxDBanswers = QuestionAttribute::model()->find(
+                QuestionAttribute::model()->find(
                     "qid = :qid AND attribute = 'max_subquestions'",
                     array(':qid' => $iQuestionID)
                 );
-                if (empty($oQuestionAttribute))
-                {
-                    $answerCount=Answer::model()->countByAttributes(array('qid' => $iQuestionID,'language'=>Survey::model()->findByPk($iSurveyID)->language));
-                    $oQuestionAttribute = new QuestionAttribute();
-                    $oQuestionAttribute->qid = $iQuestionID;
-                    $oQuestionAttribute->attribute = 'max_subquestions';
-                    $oQuestionAttribute->value = $answerCount;
-                    $oQuestionAttribute->save();
-                }
+
+                $answerCount=Answer::model()->countByAttributes(array('qid' => $iQuestionID,'language'=>Survey::model()->findByPk($iSurveyID)->language));
+                $oQuestionAttribute = new QuestionAttribute();
+                $oQuestionAttribute->qid = $iQuestionID;
+                $oQuestionAttribute->attribute = 'max_subquestions';
+                $oQuestionAttribute->value = $answerCount;
+                $oQuestionAttribute->save();
+
             }
 
             //First delete all answers
@@ -372,11 +370,12 @@ class database extends Survey_Common_Action
                             else                                                //new record: additional language
                             {
                                 $oSubQuestion=Question::model()->find("qid=:qid AND language=:language",array(":qid"=>$aInsertQID[$iScaleID][$iPosition],':language'=>$sLanguage));
-                                if(!$oSubQuestion)
+                                if(!$oSubQuestion){
                                     $oSubQuestion=new Question;
+                                }
                                 $oSubQuestion->sid=$iSurveyID;
-                                $oSubQuestion->qid=$aInsertQID[$iScaleID][$iPosition];
                                 $oSubQuestion->gid=$iQuestionGroupID;
+                                $oSubQuestion->qid=$aInsertQID[$iScaleID][$iPosition];
                                 $oSubQuestion->question_order=$iPosition+1;
                                 $oSubQuestion->title=$aCodes[$iScaleID][$iPosition];
                                 $oSubQuestion->question=$subquestionvalue;
@@ -555,7 +554,6 @@ class database extends Survey_Common_Action
                     {
                         if ($alang != "")
                         {
-                            $langqid=0;
                             $oQuestion= new Question;
                             $oQuestion->qid = $iQuestionID;
                             $oQuestion->sid = $iSurveyID;
@@ -573,10 +571,7 @@ class database extends Survey_Common_Action
                             switchMSSQLIdentityInsert('questions',true);// Not sure for this one ?
                             $oQuestion->save();
                             switchMSSQLIdentityInsert('questions',false);
-                            if($oQuestion)
-                            {
-                                $langqid=$oQuestion->qid;
-                            }
+
                             $aErrors=$oQuestion->getErrors();
                             if(count($aErrors))
                             {
@@ -610,13 +605,17 @@ class database extends Survey_Common_Action
                             foreach ($aSubQuestions as $qr1)
                             {
                                 $qr1['parent_qid'] = $iQuestionID;
+                                $oldqid= '';
                                 if (isset($aSQIDMappings[$qr1['qid']]))
                                 {
                                     $qr1['qid'] = $aSQIDMappings[$qr1['qid']];
-                                } else {
+                                }
+                                else
+                                {
                                     $oldqid = $qr1['qid'];
                                     unset($qr1['qid']);
                                 }
+
                                 $qr1['gid'] = $iQuestionGroupID;
                                 $iInsertID = Question::model()->insertRecords($qr1);
                                 if (!isset($qr1['qid']))
@@ -660,8 +659,7 @@ class database extends Survey_Common_Action
                             }
                         }
                     } else {
-                        $qattributes = questionAttributes();
-                        $validAttributes = $qattributes[Yii::app()->request->getPost('type')];
+                        $validAttributes=\ls\helpers\questionHelper::getQuestionAttributesSettings(Yii::app()->request->getPost('type'));
                         $aLanguages=array_merge(array(Survey::model()->findByPk($iSurveyID)->language),Survey::model()->findByPk($iSurveyID)->additionalLanguages);
 
                         foreach ($validAttributes as $validAttribute)
@@ -774,23 +772,17 @@ class database extends Survey_Common_Action
 
 
             // Remove invalid question attributes on saving
-            $qattributes=questionAttributes();
+
 
             $criteria = new CDbCriteria;
             $criteria->compare('qid',$iQuestionID);
-            if (isset($qattributes[$sQuestionType])){
-                $validAttributes=$qattributes[$sQuestionType];
-                foreach ($validAttributes as  $validAttribute)
-                {
-                    $criteria->compare('attribute', '<>'.$validAttribute['name']);
-                }
+            $validAttributes=\ls\helpers\questionHelper::getQuestionAttributesSettings($sQuestionType);
+            foreach ($validAttributes as  $validAttribute)
+            {
+                $criteria->compare('attribute', '<>'.$validAttribute['name']);
             }
             QuestionAttribute::model()->deleteAll($criteria);
             $aLanguages=array_merge(array(Survey::model()->findByPk($iSurveyID)->language),Survey::model()->findByPk($iSurveyID)->additionalLanguages);
-
-
-            //now save all valid attributes
-            $validAttributes=$qattributes[$sQuestionType];
 
             foreach ($validAttributes as $validAttribute)
             {
@@ -894,7 +886,6 @@ class database extends Survey_Common_Action
                 $ccresult = Condition::model()->findAllByAttributes(array('cqid'=>$iQuestionID));
                 $cccount=count($ccresult);
                 foreach ($ccresult as $ccr) {$qidarray[]=$ccr['qid'];}
-                if (isset($qidarray) && $qidarray) {$qidlist=implode(", ", $qidarray);}
             }
             if (isset($cccount) && $cccount)
             {
@@ -1113,8 +1104,6 @@ class database extends Survey_Common_Action
                 {
                     if ($langname)
                     {
-                        $url = Yii::app()->request->getPost('url_'.$langname);
-                        if ($url == 'http://') {$url="";}
 
                         $sURLDescription = html_entity_decode(Yii::app()->request->getPost('urldescrip_'.$langname), ENT_QUOTES, "UTF-8");
                         $sURL = html_entity_decode(Yii::app()->request->getPost('url_'.$langname), ENT_QUOTES, "UTF-8");
@@ -1193,7 +1182,7 @@ class database extends Survey_Common_Action
                 }
 
                 // Only owner and superadmins may change the survey owner
-                if ($oSurvey->owner_id==Yii::app()->request->getPost('owner_id') || Permission::model()->hasGlobalPermission('superadmin','read'))
+                if ($oSurvey->owner_id == Yii::app()->session['loginID'] || Permission::model()->hasGlobalPermission('superadmin','read'))
                 {
                     $oSurvey->owner_id = Yii::app()->request->getPost('owner_id');
                 }
@@ -1238,7 +1227,20 @@ class database extends Survey_Common_Action
                 $oSurvey->usecaptcha = Survey::transcribeCaptchaOptions();
                 $oSurvey->emailresponseto = App()->request->getPost('emailresponseto');
                 $oSurvey->emailnotificationto = App()->request->getPost('emailnotificationto');
-                $oSurvey->googleanalyticsapikey = App()->request->getPost('googleanalyticsapikey');
+                $oSurvey->googleanalyticsapikeysetting = App()->request->getPost('googleanalyticsapikeysetting');
+                if( $oSurvey->googleanalyticsapikeysetting == "Y")
+                {
+                    $oSurvey->googleanalyticsapikey = App()->request->getPost('googleanalyticsapikey');
+                }
+                else if( $oSurvey->googleanalyticsapikeysetting == "G")
+                {
+                    $oSurvey->googleanalyticsapikey = "9999useGlobal9999";
+                }
+                else if( $oSurvey->googleanalyticsapikeysetting == "N")
+                {
+                    $oSurvey->googleanalyticsapikey = "";
+                }
+
                 $oSurvey->googleanalyticsstyle = App()->request->getPost('googleanalyticsstyle');
                 $oSurvey->tokenlength = (App()->request->getPost('tokenlength')<5  || App()->request->getPost('tokenlength')>36)?15:App()->request->getPost('tokenlength');
                 $oSurvey->adminemail = App()->request->getPost('adminemail');

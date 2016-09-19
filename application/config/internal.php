@@ -11,11 +11,22 @@ if (!file_exists(dirname(__FILE__) .  '/config.php')) {
 } else {
     $userConfig = require(dirname(__FILE__) . '/config.php');
 }
-@date_default_timezone_set(@date_default_timezone_get());
+
+if (! date_default_timezone_set(@date_default_timezone_get()))
+{
+
+    date_default_timezone_set('Europe/London');
+}
+
 
 if (function_exists('mb_internal_encoding')) {
     // Needed to substring arabic etc
     mb_internal_encoding('UTF-8');
+    if (ini_get('mbstring.internal_encoding'))
+    {
+        ini_set('mbstring.internal_encoding','UTF-8');
+    }
+
 }
 else {
     // Do nothing, will be checked in installation
@@ -43,8 +54,8 @@ $internalConfig = array(
 
     'modules'=>array(
             'gii'=>array(
-                'class'=>'system.gii.GiiModule',
-                'password'=>'toto',
+                //'class'=>'system.gii.GiiModule',
+                //'password'=>'toto',
                 // 'ipFilters'=>array(...a list of IPs...),
                 // 'newFileMode'=>0666,
                 // 'newDirMode'=>0777,
@@ -52,9 +63,11 @@ $internalConfig = array(
         ),
 
     'params'=>array(
-        'defaultPageSize'=>10	,
-        'pageSizeOptions'=>array(5=>5,10=>10,20=>20,50=>50,100=>100),
-        'pageSizeOptionsTokens'=>array(5=>5,10=>10,25=>25,50=>50,100=>100, 250=>250, 500=>500, 1000=>1000, 2500=>2500, 5000=>5000, 10000=>10000),
+        'defaultPageSize'=>10	,                                                                                                                     // Default page size for most of the grids
+        'pageSizeOptions'=>array(5=>5,10=>10,20=>20,50=>50,100=>100),                                                                                 // Default page size options for most of the grids
+        'pageSizeOptionsTokens'=>array(5=>5,10=>10,25=>25,50=>50,100=>100, 250=>250, 500=>500, 1000=>1000, 2500=>2500, 5000=>5000, 10000=>10000),     // Tokens needs different options
+        'defaultEllipsizeHeaderValue'=>30,                                                                                                            // Default max characters before ellipsizing the headers of responses grid
+        'defaultEllipsizeQuestionValue'=>50,                                                                                                           // Default max characters before ellipsizing the questions inside responses grid
     ),
 
     'import' => array(
@@ -118,7 +131,7 @@ $internalConfig = array(
                 ),
                 'profile' => array(
                     'class' => 'CProfileLogRoute'
-                )
+                ),
             )
         ),
         'cache'=>array(
@@ -133,6 +146,7 @@ $internalConfig = array(
         'session' => array(
             'cookieParams' => array(
                 'httponly' => true,
+                'secure'=> isset($_SERVER['HTTPS']) && ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443)
             ),
         ),
         'messages' => array(

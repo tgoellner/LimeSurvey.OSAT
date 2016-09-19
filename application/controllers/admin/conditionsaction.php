@@ -189,9 +189,8 @@ class conditionsaction extends Survey_Common_Action {
             {
                 LimeExpressionManager::RevertUpgradeConditionsToRelevance($iSurveyID);
                 Condition::model()->deleteRecords("qid in (select qid from {{questions}} where sid={$iSurveyID})");
-                Yii::app()->session['flashmessage']=gT("All conditions in this survey have been deleted.");
+                Yii::app()->setFlashMessage(gT("All conditions in this survey have been deleted."));
                 $this->getController()->redirect(array('admin/survey/sa/view/surveyid/'.$iSurveyID));
-
             }
         }
 
@@ -434,10 +433,7 @@ class conditionsaction extends Survey_Common_Action {
                 $newindex++;
             }
             LimeExpressionManager::UpgradeConditionsToRelevance(NULL,$qid);
-            Yii::app()->session['flashmessage'] = gT("All conditions scenarios were renumbered.");
-
-
-
+            Yii::app()->setFlashMessage(gT("All conditions scenarios were renumbered."));
         }
 
         // COPY CONDITIONS IF THIS IS COPY
@@ -1680,7 +1676,8 @@ class conditionsaction extends Survey_Common_Action {
         $subaction == "editthiscondition" || $subaction == "delete")
         {
             $mytitle = ($subaction == "editthiscondition" &&  isset($p_cid))?gT("Edit condition"):gT("Add condition");
-            $showScenario = ( ( $subaction != "editthiscondition" && isset($scenariocount) && ($scenariocount == 1 || $scenariocount==0)) || ( $subaction == "editthiscondition" && isset($scenario) && $scenario == 1) )?true:false;
+            $scenario = '';
+            $showScenario = ( ( $subaction != "editthiscondition" && isset($scenariocount) && ($scenariocount == 1 || $scenariocount==0)) || ( $subaction == "editthiscondition" && $scenario == 1) )?true:false;
 
             $aDataEditconditions = array(
                 'subaction'=>$subaction,

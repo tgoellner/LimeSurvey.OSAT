@@ -48,6 +48,7 @@
         var duplicateanswercode     = '<?php eT('Error: You are trying to use duplicate answer codes.','js'); ?>';
         var sAssessmentValue        = '<?php eT('Assessment value','js'); ?>';
         var scalecount              = <?php echo $scalecount; ?>;
+
     </script>
 <?php endif; ?>
 

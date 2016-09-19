@@ -566,8 +566,15 @@ class TokenDynamic extends LSActiveRecord
     {
         if ( $field != 'N' && $field != '')
         {
-            $field = convertToGlobalSettingFormat($field);
-            $field = '<span class="text-success">'.$field.'</span>';
+            if ($field != 'Y')
+            {
+                $fieldDate = convertToGlobalSettingFormat($field);
+                $field     = '<span class="text-success">'.$fieldDate.'</span>';
+            }
+            else
+            {
+                $field     = '<span class="text-success fa fa-check"></span>';
+            }
         }
         elseif( $field != '')
         {
@@ -576,8 +583,33 @@ class TokenDynamic extends LSActiveRecord
         return $field;
     }
 
+    public function getEmailFormated()
+    {
+        if ($this->emailstatus=="bounced")
+        {
+            return '<span class="text-warning"><strong> '.$this->email.'</strong></span>';
+        }
+        else
+        {
+            return $this->email;
+        }
+    }
+
+    public function getEmailstatusFormated()
+    {
+        if ($this->emailstatus=="bounced")
+        {
+            return '<span class="text-warning"><strong> '.$this->emailstatus.'</strong></span>';
+        }
+        else
+        {
+            return $this->emailstatus;
+        }
+    }
+
     public function getStandardColsForGrid()
     {
+        $dateformatdetails = getDateFormatData(Yii::app()->session['dateformat']);
         return array(
             array(
                 'id'=>'tid',
@@ -624,7 +656,8 @@ class TokenDynamic extends LSActiveRecord
             array(
                 'header' => gT('Email address'),
                 'name' => 'email',
-                'value'=>'$data->email',
+                'type' => 'raw',
+                'value'=>'$data->emailFormated',
                 'headerHtmlOptions'=>array('class' => 'hidden-xs'),
                 'htmlOptions' => array('class' => 'hidden-xs name'),
             ),
@@ -632,7 +665,8 @@ class TokenDynamic extends LSActiveRecord
             array(
                 'header' => gT('Email status'),
                 'name' => 'emailstatus',
-                'value'=>'$data->emailstatus',
+                'value'=>'$data->emailstatusFormated',
+                'type' => 'raw',
                 'headerHtmlOptions'=>array('class' => 'hidden-xs'),
                 'htmlOptions' => array('class' => 'hidden-xs'),
             ),
@@ -709,7 +743,7 @@ class TokenDynamic extends LSActiveRecord
                 'type'=>'raw',
                 'value'=>'$data->validfromFormated',
                 'headerHtmlOptions'=>array('class' => 'hidden-xs'),
-                'htmlOptions' => array('class' => 'hidden-xs text-center'),
+                'htmlOptions' => array('class' => 'hidden-xs name'),
             ),
             array(
                 'header' => gT('Valid until'),
@@ -717,7 +751,7 @@ class TokenDynamic extends LSActiveRecord
                 'name' => 'validuntil',
                 'value'=>'$data->validuntilFormated',
                 'headerHtmlOptions'=>array('class' => 'hidden-xs'),
-                'htmlOptions' => array('class' => 'hidden-xs'),
+                'htmlOptions' => array('class' => 'hidden-xs name'),
             ),
         );
     }
@@ -743,7 +777,6 @@ class TokenDynamic extends LSActiveRecord
             );
         }
 
-
         return array_merge($this->standardColsForGrid, $aCustomAttributesCols);
     }
 
@@ -753,6 +786,7 @@ class TokenDynamic extends LSActiveRecord
         $sEditUrl     = App()->createUrl("/admin/tokens/sa/edit/iSurveyId/".self::$sid."/iTokenId/$this->tid/ajax/true");
         $sInviteUrl   = App()->createUrl("/admin/tokens/sa/email/surveyid/".self::$sid."/tokenids/$this->tid");
         $sRemindUrl   = App()->createUrl("admin/tokens/sa/email/action/remind/surveyid/".self::$sid."/tokenids/$this->tid");
+        $sDeleteUrl   = App()->createUrl("admin/tokens/sa/deleteToken/sid/".self::$sid."/sItem/$this->tid");
         $button = '';
 
         // View response details
@@ -819,7 +853,10 @@ class TokenDynamic extends LSActiveRecord
         if (Permission::model()->hasSurveyPermission(self::$sid, 'tokens', 'update'))
         {
             // $sEditUrl     = App()->createUrl("/admin/tokens/sa/edit/iSurveyId/".self::$sid."/iTokenId/$this->tid");
-            $button .= '<a class="btn btn-default btn-xs edit-token" href="#" data-sid="'.self::$sid.'" data-tid="'.$this->tid.'" data-url="'.$sEditUrl.'" role="button" data-toggle="tooltip" title="'.gT('Edit this survey participant').'"><span class="icon-edit" ></span></a>';
+            $button .= '<a class="btn  btn-default btn-xs edit-token" href="#" data-sid="'.self::$sid.'" data-tid="'.$this->tid.'" data-url="'.$sEditUrl.'" role="button" data-toggle="tooltip" title="'.gT('Edit this survey participant').'"><span class="icon-edit" ></span></a>';
+            //Delete Token
+            $button .= '<a class="btn btn-danger btn-xs delete-token" href="#" data-sid="'.self::$sid.'" data-tid="'.$this->tid.'" data-url="'.$sDeleteUrl.'" role="button" data-toggle="tooltip" title="'.gT('Delete survey participant').'"><span class="fa fa-trash-o" ></span></a>';
+
         }
         else
         {
@@ -836,7 +873,7 @@ class TokenDynamic extends LSActiveRecord
         {
             $button .= '<span class="btn btn-default btn-xs disabled blank_button" href="#"><span class="fa-fw fa" ><!-- Display participant in CPDB--></span></span>';
         }
-        return $button;
+        return "<div style='white-space:nowrap'>".$button."</div>";
     }
 
     public function search()
@@ -935,8 +972,8 @@ class TokenDynamic extends LSActiveRecord
           );
       }
 
-      $criteria = new CDbCriteria;
-      $criteria->compare('tid',$this->tid,true);
+      $criteria = new LSDbCriteria;
+      $criteria->compare('tid',$this->tid,false);
       $criteria->compare('token',$this->token,true);
       $criteria->compare('firstname',$this->firstname,true);
       $criteria->compare('lastname',$this->lastname,true);
@@ -947,11 +984,24 @@ class TokenDynamic extends LSActiveRecord
       $criteria->compare('language',$this->language,true);
       $criteria->compare('sent',$this->sent,true);
       $criteria->compare('remindersent',$this->remindersent,true);
-      $criteria->compare('remindercount',$this->remindercount,true);
+      $criteria->compare('remindercount',$this->remindercount,false);
       $criteria->compare('completed',$this->completed,true);
-      $criteria->compare('usesleft',$this->usesleft,true);
-      $criteria->compare('validfrom',$this->validfrom,true);
-      $criteria->compare('validuntil',$this->validuntil,true);
+      $criteria->compare('usesleft',$this->usesleft,false);
+
+      $dateformatdetails = getDateFormatData(Yii::app()->session['dateformat']);
+      if ($this->validfrom)
+      {
+          $s = DateTime::createFromFormat($dateformatdetails['phpdate'] . ' H:i', $this->validfrom);
+          $s2 = $s->format('Y-m-d H:i');
+          $criteria->addCondition('validfrom <= \'' . $s2 . '\'');
+      }
+
+      if ($this->validuntil)
+      {
+          $s = DateTime::createFromFormat($dateformatdetails['phpdate'] . ' H:i', $this->validuntil);
+          $s2 = $s->format('Y-m-d H:i');
+          $criteria->addCondition('validuntil >= \'' . $s2 . '\'');
+      }
 
       foreach($this->custom_attributes as $sColName => $oColumn)
       {

@@ -899,10 +899,10 @@ class statistics_helper {
                     $statisticsoutput .=  "\n<table class='statisticstable table table-bordered >\n"
                     ."\t<thead><tr class='success'><th style='text-align: center; '><strong>".sprintf(gT("Field summary for %s"),$qtitle).":</strong>"
                     ."</th></tr>\n"
-                    ."\t<tr><th colspan='2' align='center'><strong>$qquestion</strong></th></tr>\n"
-                    ."\t<tr>\n\t\t<th width='50%' align='center' ><strong>"
+                    ."\t<tr><th colspan='2' align='right'><strong>$qquestion</strong></th></tr>\n"
+                    ."\t<tr>\n\t\t<th width='50%' align='right' ><strong>"
                     .gT("Calculation")."</strong></th>\n"
-                    ."\t\t<th width='50%' align='center' ><strong>"
+                    ."\t\t<th width='50%' align='right' ><strong>"
                     .gT("Result")."</strong></th>\n"
                     ."\t</tr></thead>\n";
 
@@ -979,12 +979,12 @@ class statistics_helper {
                     case 'html':
 
                         $statisticsoutput .= "\n<table class='statisticstable table table-bordered' >\n"
-                        ."\t<thead><tr  class='success'><th colspan='2' align='center'  class='success'><strong>".sprintf(gT("Field summary for %s"),$qtitle).":</strong>"
+                        ."\t<thead><tr  class='success'><th colspan='2' align='right'  class='success'><strong>".sprintf(gT("Field summary for %s"),$qtitle).":</strong>"
                         ."</th></tr>\n"
-                        ."\t<tr><th colspan='2' align='center'><strong>$qquestion</strong></th></tr>\n"
-                        ."\t<tr>\n\t\t<th width='50%' align='center' ><strong>"
+                        ."\t<tr><th colspan='2' align='right'><strong>$qquestion</strong></th></tr>\n"
+                        ."\t<tr>\n\t\t<th width='50%' align='right' ><strong>"
                         .gT("Calculation")."</strong></th>\n"
-                        ."\t\t<th width='50%' align='center' ><strong>"
+                        ."\t\t<th width='50%' align='right' ><strong>"
                         .gT("Result")."</strong></th>\n"
                         ."\t</tr></thead>\n";
 
@@ -1118,8 +1118,8 @@ class statistics_helper {
                         case 'html':
 
                             $statisticsoutput .= "\t<tr>\n"
-                            ."\t\t<td align='center' >$shw[0]</td>\n"
-                            ."\t\t<td align='center' >$shw[1]</td>\n"
+                            ."\t\t<td align='right' >$shw[0]</td>\n"
+                            ."\t\t<td align='right' >$shw[1]</td>\n"
                             ."\t</tr>\n";
 
                             break;
@@ -1159,7 +1159,7 @@ class statistics_helper {
 
                         //footer of question type "N"
                         $statisticsoutput .= "\t<tr class='info'>\n"
-                        ."\t\t<td colspan='4' align='center'>\n"
+                        ."\t\t<td colspan='4' align='right'>\n"
                         ."\t\t\t<font size='1'>".gT("Null values are ignored in calculations")."<br />\n"
                         ."\t\t\t".sprintf(gT("Q1 and Q3 calculated using %s"), "<a href='http://mathforum.org/library/drmath/view/60969.html' target='_blank'>".gT("minitab method")."</a>")
                         ."</font>\n"
@@ -1168,7 +1168,7 @@ class statistics_helper {
                         if($browse)
                         {
                             $statisticsoutput .= "\t<tr>\n"
-                            ."\t\t<td align='center'  colspan='4'>
+                            ."\t\t<td align='right'  colspan='4'>
                             <input type='button' class='statisticsbrowsebutton numericalbrowse btn btn-default btn-large' value='"
                             .gT("Browse")."' id='$fieldname' /></td>\n</tr>";
                             $statisticsoutput .= "<tr><td class='statisticsbrowsecolumn' colspan='3' style='display: none'>
@@ -1210,7 +1210,7 @@ class statistics_helper {
 
                             //output
                             $statisticsoutput .= "\t<tr>\n"
-                            ."\t\t<td align='center'  colspan='4'>".gT("Not enough values for calculation")."</td>\n"
+                            ."\t\t<td align='right'  colspan='4'>".gT("Not enough values for calculation")."</td>\n"
                             ."\t</tr>\n</table><br />\n";
 
                             break;
@@ -2136,7 +2136,7 @@ class statistics_helper {
                 $statisticsoutput .= Yii::app()->getController()->renderPartial('/admin/export/generatestats/simplestats/_statisticsoutput_answer', $aData, true);
 
             }    //end while
-            $statisticsoutput .= '</table>';
+            //$statisticsoutput .= '</table>';
             $aData['showaggregateddata'] = false;
 
             //only show additional values when this setting is enabled
@@ -2454,7 +2454,7 @@ class statistics_helper {
         }
         //loop though the array which contains all answer data
         $ColumnName_RM=array();
-        //var_dump($outputs['alist']); die();
+        //echo '<pre>'; var_dump($outputs['alist']); echo '</pre>';die;
         foreach ($outputs['alist'] as $al)
         {
             //picks out answer list ($outputs['alist']/$al)) that come from the multiple list above

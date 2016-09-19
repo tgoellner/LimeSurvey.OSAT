@@ -519,6 +519,11 @@ class statistics extends Survey_Common_Action {
         $aData['fresults'] = (isset($aData['fresults']))?$aData['fresults']:false;
         $aData['dateformatdetails'] = getDateFormatData(Yii::app()->session['dateformat']);
 
+        if (!isset($aData['result']))
+        {
+            $aData['result'] = null;
+        }
+
         $this->_renderWrappedTemplate('export', 'statistics_view', $aData);
 
     }
@@ -803,6 +808,17 @@ class statistics extends Survey_Common_Action {
         echo $this->_renderWrappedTemplate('export', 'statistics_user_view', $aData);
      }
 
+
+    public function setIncompleteanswers()
+    {
+        $sIncompleteAnswers = Yii::app()->request->getPost('state');
+        if (in_array($sIncompleteAnswers,array('all', 'complete', 'incomplete')))
+        {
+            Yii::app()->session['incompleteanswers']= $sIncompleteAnswers;            
+        }
+
+    }
+
     /**
      * Renders template(s) wrapped in header and footer
      *
@@ -814,7 +830,7 @@ class statistics extends Survey_Common_Action {
     {
         $this->registerScriptFile( 'ADMIN_SCRIPT_PATH', 'bootstrap-switch.min.js');
 
-        $aData['menu']['closeurl'] = Yii::app()->request->getUrlReferrer(Yii::app()->createUrl("/admin/survey/sa/view/surveyid/".$aData['surveyid']), array('simpleStatistics', 'admin/statistics/sa/index') );
+        $aData['menu']['closeurl'] = Yii::app()->request->getUrlReferrer(Yii::app()->createUrl("/admin/survey/sa/view/surveyid/".$aData['surveyid']) );
 
         $aData['display'] = array();
         $aData['display']['menu_bars'] = false;

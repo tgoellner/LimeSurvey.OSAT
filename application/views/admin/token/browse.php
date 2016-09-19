@@ -140,8 +140,9 @@
 </script>
 
 <div class='side-body <?php echo getSideBodyClass(false); ?>'>
+    <input type='hidden' name='dateFormatDetails' value='<?php echo json_encode($dateformatdetails); ?>' />
     <?php $this->renderPartial('/admin/survey/breadcrumb', array('oSurvey'=>$oSurvey, 'token'=>true, 'active'=>gT("Display"))); ?>
-    <h3><?php eT("Survey participants",'js'); ?></h3>
+    <h3><?php eT("Survey participants"); ?></h3>
 
         <p class="alert alert-info alert-dismissible">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span >&times;</span></button>
@@ -176,6 +177,7 @@
                         'columns' => $model->attributesForGrid,
 
                         'ajaxUpdate'=>true,
+                        'afterAjaxUpdate' => 'reinstallParticipantsFilterDatePicker'
                     ));
                 ?>
             </div>
@@ -184,6 +186,7 @@
         <!-- To update rows per page via ajax -->
         <script type="text/javascript">
             jQuery(function($) {
+                reinstallParticipantsFilterDatePicker();
                 jQuery(document).on("change", '#pageSize', function(){
                     $.fn.yiiGridView.update('token-grid',{ data:{ pageSize: $(this).val() }});
                 });

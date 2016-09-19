@@ -7,7 +7,7 @@
 
 
 <div class='menubar surveybar' id="surveybarid">
-    <div class='row container-fluid'>
+    <div class='row container-fluid row-button-margin-bottom'>
 
         <?php // If there are no save or close buttons, take up some more space (useful for 1366x768 screens) ?>
         <?php if (!isset($surveybar['savebutton']['form']) && (!isset($surveybar['saveandclosebutton'])) && (!isset($surveybar['closebutton']))): ?>
@@ -493,76 +493,47 @@
 
                     <div class="btn-group">
                         <!-- main  dropdown header -->
+                        <?php if($activated):?>
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="icon-responses"></span>
                             <?php eT("Responses");?><span class="caret"></span>
                         </button>
+                        <?php else:?>
+                            <button type="button" data-toggle="tooltip" data-placement="bottom" title="<?php eT("This survey is not active - no responses are available.");?>" class="readonly btn btn-default">
+                                <span class="icon-responses"></span>
+                                <?php eT("Responses");?><span class="caret"></span>
+                            </button>
+                        <?php endif; ?>
 
                         <!-- dropdown -->
                         <ul class="dropdown-menu">
-                            <?php if($respstatsread):?>
-                                <?php if($activated):?>
-
-                                    <!-- Responses & statistics -->
-                                    <li>
-                                        <a href='<?php echo $this->createUrl("admin/responses/sa/index/surveyid/$surveyid/");?>' >
-                                            <span class="icon-browse"></span>
-                                            <?php eT("Responses & statistics");?>
-                                        </a>
-                                    </li>
-                                <?php else:?>
-
-                                    <!-- Responses & statistics -->
-                                    <li>
-                                        <a href="#" onclick="alert('<?php eT("This survey is not active - no responses are available.","js");?>');" >
-                                            <span class="icon-browse"></span>
-                                            <?php eT("Responses & statistics");?>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
+                            <?php if($respstatsread && $activated):?>
+                                <!-- Responses & statistics -->
+                                <li>
+                                    <a href='<?php echo $this->createUrl("admin/responses/sa/index/surveyid/$surveyid/");?>' >
+                                        <span class="icon-browse"></span>
+                                        <?php eT("Responses & statistics");?>
+                                    </a>
+                                </li>
                             <?php endif; ?>
 
-                            <?php if($responsescreate): ?>
-                                <?php if($activated): ?>
-
-                                    <!-- Data entry screen -->
-                                    <li>
-                                        <a href='<?php echo $this->createUrl("admin/dataentry/sa/view/surveyid/$surveyid");?>' >
-                                            <span class="fa fa-keyboard-o"></span>
-                                            <?php eT("Data entry screen");?>
-                                        </a>
-                                    </li>
-                                <?php else: ?>
-
-                                    <!-- Data entry screen disabled -->
-                                    <li>
-                                        <a href="#" onclick="alert('<?php eT("This survey is not active, data entry is not allowed","js");?>');" >
-                                            <span class="fa fa-keyboard-o"></span>
-                                            <?php eT("Data entry screen");?>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
+                            <?php if($responsescreate && $activated): ?>
+                                <!-- Data entry screen -->
+                                <li>
+                                    <a href='<?php echo $this->createUrl("admin/dataentry/sa/view/surveyid/$surveyid");?>' >
+                                        <span class="fa fa-keyboard-o"></span>
+                                        <?php eT("Data entry screen");?>
+                                    </a>
+                                </li>
                             <?php endif; ?>
-                            <?php if($responsesread): ?>
-                                <?php if($activated): ?>
-
-                                    <!-- Partial (saved) responses -->
-                                    <li>
-                                        <a href='<?php echo $this->createUrl("admin/saved/sa/view/surveyid/$surveyid");?>' >
-                                            <span class="icon-saved"></span>
-                                            <?php eT("Partial (saved) responses");?>
-                                        </a>
-                                    </li>
-                                <?php else :?>
-
-                                    <!-- Partial (saved) responses disabled -->
-                                    <li>
-                                        <a href="#" onclick="alert('<?php eT("This survey is not active - no responses are available","js");?>');" >
-                                            <span class="icon-saved"></span>
-                                            <?php eT("Partial (saved) responses");?>
-                                        </a>
-                                    </li>
-                                <?php endif; ?>
+                            <?php if($responsesread && $activated): ?>
+                                <!-- Partial (saved) responses -->
+                                <li>
+                                    <a href='<?php echo $this->createUrl("admin/saved/sa/view/surveyid/$surveyid");?>' >
+                                        <span class="icon-saved"></span>
+                                        <?php eT("Partial (saved) responses");?>
+                                    </a>
+                                </li>
                             <?php endif; ?>
                         </ul>
                     </div>

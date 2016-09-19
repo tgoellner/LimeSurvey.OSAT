@@ -17,9 +17,24 @@
 // For this there will be a settings table which holds the last time the database was upgraded
 
 /**
- * @param integer $iOldDBVersion
+ * @param integer $iOldDBVersion The previous database version
+ * @param boolean $bSilent Run update silently with no output - this checks if the update can be run silently at all. If not it will not run any updates at all.
  */
-function db_upgrade_all($iOldDBVersion) {
+function db_upgrade_all($iOldDBVersion, $bSilent=false) {
+
+    /**
+    * If you add a new database version add any critical database version numbers to this array. See link
+    * @link https://manual.limesurvey.org/Database_versioning for explanations
+    * @var array $aCriticalDBVersions An array of cricital database version.
+    */
+    $aCriticalDBVersions=array();
+    $aAllUpdates=range($iOldDBVersion+1,Yii::app()->getConfig('dbversionnumber'));
+    // If trying to update silenty check if it is really possible
+    if ($bSilent && ($iOldDBVersion<258 || count(array_intersect($aCriticalDBVersions,$aAllUpdates))>0))
+    {
+        return false;
+    }
+
     /// This function does anything necessary to upgrade
     /// older versions to match current functionality
     global $modifyoutput;
@@ -1397,6 +1412,40 @@ function db_upgrade_all($iOldDBVersion) {
             $oDB->createCommand()->update('{{settings_global}}',array('stg_value'=>258),"stg_name='DBVersion'");
         }
 
+        /**
+         * Add table for notifications
+         * @since 2016-08-04
+         * @author Olle Haerstedt
+         */
+        if ($iOldDBVersion < 259) {
+            $oDB->createCommand()->createTable('{{notifications}}', array(
+                'id' => 'pk',
+                'entity' => 'string(15) not null',
+                'entity_id' => 'int not null',
+                'title' => 'string not null',  // varchar(255) in postgres
+                'message' => 'text not null',
+                'status' => 'string(15) default \'new\'',
+                'importance' => 'int default 1',
+                'display_class' => 'string(31) default \'default\'',
+                'created' => 'datetime not null',
+                'first_read' => 'datetime null'
+            ));
+            $oDB->createCommand()->createIndex('notif_index', '{{notifications}}', 'entity, entity_id, status', false);
+            $oDB->createCommand()->update('{{settings_global}}',array('stg_value'=>259),"stg_name='DBVersion'");
+        }
+        if ($iOldDBVersion < 260) {
+            alterColumn('{{participant_attribute_names}}','defaultname',"string(255)",false);
+            alterColumn('{{participant_attribute_names_lang}}','attribute_name',"string(255)",false);
+            $oDB->createCommand()->update('{{settings_global}}',array('stg_value'=>260),"stg_name='DBVersion'");
+        }
+        // Inform superadmin about update
+        $superadmins = User::model()->getSuperAdmins();
+        Notification::broadcast(array(
+            'title' => gT('Database update'),
+            'message' => sprintf(gT('The database has been updated from version %s to version %s.'), $iOldDBVersion, '260')
+        ), $superadmins);
+
+
         $oTransaction->commit();
         // Activate schema caching
         $oDB->schemaCachingDuration=3600;
@@ -1415,7 +1464,8 @@ function db_upgrade_all($iOldDBVersion) {
         $oDB->schema->getTables();
         // clear the cache of all loaded tables
         $oDB->schema->refresh();
-        echo '<br /><br />'.gT('An non-recoverable error happened during the update. Error details:')."<p>".htmlspecialchars($e->getMessage()).'</p><br />';
+        //echo '<br /><br />'.gT('An non-recoverable error happened during the update. Error details:')."<p>".htmlspecialchars($e->getMessage()).'</p><br />';
+        Yii::app()->user->setFlash('error', gT('An non-recoverable error happened during the update. Error details:')."<p>".htmlspecialchars($e->getMessage()).'</p><br />');
         return false;
     }
     fixLanguageConsistencyAllSurveys();

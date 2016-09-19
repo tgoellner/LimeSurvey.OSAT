@@ -3,13 +3,18 @@
 
 <div id='edit-question-body' class='side-body <?php echo getSideBodyClass(false); ?>'>
     <?php
-    if (!$adding)
+
+    if ($adding)
     {
-        $this->renderPartial('/admin/survey/breadcrumb', array('oQuestion'=>$oQuestion, 'active'=>gT('Edit question')));
+        $this->renderPartial('/admin/survey/breadcrumb', array('oQuestionGroup'=>$oQuestionGroup, 'active'=>gT("Add a new question")));
     }
-    elseif(isset($oQuestionGroup)) // NB: Logic is not obvious
+    elseif($copying)
     {
         $this->renderPartial('/admin/survey/breadcrumb', array('oQuestionGroup'=>$oQuestionGroup, 'active'=>gT("Copy question")));
+    }
+    else
+    {
+        $this->renderPartial('/admin/survey/breadcrumb', array('oQuestion'=>$oQuestion, 'active'=>gT('Edit question')));
     }
     ?>
     <!-- Page Title-->
@@ -72,7 +77,7 @@
         </div>
 
         <!-- The Accordion -->
-        <div class="col-sm-12 col-md-5" id="accordion-container" style="background-color: #fff;">
+        <div class="col-sm-12 col-md-5" id="accordion-container" style="background-color: #fff; z-index: 2;">
             <?php // TODO : find why the $groups can't be generated from controller?>
             <div id='questionbottom'>
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -159,7 +164,8 @@
                                         </label>
                                         <?php if(isset($selectormodeclass) && $selectormodeclass != "none" && $activated != "Y"): ?>
                                             <?php
-                                            foreach (getQuestionTypeList($eqrow['type'], 'array') as $key=> $questionType)
+                                            $aQuestionTypeList = (array) getQuestionTypeList($eqrow['type'], 'array');
+                                            foreach ( $aQuestionTypeList as $key=> $questionType)
                                             {
                                                 if (!isset($groups[$questionType['group']]))
                                                 {
@@ -252,7 +258,7 @@
                                             </div>
                                             <?php else:?>
                                             <?php eT("Cannot be changed (survey is active)");?>
-                                            <input type='hidden' name='other' value="<?php echo $eqrow['other']; ?>" />
+                                            <input type='hidden' name='other' value="<?php echo ($eqrow['other']=='Y' ? 1 : 0); ?>" />
                                             <?php endif;?>
                                     </div>
 

@@ -147,7 +147,7 @@ CREATE TABLE `prefix_participant_attribute` (
 --
 CREATE TABLE `prefix_participant_attribute_names_lang` (
   `attribute_id` int(11) NOT NULL,
-  `attribute_name` varchar(30) NOT NULL,
+  `attribute_name` varchar(255) NOT NULL,
   `lang` varchar(20) NOT NULL,
   PRIMARY KEY (`attribute_id`,`lang`)
  ) ENGINE=MYISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -159,7 +159,7 @@ CREATE TABLE `prefix_participant_attribute_names_lang` (
 CREATE TABLE `prefix_participant_attribute_names` (
   `attribute_id` int(11) NOT NULL AUTO_INCREMENT,
   `attribute_type` varchar(4) NOT NULL,
-  `defaultname` varchar(50) NOT NULL,
+  `defaultname` varchar(255) NOT NULL,
   `visible` varchar(5) NOT NULL,
   PRIMARY KEY (`attribute_id`,`attribute_type`)
 ) ENGINE=MYISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -595,8 +595,25 @@ CREATE INDEX `saved_control_idx2` ON `prefix_saved_control` (`sid`);
 CREATE INDEX `quota_idx2` ON `prefix_quota` (`sid`);
 CREATE INDEX `parent_qid_idx` ON `prefix_questions` (`parent_qid`);
 
+--
+-- Notification table
+--
+CREATE TABLE IF NOT EXISTS `prefix_notifications` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `entity` VARCHAR(15) NOT NULL COMMENT 'Should be either survey or user',
+    `entity_id` INT(11) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `message` TEXT NOT NULL,
+    `status` VARCHAR(15) NOT NULL DEFAULT 'new' COMMENT 'new or read',
+    `importance` INT(11) NOT NULL DEFAULT 1,
+    `display_class` VARCHAR(31) DEFAULT 'default' COMMENT 'Bootstrap class, like warning, info, success',
+    `created` DATETIME NOT NULL,
+    `first_read` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    INDEX(`entity`, `entity_id`, `status`)
+) ENGINE=MYISAM CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 --
 -- Version Info
 --
-INSERT INTO `prefix_settings_global` VALUES ('DBVersion', '258');
+INSERT INTO `prefix_settings_global` VALUES ('DBVersion', '260');

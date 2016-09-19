@@ -51,7 +51,7 @@ class LSYii_Application extends CWebApplication
             }
         }
         // Runtime path has to be set before  parent constructor is executed
-        $aApplicationConfig['runtimePath']=$settings['tempdir'] . '/runtime';
+        $aApplicationConfig['runtimePath']=$settings['tempdir'] . DIRECTORY_SEPARATOR. 'runtime';
 
         parent::__construct($aApplicationConfig);
 
@@ -154,11 +154,11 @@ class LSYii_Application extends CWebApplication
      * $this->widget('application.extensions.FlashMessage.FlashMessage');
      * </code>
      *
-     * @param string $message
-     * @param string $type
+     * @param string $message The message you want to show on next page load
+     * @param string $type Type can be 'success','info','warning','danger','error' which relate to the particular bootstrap alert classes - see http://getbootstrap.com/components/#alerts . Note: Option 'error' is synonymous to 'danger'
      * @return LSYii_Application Provides a fluent interface
      */
-    public function setFlashMessage($message,$type='default')
+    public function setFlashMessage($message,$type='success')
     {
         $aFlashMessage=$this->session['aFlashMessage'];
         $aFlashMessage[]=array('message'=>$message,'type'=>$type);

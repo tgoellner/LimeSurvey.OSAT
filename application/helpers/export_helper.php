@@ -96,10 +96,6 @@ function SPSSExportData ($iSurveyID, $iLength, $na = '', $q='\'', $header=FALSE)
         $rownr++;
         if ($rownr == 1) {
             $num_fields = count($row);
-
-            //This shouldn't occur, but just to be safe:
-            if (count($fields)<>$num_fields) safeDie("Database inconsistency error");
-
             // Add column headers (used by R export)
             if($header==TRUE)
             {
@@ -184,9 +180,11 @@ function SPSSExportData ($iSurveyID, $iLength, $na = '', $q='\'', $header=FALSE)
                                 if ($row[$fieldno] == 'Y')
                                 {
                                     echo($q. 1 .$q);
-                                } else
+                                } elseif(isset($row[$fieldno]))
                                 {
                                     echo($q. 0 .$q);
+                                } else {
+                                    echo($na);
                                 }
                             } elseif (!$field['hide']) {
                                 $strTmp=mb_substr(stripTagsFull($row[$fieldno]), 0, $iLength);
@@ -394,7 +392,7 @@ function SPSSFieldMap($iSurveyID, $prefix = 'V')
     }
 
     $tempArray = array();
-    $fieldnames = Yii::app()->db->schema->getTable("{{survey_$iSurveyID}}")->getColumnNames();
+    $fieldnames = array_keys($fieldmap);
     $num_results = count($fieldnames);
     $num_fields = $num_results;
     $diff = 0;

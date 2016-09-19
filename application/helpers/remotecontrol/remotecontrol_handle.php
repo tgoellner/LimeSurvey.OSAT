@@ -192,8 +192,8 @@ class remotecontrol_handle
     *
     * @access public
     * @param string $sSessionKey Auth Credentials
-    * @param string $sImportData String containing the BASE 64 encoded data of a lss,csv,xls or survey zip archive
-    * @param string $sImportDataType  lss,csv,txt or zip
+    * @param string $sImportData String containing the BASE 64 encoded data of a lss,csv,txt or survey lsa archive
+    * @param string $sImportDataType  lss,csv,txt or lsa
     * @param string $sNewSurveyName The optional new name of the survey
     * @param integer $DestSurveyID This is the new ID of the survey - if already used a random one will be taken instead
     * @return array|integer iSurveyID  - ID of the new survey
@@ -211,7 +211,7 @@ class remotecontrol_handle
                 file_put_contents($sFullFilePath,base64_decode(chunk_split($sImportData)));
                 $aImportResults = importSurveyFile($sFullFilePath, true, $sNewSurveyName, $DestSurveyID);
                 unlink($sFullFilePath);
-                if (isset($aImportResults['error'])) return array('status' => 'Error: '.$aImportResults['error']);
+                if (isset($aImportResults['error']) && $aImportResults['error']) return array('status' => 'Error: '.$aImportResults['error']);
                 else
                 {
                     return (int)$aImportResults['newsid'];
@@ -934,7 +934,6 @@ class remotecontrol_handle
     */
     public function import_group($sSessionKey, $iSurveyID, $sImportData, $sImportDataType, $sNewGroupName=NULL, $sNewGroupDescription=NULL)
     {
-
         if ($this->_checkSessionKey($sSessionKey))
         {
             $oSurvey = Survey::model()->findByPk($iSurveyID);
@@ -955,11 +954,13 @@ class remotecontrol_handle
 
                 if ( strtolower($sImportDataType)=='lsg')
                 {
+                    $bOldEntityLoaderState = libxml_disable_entity_loader(true);             // @see: http://phpsecurity.readthedocs.io/en/latest/Injection-Attacks.html#xml-external-entity-injection
                     $sXMLdata = file_get_contents($sFullFilePath);
                     $xml = @simplexml_load_string($sXMLdata,'SimpleXMLElement',LIBXML_NONET);
                     if(!$xml)
                     {
                         unlink($sFullFilePath);
+                        libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
                         return array('status' => 'Error: Invalid LimeSurvey group structure XML ');
                     }
                     $aImportResults = XMLImportGroup($sFullFilePath, $iSurveyID);
@@ -969,7 +970,11 @@ class remotecontrol_handle
 
                 unlink($sFullFilePath);
 
-                if (isset($aImportResults['fatalerror'])) return array('status' => 'Error: '.$aImportResults['fatalerror']);
+                if (isset($aImportResults['fatalerror']))
+                {
+                    libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
+                    return array('status' => 'Error: '.$aImportResults['fatalerror']);
+                }
                 else
                 {
                     $iNewgid = $aImportResults['newgid'];
@@ -988,6 +993,7 @@ class remotecontrol_handle
                     {
                         // no need to throw exception
                     }
+                    libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
                     return (int)$aImportResults['newgid'];
                 }
             }
@@ -1246,21 +1252,31 @@ class remotecontrol_handle
 
                 if ( strtolower($sImportDataType)=='lsq')
                 {
+                    $bOldEntityLoaderState = libxml_disable_entity_loader(true);             // @see: http://phpsecurity.readthedocs.io/en/latest/Injection-Attacks.html#xml-external-entity-injection
+
                     $sXMLdata = file_get_contents($sFullFilePath);
                     $xml = @simplexml_load_string($sXMLdata,'SimpleXMLElement',LIBXML_NONET);
                     if(!$xml)
                     {
                         unlink($sFullFilePath);
+                        libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
                         return array('status' => 'Error: Invalid LimeSurvey question structure XML ');
                     }
                     $aImportResults =  XMLImportQuestion($sFullFilePath, $iSurveyID, $iGroupID);
                 }
                 else
+                {
+                    libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
                     return array('status' => 'Really Invalid extension'); //just for symmetry!
+                }
 
                 unlink($sFullFilePath);
 
-                if (isset($aImportResults['fatalerror'])) return array('status' => 'Error: '.$aImportResults['fatalerror']);
+                if (isset($aImportResults['fatalerror']))
+                {
+                    libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
+                    return array('status' => 'Error: '.$aImportResults['fatalerror']);
+                }
                 else
                 {
                     fixLanguageConsistency($iSurveyID);
@@ -1278,6 +1294,8 @@ class remotecontrol_handle
                     else
                     $oQuestion->setAttribute('mandatory','N');
 
+                    libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
+                    
                     try
                     {
                         $oQuestion->save();
@@ -1416,9 +1434,9 @@ class remotecontrol_handle
                     }
                     else if ($sPropertyName == 'defaultvalue')
                     {
-					    $aResult['defaultvalue'] = DefaultValue::model()->findByAttributes(array('qid' => $iQuestionID, 'language'=> $sLanguage))->defaultvalue;
-					}
-					else
+                        $aResult['defaultvalue'] = DefaultValue::model()->findByAttributes(array('qid' => $iQuestionID, 'language'=> $sLanguage))->defaultvalue;
+                    }
+                    else
                     {
                         $aResult[$sPropertyName]=$oQuestion->$sPropertyName;
                     }
@@ -1626,11 +1644,11 @@ class remotecontrol_handle
     * @access public
     * @param string $sSessionKey Auth credentials
     * @param int $iSurveyID Id of the Survey to get token properties
-    * @param int $iTokenID Id of the participant to check
+    * @param array|struct|int Array $aTokenQueryProperties of participant properties used to query the participant, or the token id as an integer
     * @param array $aTokenProperties The properties to get
     * @return array The requested values
     */
-    public function get_participant_properties($sSessionKey, $iSurveyID, $iTokenID, $aTokenProperties)
+    public function get_participant_properties($sSessionKey, $iSurveyID, $aTokenQueryProperties, $aTokenProperties)
     {
         if ($this->_checkSessionKey($sSessionKey))
         {
@@ -1643,7 +1661,20 @@ class remotecontrol_handle
                 if(!tableExists("{{tokens_$iSurveyID}}"))
                     return array('status' => 'Error: No token table');
 
-                $token = Token::model($iSurveyID)->findByPk($iTokenID);
+                if(is_array($aTokenQueryProperties)){
+            $tokenCount = Token::model($iSurveyID)->countByAttributes($aTokenQueryProperties);
+
+            if($tokenCount == 0){
+            return array('status' => 'Error: No results were found based on your attributes.');
+            }else if($tokenCount > 1){
+            return array('status' => 'Error: More than 1 result was found based on your attributes.');
+            }
+            $token = Token::model($iSurveyID)->findByAttributes($aTokenQueryProperties);
+        }else{
+                    // If aTokenQueryProperties is not an array, it's an integer
+                    $iTokenID = $aTokenQueryProperties;
+            $token = Token::model($iSurveyID)->findByPk($iTokenID);
+        }
                 if (!isset($token))
                     return array('status' => 'Error: Invalid tokenid');
 
@@ -1673,11 +1704,11 @@ class remotecontrol_handle
     * @access public
     * @param string $sSessionKey Auth credentials
     * @param int $iSurveyID Id of the survey that participants belong
-    * @param int $iTokenID Id of the participant to alter
+    * @param array|struct|int Array $aTokenQueryProperties of participant properties used to query the participant, or the token id as an integer
     * @param array|struct $aTokenData Data to change
     * @return array Result of the change action
     */
-    public function set_participant_properties($sSessionKey, $iSurveyID, $iTokenID, $aTokenData)
+    public function set_participant_properties($sSessionKey, $iSurveyID, $aTokenQueryProperties, $aTokenData)
     {
         if ($this->_checkSessionKey($sSessionKey))
         {
@@ -1690,7 +1721,19 @@ class remotecontrol_handle
                 if(!tableExists("{{tokens_$iSurveyID}}"))
                     return array('status' => 'Error: No token table');
 
-                $oToken = Token::model($iSurveyID)->findByPk($iTokenID);
+                if(is_array($aTokenQueryProperties)){
+            $tokenCount = Token::model($iSurveyID)->countByAttributes($aTokenQueryProperties);
+            if($tokenCount == 0){
+            return array('status' => 'Error: No results were found based on your attributes.');
+            }else if($tokenCount > 1){
+            return array('status' => 'Error: More than 1 result was found based on your attributes.');
+            }
+            $oToken = Token::model($iSurveyID)->findByAttributes($aTokenQueryProperties);
+        }else{
+                    // If aTokenQueryProperties is not an array, it's an integer
+                    $iTokenID = $aTokenQueryProperties;
+              $oToken = Token::model($iSurveyID)->findByPk($iTokenID);
+        }
                 if (!isset($oToken))
                     return array('status' => 'Error: Invalid tokenid');
 
@@ -2048,33 +2091,33 @@ class remotecontrol_handle
             if(!tableExists("{{tokens_$iSurveyID}}"))
                 return array('status' => 'Error: No token table');
 
-			$command = new CDbCriteria();
-			$command->condition = '';
-			if (count($overrideAllConditions)) {
-				foreach($overrideAllConditions as $condition)
-				{
-					$command->addCondition($condition);
-				}
-			}
-			else
-			{
-				$command->addCondition('usesleft > 0');
-				$command->addCondition("sent = 'N'");
-				$command->addCondition("remindersent = 'N'");
-				$command->addCondition("(completed ='N') or (completed='')");
-				$command->addCondition('ISNULL(validfrom) OR validfrom < NOW()');
-				$command->addCondition('ISNULL(validuntil) OR validuntil > NOW()');
-				$command->addCondition('emailstatus = "OK"');
-			}
-			$command->order = 'tid';
+            $command = new CDbCriteria();
+            $command->condition = '';
+            if (count($overrideAllConditions)) {
+                foreach($overrideAllConditions as $condition)
+                {
+                    $command->addCondition($condition);
+                }
+            }
+            else
+            {
+                $command->addCondition('usesleft > 0');
+                $command->addCondition("sent = 'N'");
+                $command->addCondition("remindersent = 'N'");
+                $command->addCondition("(completed ='N') or (completed='')");
+                $command->addCondition('ISNULL(validfrom) OR validfrom < NOW()');
+                $command->addCondition('ISNULL(validuntil) OR validuntil > NOW()');
+                $command->addCondition('emailstatus = "OK"');
+            }
+            $command->order = 'tid';
 
             $aAllTokens = Token::model($iSurveyID)->findAll( $command );
             $iAllTokensCount=count($aAllTokens);
             unset($aAllTokens);
 
             $iMaxEmails = (int)Yii::app()->getConfig("maxemails");
-			$command->limit = $iMaxEmails;
-			$aResultTokens = Token::model($iSurveyID)->findAll( $command );
+            $command->limit = $iMaxEmails;
+            $aResultTokens = Token::model($iSurveyID)->findAll( $command );
 
             if (empty($aResultTokens))
                 return array('status' => 'Error: No candidate tokens');
@@ -2086,11 +2129,11 @@ class remotecontrol_handle
 
                 //if(!filter_var($emailaddress, FILTER_VALIDATE_EMAIL))
                 if (preg_match($pattern, $oToken['email']) !== 1)
-				{
-					unset($aResultTokens[$key]);
-					//subtract from 'left to send'
-					$iAllTokensCount--;
-				}
+                {
+                    unset($aResultTokens[$key]);
+                    //subtract from 'left to send'
+                    $iAllTokensCount--;
+                }
             }
 
             if (empty($aResultTokens))

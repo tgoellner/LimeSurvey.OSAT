@@ -841,13 +841,13 @@
         public static function ConvertConditionsToRelevance($surveyId=NULL, $qid=NULL)
         {
             $query = LimeExpressionManager::getConditionsForEM($surveyId,$qid);
-
+            $aConditions=$query->readAll();
             $_qid = -1;
             $relevanceEqns = array();
             $scenarios = array();
             $relAndList = array();
             $relOrList = array();
-            foreach($query->readAll() as $row)
+            foreach($aConditions as $row)
             {
                 $row['method']=trim($row['method']); //For Postgres
                 if ($row['qid'] != $_qid)
@@ -1004,10 +1004,10 @@
                         }
                     }
                 }
-
-                if (($row['cqid'] == 0 && !preg_match('/^{TOKEN:([^}]*)}$/',$row['cfieldname'])) || substr($row['cfieldname'],0,1) == '+') {
-                    $_cqid = -1;    // forces this statement to be ANDed instead of being part of a cqid OR group (except for TOKEN fields)
+                if (($row['cqid'] == 0 && preg_match('/^{TOKEN:([^}]*)}$/',$row['cfieldname']) && preg_match('/^{TOKEN:([^}]*)}$/',isset($previousCondition)?$previousCondition['cfieldname']:'')) || substr($row['cfieldname'],0,1) == '+') {
+                    $_cqid = -1;    // forces this statement to be ANDed instead of being part of a cqid OR group (except for TOKEN fields that follow a a token field)
                 }
+                $previousCondition=$row;
             }
             // output last one
             if ($_qid != -1)
@@ -3603,6 +3603,9 @@
             $this->groupSeqInfo = array();
             $this->gseq2relevanceStatus = array();
 
+            /* Add the core replacement before question code : needed if use it in equation , use SID to never send error */
+            templatereplace("{SID}");
+
             // Since building array of allowable answers, need to know preset values for certain question types
             $presets = array();
             $presets['G'] = array(  //GENDER drop-down list
@@ -4879,7 +4882,6 @@
             $LEM->indexGseq=array();
             $LEM->indexQseq=array();
             $LEM->qrootVarName2arrayFilter=array();
-            templatereplace("{}"); // Needed for coreReplacements in relevance equation (in all mode)
             if (isset($_SESSION[$LEM->sessid]['startingValues']) && is_array($_SESSION[$LEM->sessid]['startingValues']) && count($_SESSION[$LEM->sessid]['startingValues']) > 0)
             {
                 $startingValues = array();
@@ -7064,6 +7066,7 @@
         */
         static function GetRelevanceAndTailoringJavaScript()
         {
+            $aQuestionsWithDependencies = array();
             $now = microtime(true);
             $LEM =& LimeExpressionManager::singleton();
 
@@ -7309,8 +7312,7 @@
                                     $relParts[] = " || ($('#java" . $sq['sgqa'] ."').val() == '-oth-')";
                                 }
                                 $relParts[] = "){\n";
-                                $relParts[] = "      $('#java" . $sq['sgqa'] . "').val('');\n";
-                                $relParts[] = "      $('#answer" . $sq['sgqa'] . "NANS').attr('checked',true);\n";
+                                $relParts[] = "      $('#answer" . $sq['sgqa'] . "').click();\n"; // trigger click : no need other think, and whole event happen
                                 $relParts[] = "    }\n";
                                 break;
                             case 'R':
@@ -7563,6 +7565,7 @@
                             $qrelgseqs[] = 'relChangeG' . $knownVar['gseq'];
                         }
                     }
+
                     $qrelgseqs[] = 'relChangeG' . $arg['gseq'];   // so if current group changes visibility, re-tailor it.
                     $qrelQIDs = array_unique($qrelQIDs);
                     $qrelgseqs = array_unique($qrelgseqs);
@@ -7571,6 +7574,21 @@
                         $qrelQIDs=array();  // in question-by-questin mode, should never test for dependencies on self or other questions.
                         $qrelgseqs=array();
                     }
+
+                    /**
+                     * https://bugs.limesurvey.org/view.php?id=8308#c26972
+                     * Thomas White explained: "LEMrelXX functions were specifically designed to only be called for questions that have some dependency upon others "
+                     * So $qrelQIDs contains those questions.
+                     */
+                    foreach($qrelQIDs as $qrelQID)
+                    {
+                        $sQid = str_replace("relChange","",$qrelQID);
+                        if(!in_array($sQid, $aQuestionsWithDependencies)  )
+                        {
+                            $aQuestionsWithDependencies[]=$sQid;
+                        }
+                    }
+
 
                     $qrelJS = "function LEMrel" . $arg['qid'] . "(sgqa){\n";
                     $qrelJS .= "  var UsesVars = ' " . implode(' ', $relJsVarsUsed) . " ';\n";
@@ -7867,6 +7885,9 @@
                 $jsParts[] = "<input type='hidden' id='relevance" . $key . "' name='relevance" . $key .  "' value='" . $val . "'/>\n";
             }
             $LEM->runtimeTimings[] = array(__METHOD__,(microtime(true) - $now));
+
+
+            $jsParts[]="<input type='hidden' id='aQuestionsWithDependencies' data-qids='".json_encode($aQuestionsWithDependencies)."' />";
 
             return implode('',$jsParts);
         }
@@ -8244,7 +8265,7 @@ EOD;
             return $usingCommaAsRadix;
         }
 
-        private static function getConditionsForEM($surveyid=NULL, $qid=NULL)
+        private static function getConditionsForEM($surveyid, $qid=NULL)
         {
             if (!is_null($qid)) {
                 $where = " c.qid = ".$qid." AND ";
@@ -8271,11 +8292,11 @@ EOD;
             $databasetype = Yii::app()->db->getDriverName();
             if ($databasetype=='mssql' || $databasetype=='dblib')
             {
-                $query .= " order by c.qid, sid, scenario, cqid, cfieldname, value";
+                $query .= " order by c.qid, scenario, cqid, cfieldname, value";
             }
             else
             {
-                $query .= " order by qid, sid, scenario, cqid, cfieldname, value";
+                $query .= " order by qid, scenario, cqid, cfieldname, value";
             }
 
             return Yii::app()->db->createCommand($query)->query();
@@ -9703,138 +9724,26 @@ EOD;
         */
         static public function &TSVSurveyExport($sid)
         {
-            $fields = array(
-            'class',
-            'type/scale',
-            'name',
-            'relevance',
-            'text',
-            'help',
-            'language',
-            'validation',
-            'mandatory',
-            'other',
-            'default',
-            'same_default',
-            // Advanced question attributes : @todo get used question attribute by question in survey ?
-            'allowed_filetypes',
-            'alphasort',
-            'answer_width',
-            'array_filter',
-            'array_filter_exclude',
-            'array_filter_style',
-            'assessment_value',
-            'category_separator',
-            'choice_title',
-            'code_filter',
-            'commented_checkbox',
-            'commented_checkbox_auto',
-            'date_format',
-            'date_max',
-            'date_min',
-            'display_columns',
-            'display_rows',
-            'dropdown_dates',
-            'dropdown_dates_minute_step',
-            'dropdown_dates_month_style',
-            'dropdown_prefix',
-            'dropdown_prepostfix',
-            'dropdown_separators',
-            'dropdown_size',
-            'dualscale_headerA',
-            'dualscale_headerB',
-            'em_validation_q',
-            'em_validation_q_tip',
-            'em_validation_sq',
-            'em_validation_sq_tip',
-            'equals_num_value',
-            'exclude_all_others',
-            'exclude_all_others_auto',
-            'hidden',
-            'hide_tip',
-            'input_boxes',
-            'location_city',
-            'location_country',
-            'location_defaultcoordinates',
-            'location_mapheight',
-            'location_mapservice',
-            'location_mapwidth',
-            'location_mapzoom',
-            'location_nodefaultfromip',
-            'location_postal',
-            'location_state',
-            'max_answers',
-            'max_filesize',
-            'max_num_of_files',
-            'max_num_value',
-            'max_num_value_n',
-            'maximum_chars',
-            'min_answers',
-            'min_num_of_files',
-            'min_num_value',
-            'min_num_value_n',
-            'multiflexible_checkbox',
-            'multiflexible_max',
-            'multiflexible_min',
-            'multiflexible_step',
-            'num_value_int_only',
-            'numbers_only',
-            'other_comment_mandatory',
-            'other_numbers_only',
-            'other_replace_text',
-            'page_break',
-            'parent_order',
-            'prefix',
-            'printable_help',
-            'public_statistics',
-            'random_group',
-            'random_order',
-            'rank_title',
-            'repeat_headings',
-            'reverse',
-            'samechoiceheight',
-            'samelistheight',
-            'scale_export',
-            'show_comment',
-            'show_grand_total',
-            'show_title',
-            'show_totals',
-            'showpopups',
-            'slider_accuracy',
-            'slider_default',
-            'slider_layout',
-            'slider_max',
-            'slider_middlestart',
-            'slider_min',
-            'slider_rating',
-            'slider_reset',
-            'slider_separator',
-            'slider_showminmax',
-            'statistics_graphtype',
-            'statistics_showgraph',
-            'statistics_showmap',
-            'suffix',
-            'text_input_width',
-            'time_limit',
-            'time_limit_action',
-            'time_limit_countdown_message',
-            'time_limit_disable_next',
-            'time_limit_disable_prev',
-            'time_limit_message',
-            'time_limit_message_delay',
-            'time_limit_message_style',
-            'time_limit_timer_style',
-            'time_limit_warning',
-            'time_limit_warning_2',
-            'time_limit_warning_2_display_time',
-            'time_limit_warning_2_message',
-            'time_limit_warning_2_style',
-            'time_limit_warning_display_time',
-            'time_limit_warning_message',
-            'time_limit_warning_style',
-            'use_dropdown',
 
+            $aBaseFields = array(
+                'class',
+                'type/scale',
+                'name',
+                'relevance',
+                'text',
+                'help',
+                'language',
+                'validation',
+                'mandatory',
+                'other',
+                'default',
+                'same_default',
             );
+
+            // Advanced question attributes : @todo get used question attribute by question in survey ?
+            $aQuestionAttributes=array_keys(\ls\helpers\questionHelper::getAttributesDefinitions());
+            sort($aQuestionAttributes);
+            $fields=array_merge($aBaseFields,$aQuestionAttributes);
 
             $rows = array();
             $primarylang='en';

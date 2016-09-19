@@ -82,7 +82,7 @@ $config['allowunblacklist']     =  'N';             // Allow participant to unbl
 $config['userideditable']     =  'N';               // Allow editing of user IDs
 $config['defaulttemplate']    =  'default';         // This setting specifys the default theme used for the 'public list' of surveys
 
-$config['allowedtemplateuploads'] = 'gif,ico,jpg,png,css,js,map,json,eot,svg,ttf,woff,txt,md,xml';  // File types allowed to be uploaded in the templates section.
+$config['allowedtemplateuploads'] = 'gif,ico,jpg,png,css,js,map,json,eot,svg,ttf,woff,txt,md,xml,woff2';  // File types allowed to be uploaded in the templates section.
 
 $config['allowedresourcesuploads'] = '7z,aiff,asf,avi,bmp,csv,doc,docx,fla,flv,gif,gz,gzip,ico,jpeg,jpg,mid,mov,mp3,mp4,mpc,mpeg,mpg,ods,odt,pdf,png,ppt,pxd,qt,ram,rar,rm,rmi,rmvb,rtf,sdc,sitd,swf,sxc,sxw,tar,tgz,tif,tiff,txt,vsd,wav,wma,wmv,xls,xlsx,xml,zip,pstpl,css,js';   // File types allowed to be uploaded in the resources sections, and with the HTML Editor
 
@@ -505,6 +505,15 @@ $config['force_ssl'] = 'neither'; // DO not turn on unless you are sure your ser
 */
 $config['ssl_emergency_override'] = false;
 
+/**
+* Sets if any part of LimeSUrvey may be embedded in an iframe
+* Valid values are allow, sameorigin
+* Default: allow
+* Recommended: sameorigin
+* Using 'deny' is currently not supported as it will disable the template editor preview and probably file upload.
+*/
+$config['x_frame_options'] = 'allow';
+
 
 // Get your IP Info DB key from http://ipinfodb.com/
 // If you have the API key, you can use it to get the approximate location of the user initially.
@@ -573,13 +582,6 @@ $config['iSessionExpirationTime'] = 7200;
 * @var array
 */
 $config['InsertansUnsupportedtypes'] = array();
-
-/**
-* This parameter sets if and what update notifications are shown to the administrator. Valid values are 'never', 'stable', 'both' (for stable and unstable)
-* Default is 'stable'
-* @var string
-*/
-$config['updatenotification'] = 'both';
 
 // Proxy settings for ComfortUpdate
 /**

@@ -109,7 +109,6 @@ class SurveyLanguageSetting extends LSActiveRecord
         );
     }
 
-
     /**
     * Defines the customs validation rule lsdefault
     *

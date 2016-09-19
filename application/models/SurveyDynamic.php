@@ -14,20 +14,27 @@
  */
 class SurveyDynamic extends LSActiveRecord
 {
+    public  $completed_filter;
+    public $firstname_filter;
+    public $lastname_filter;
+    public $email_filter;
+    public $lastpage;
+
     protected static $sid = 0;
+    protected $bHaveToken;
 
     /**
      * Returns the static model of Settings table
      *
      * @static
      * @access public
-     * @param int $surveyid
      * @return SurveyDynamic
      */
     public static function model($sid = NULL)
     {
         $refresh = false;
-        if (!is_null($sid)) {
+        if (!is_null($sid))
+        {
             self::sid($sid);
             $refresh = true;
         }
@@ -36,6 +43,7 @@ class SurveyDynamic extends LSActiveRecord
 
         //We need to refresh if we changed sid
         if ($refresh === true) $model->refreshMetaData();
+
         return $model;
     }
 
@@ -60,8 +68,29 @@ class SurveyDynamic extends LSActiveRecord
      */
     public function tableName()
     {
-        $refresh = true;
         return '{{survey_' . self::$sid . '}}';
+    }
+
+    /**
+    * Returns this model's relations
+    *
+    * @access public
+    * @return array
+    */
+    public function relations()
+    {
+        if($this->getbHaveToken())
+        {
+            TokenDynamic::sid(self::$sid);
+            return array(
+                'survey'   => array(self::HAS_ONE, 'Survey', array(), 'condition'=>('sid = '.self::$sid)),
+                'tokens'   => array(self::HAS_ONE, 'TokenDynamic', array('token' => 'token'))
+            );
+        }
+        else
+        {
+            return array();
+        }
     }
 
     /**
@@ -133,7 +162,6 @@ class SurveyDynamic extends LSActiveRecord
     /**
      * Return criteria updated with the ones needed for including results from the timings table
      *
-     * @param CDbCriteria|string $criteria
      *
      * @return CDbCriteria
      */
@@ -158,7 +186,6 @@ class SurveyDynamic extends LSActiveRecord
     /**
      * Return criteria updated with the ones needed for including results from the token table
      *
-     * @param CDbCriteria|string $criteria
      *
      * @return CDbCriteria
      */
@@ -237,6 +264,103 @@ class SurveyDynamic extends LSActiveRecord
     }
 
     /**
+     * For grid list
+     */
+    public function getCompleted()
+    {
+        return ($this->submitdate != '')?'<span class="text-success fa fa-check"></span>':'<span class="text-warning fa fa-times"></span>';
+    }
+
+    public function getButtons()
+    {
+        $sViewUrl     = App()->createUrl("/admin/responses/sa/view/surveyid/".self::$sid."/id/".$this->id);
+        $sEditUrl     = App()->createUrl("admin/dataentry/sa/editdata/subaction/edit/surveyid/".self::$sid."/id/".$this->id);
+        $sDownloadUrl = App()->createUrl("admin/responses",array("sa"=>"actionDownloadfiles","surveyid"=>self::$sid,"sResponseId"=>$this->id));
+        $sDeleteUrl   = App()->createUrl("admin/responses",array("sa"=>"actionDelete","surveyid"=>self::$sid));
+        //$sDeleteUrl   = "#";
+        $button       = "";
+
+        // View detail icon
+        $button .= '<a class="btn btn-default btn-xs" href="'.$sViewUrl.'" target="_blank" role="button" data-toggle="tooltip" title="'.gT("View response details").'"><span class="glyphicon glyphicon-list-alt" ></span></a>';
+
+        // Edit icon
+        if (Permission::model()->hasSurveyPermission(self::$sid,'responses','update'))
+        {
+            $button .= '<a class="btn btn-default btn-xs" href="'.$sEditUrl.'" target="_blank" role="button" data-toggle="tooltip" title="'.gT("Edit this response").'"><span class="glyphicon glyphicon-pencil text-success" ></span></a>';
+        }
+
+        // Download icon
+        if (hasFileUploadQuestion(self::$sid))
+        {
+            if (Response::model(self::$sid)->findByPk($this->id)->getFiles())
+            {
+                $button .= '<a class="btn btn-default btn-xs" href="'.$sDownloadUrl.'" target="_blank" role="button" data-toggle="tooltip" title="'.gT("Download all files in this response as a zip file").'"><span class="glyphicon glyphicon-download-alt downloadfile text-success" ></span></a>';
+            }
+        }
+
+        // Delete icon
+        if (Permission::model()->hasSurveyPermission(self::$sid,'responses','delete'))
+        {
+            $aPostDatas = json_encode(array('sResponseId'=>$this->id));
+            //$button .= '<a class="deleteresponse btn btn-default btn-xs" href="'.$sDeleteUrl.'" role="button" data-toggle="modal" data-ajax="true" data-post="'.$aPostDatas.'" data-target="#confirmation-modal" data-tooltip="true" title="'. sprintf(gT('Delete response %s'),$this->id).'"><span class="glyphicon glyphicon-trash text-danger" ></span></a>';
+            $button .= "<a class='deleteresponse btn btn-default btn-xs' data-ajax-url='".$sDeleteUrl."' data-gridid='responses-grid' role='button' data-toggle='modal' data-post='".$aPostDatas."' data-target='#confirmation-modal' data-tooltip='true' title='". sprintf(gT('Delete response %s'),$this->id)."'><span class='glyphicon glyphicon-trash text-danger' ></span></a>";
+        }
+
+        return $button;
+    }
+
+
+    public function getExtendedData($colName, $sLanguage, $base64jsonFieldMap)
+    {
+        $oFieldMap = json_decode( base64_decode($base64jsonFieldMap) );
+        $value     = $this->$colName;
+
+        $sFullValue      = strip_tags(getExtendedAnswer(self::$sid, $oFieldMap->fieldname, $value, $sLanguage));
+        if (strlen($sFullValue) > 50)
+        {
+            $sElipsizedValue = ellipsize($sFullValue, $this->ellipsize_question_value );
+            $sValue          = '<span data-toggle="tooltip" data-placement="left" title="'.quoteText($sFullValue).'">'.$sElipsizedValue.'</span>';
+        }
+        else
+        {
+            $sValue          = $sFullValue;
+        }
+
+        // Upload question
+        if($oFieldMap->type =='|' && strpos($oFieldMap->fieldname,'filecount')===false)
+        {
+            $sSurveyEntry="<table class='table table-condensed'><tr>";
+            $aQuestionAttributes = getQuestionAttributeValues($oFieldMap->qid);
+            $aFilesInfo = json_decode_ls($this->$colName);
+            for ($iFileIndex = 0; $iFileIndex < $aQuestionAttributes['max_num_of_files']; $iFileIndex++)
+            {
+                $sSurveyEntry .='<tr>';
+                if (isset($aFilesInfo[$iFileIndex]))
+                {
+                    $sSurveyEntry.= '<td>'.CHtml::link(rawurldecode($aFilesInfo[$iFileIndex]['name']), App()->createUrl("/admin/responses",array("sa"=>"actionDownloadfile","surveyid"=>self::$sid,"iResponseId"=>$this->id,"sFileName"=>$aFilesInfo[$iFileIndex]['name'])) ).'</td>';
+                    $sSurveyEntry.= '<td>'.sprintf('%s Mb',round($aFilesInfo[$iFileIndex]['size']/1000,2)).'</td>';
+
+                    if ($aQuestionAttributes['show_title'])
+                    {
+                        if (!isset($aFilesInfo[$iFileIndex]['title'])) $aFilesInfo[$iFileIndex]['title']='';
+                        $sSurveyEntry.= '<td>'.htmlspecialchars($aFilesInfo[$iFileIndex]['title'],ENT_QUOTES, 'UTF-8').'</td>';
+                    }
+                    if ($aQuestionAttributes['show_comment'])
+                    {
+                        if (!isset($aFilesInfo[$iFileIndex]['comment'])) $aFilesInfo[$iFileIndex]['comment']='';
+                        $sSurveyEntry.= '<td>'.htmlspecialchars($aFilesInfo[$iFileIndex]['comment'],ENT_QUOTES, 'UTF-8').'</td>';
+                    }
+                }
+                    $sSurveyEntry .='</tr>';
+            }
+            $sSurveyEntry.='</table>';
+            $sValue = $sSurveyEntry;
+        }
+
+        return $sValue;
+    }
+
+    /**
      * Return true if actual respnse exist in database
      *
      * @param $srid : actual save survey id
@@ -245,7 +369,6 @@ class SurveyDynamic extends LSActiveRecord
      */
     public function exist($srid)
     {
-        $sid = self::$sid;
         $exist=false;
 
         if(Yii::app()->db->schema->getTable($this->tableName())){
@@ -272,7 +395,6 @@ class SurveyDynamic extends LSActiveRecord
      */
     public function next($srid,$usefilterstate=false)
     {
-        $sid = self::$sid;
         $next=false;
         if ($usefilterstate && incompleteAnsFilterState() == 'incomplete')
             $wherefilterstate='submitdate IS NULL';
@@ -306,7 +428,6 @@ class SurveyDynamic extends LSActiveRecord
      */
     public function previous($srid,$usefilterstate=false)
     {
-        $sid = self::$sid;
         $previous=false;
         if ($usefilterstate && incompleteAnsFilterState() == 'incomplete')
             $wherefilterstate='submitdate IS NULL';
@@ -372,6 +493,162 @@ class SurveyDynamic extends LSActiveRecord
 
             return array_count_values($aRes);
         }
+    }
+
+    private function getbHaveToken()
+    {
+        if (!isset($this->bHaveToken))
+        {
+            $this->bHaveToken = tableExists('tokens_' . self::$sid) && Permission::model()->hasSurveyPermission(self::$sid,'tokens','read');// Boolean : show (or not) the token;
+        }
+        return $this->bHaveToken;
+    }
+
+
+    public function getFirstNameForGrid()
+    {
+        if(is_object($this->tokens))
+        {
+            return '<strong>'.$this->tokens->firstname.'</strong>';
+        }
+
+    }
+
+    public function getLastNameForGrid()
+    {
+        if(is_object($this->tokens))
+        {
+            return '<strong>'.$this->tokens->lastname.'</strong>';
+        }
+    }
+
+    public function getTokenForGrid()
+    {
+        $sToken = '';
+        if(is_object($this->tokens) && ! is_null($this->tokens->tid) )
+        {
+            $sToken = "<a class='btn btn-default btn-xs edit-token' href='#' data-sid='".self::$sid."' data-tid='".$this->tokens->tid."'  data-url='".App()->createUrl("admin/tokens",array("sa"=>"edit","iSurveyId"=>self::$sid,"iTokenId"=>$this->tokens->tid, 'ajax'=>'true'))."' data-toggle='tooltip' title='".gT("Edit this survey participant")."'>".strip_tags($this->token)."&nbsp;&nbsp;&nbsp;<span class='glyphicon glyphicon-pencil'></span></a>";
+        }
+        else
+        {
+            $sToken = '<span class="badge badge-success">'.strip_tags($this->token).'</span>';
+        }
+
+        return $sToken;
+    }
+
+    // Get the list of default columns for surveys
+    public function getDefaultColumns()
+    {
+        return array('id', 'token', 'submitdate', 'lastpage','startlanguage', 'completed', 'seed');
+    }
+
+    /**
+     * Define what value to use to ellipsize the headers of the grid
+     * It's using user state/default config, like for pagination
+     * @see: http://www.yiiframework.com/wiki/324/cgridview-keep-state-of-page-and-sort/
+     * @see: http://www.yiiframework.com/forum/index.php?/topic/8994-dropdown-for-pagesize-in-cgridview
+     */
+    public function getEllipsize_header_value()
+    {
+        return Yii::app()->user->getState('defaultEllipsizeHeaderValue',Yii::app()->params['defaultEllipsizeHeaderValue']);
+    }
+
+    /**
+     * Define what value to use to ellipsize the question in the grid
+     * It's using user state/default config, like for pagination.
+     * @see: http://www.yiiframework.com/wiki/324/cgridview-keep-state-of-page-and-sort/
+     * @see: http://www.yiiframework.com/forum/index.php?/topic/8994-dropdown-for-pagesize-in-cgridview
+     */
+    public function getEllipsize_question_value()
+    {
+        return Yii::app()->user->getState('defaultEllipsizeQuestionValue',Yii::app()->params['defaultEllipsizeQuestionValue']);
+    }
+
+    public function search()
+    {
+       $pageSize = Yii::app()->user->getState('pageSize',Yii::app()->params['defaultPageSize']);
+       $criteria = new CDbCriteria;
+       $sort     = new CSort;
+
+       // Make all the model's columns sortable (default behaviour)
+       $sort->attributes = array(
+           '*',
+       );
+
+
+       // Join the token table and filter tokens if needed
+       if ($this->bHaveToken && $this->survey->anonymized != 'Y')
+       {
+            $criteria->compare('t.token',$this->token, true);
+            $criteria->join = "LEFT JOIN {{tokens_" . self::$sid . "}} as tokens ON t.token = tokens.token";
+            $criteria->compare('tokens.firstname',$this->firstname_filter, true);
+            $criteria->compare('tokens.lastname',$this->lastname_filter, true);
+            $criteria->compare('tokens.email',$this->email_filter, true);
+
+            // Add the related token model's columns sortable
+            $aSortVirtualAttributes = array(
+                'tokens.firstname'=>array(
+                           'asc'=>'tokens.firstname ASC',
+                           'desc'=>'tokens.firstname DESC',
+                       ),
+                'tokens.lastname' => array(
+                    'asc'=>'lastname ASC',
+                    'desc'=>'lastname DESC'
+                ),
+                'tokens.email' => array(
+                    'asc'=>'email ASC',
+                    'desc'=>'email DESC'
+                ),
+            );
+
+            $sort->attributes = array_merge($sort->attributes, $aSortVirtualAttributes);
+       }
+
+       // Basic filters
+       $criteria->compare('t.lastpage',empty($this->lastpage)?null:(int)$this->lastpage, false);
+       $criteria->compare('t.id',empty($this->id)?null:(int)$this->id, false);
+       $criteria->compare('t.submitdate',$this->submitdate, true);
+       $criteria->compare('t.startlanguage',$this->startlanguage, true);
+
+
+       // Completed filters
+       if($this->completed_filter == "Y")
+       {
+           $criteria->addCondition('t.submitdate IS NOT NULL');
+       }
+
+       if($this->completed_filter == "N")
+       {
+           $criteria->addCondition('t.submitdate IS NULL');
+       }
+
+       // Filters for responses
+       foreach($this->metaData->columns as $column)
+       {
+           if(!in_array($column->name, $this->defaultColumns))
+           {
+               $c1 = (string) $column->name;
+               if (!empty($this->$c1))
+               {
+                   if ($column->dbType=='decimal')
+                   {
+                        $this->$c1=(float)$this->$c1;
+                   }
+                    $criteria->compare( Yii::app()->db->quoteColumnName($c1), $this->$c1, false);
+               }
+           }
+       }
+
+       $dataProvider=new CActiveDataProvider('SurveyDynamic', array(
+           'sort'=>$sort,
+           'criteria'=>$criteria,
+           'pagination'=>array(
+               'pageSize'=>$pageSize,
+           ),
+       ));
+
+       return $dataProvider;
     }
 }
 ?>

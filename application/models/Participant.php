@@ -114,7 +114,7 @@ class Participant extends LSActiveRecord
 
         $criteria = new CDbCriteria;
 
-        $criteria->compare('participant_id', $this->participant_id, true);
+        $criteria->compare('participant_id', $this->participant_id, false);
         $criteria->compare('firstname', $this->firstname, true);
         $criteria->compare('lastname', $this->lastname, true);
         $criteria->compare('email', $this->email, true);
@@ -1314,7 +1314,6 @@ class Participant extends LSActiveRecord
      *                overwritest - If true, overwrite standard fields (ie: names, email, participant_id, token)
      *                createautomap - If true, rename the fieldnames of automapped attributes so that in future they are automatically mapped
      */
-    //function copyCPBDAttributesToTokens($surveyId, $mapped, $newcreate, $participantid, $overwriteauto=false, $overwriteman=false, $overwritest=false, $createautomap=true)
     public function copyCPDBAttributesToTokens($surveyId, array $participantIds, array $mappedAttributes, array $newAttributes, array $options)
     {
         Yii::app()->loadHelper('common');
@@ -1467,7 +1466,8 @@ class Participant extends LSActiveRecord
 
     function copyToCentral($surveyid, $aAttributesToBeCreated, $aMapped, $overwriteauto=false, $overwriteman=false, $createautomap=true)
     {
-        $tokenid = Yii::app()->session['participantid']; //List of token_id's to add to participants table
+        $tokenid_string = Yii::app()->session['participantid']; //List of token_id's to add to participants table
+        $tokenid = json_decode($tokenid_string);
         $duplicate = 0;
         $sucessfull = 0;
         $writearray = array();

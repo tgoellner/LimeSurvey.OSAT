@@ -436,6 +436,51 @@ class Survey extends LSActiveRecord
         }
     }
 
+     /**
+     * Returns the value for the SurveyEdit GoogleAnalytics API-Key UseGlobal Setting
+     *
+     */
+    public function getGoogleanalyticsapikeysetting(){
+        if($this->googleanalyticsapikey === "9999useGlobal9999")
+        {
+            return "G";
+        } 
+        else if($this->googleanalyticsapikey == "")
+        {
+            return "N";
+        }
+        else 
+        {
+            return "Y";
+        }
+    }
+    public function setGoogleanalyticsapikeysetting($value){
+        if($value == "G")
+        {
+            $this->googleanalyticsapikey = "9999useGlobal9999";
+        } 
+        else if($value == "N")
+        {
+           $this->googleanalyticsapikey = "";
+        }
+    }
+
+     /**
+     * Returns the value for the SurveyEdit GoogleAnalytics API-Key UseGlobal Setting
+     *
+     */
+    public function getGoogleanalyticsapikey(){
+        if($this->googleanalyticsapikey === "9999useGlobal9999")
+        {
+            return getGlobalSetting(googleanalyticsapikey);
+        } 
+        else 
+        {
+            return $this->googleanalyticsapikey;
+        }
+    }
+
+
 
     /**
     * Creates a new survey - does some basic checks of the suppplied data
@@ -944,7 +989,7 @@ class Survey extends LSActiveRecord
         );
         $sort->defaultOrder = array('creation_date' => CSort::SORT_DESC);
 
-        $criteria = new CDbCriteria;
+        $criteria = new LSDbCriteria;
         $aWithRelations = array('correct_relation_defaultlanguage');
 
         // Search filter
@@ -971,11 +1016,27 @@ class Survey extends LSActiveRecord
 
                 if($this->active == "E")
                 {
+                    $criteria->compare("t.active",'Y');
                     $criteria->addCondition("t.expires <'$sNow'");
                 }
                 if($this->active == "S")
                 {
+                    $criteria->compare("t.active",'Y');
                     $criteria->addCondition("t.startdate >'$sNow'");
+                }
+                if($this->active == "R")
+                {
+                    $now = new CDbExpression("NOW()");
+
+                    $criteria->compare("t.active",'Y');
+                    $subCriteria1 = new CDbCriteria;
+                    $subCriteria2 = new CDbCriteria;
+                    $subCriteria1->addCondition($now.' > t.startdate', 'OR');
+                    $subCriteria2->addCondition($now.' < t.expires', 'OR');
+                    $subCriteria1->addCondition('t.expires IS NULL', "OR");
+                    $subCriteria2->addCondition('t.startdate IS NULL', "OR");
+                    $criteria->mergeWith($subCriteria1);
+                    $criteria->mergeWith($subCriteria2);
                 }
             }
         }
@@ -997,7 +1058,7 @@ class Survey extends LSActiveRecord
             $criteriaPerm->compare('permissions.read_p', '1', false, 'OR');
             $criteria->mergeWith($criteriaPerm, 'AND');
         }
-
+        // $criteria->addCondition("t.blabla == 'blub'");
         $dataProvider=new CActiveDataProvider('Survey', array(
             'sort'=>$sort,
             'criteria'=>$criteria,
@@ -1064,4 +1125,29 @@ class Survey extends LSActiveRecord
         return 'N';
     }
 
+    /**
+    * Method to make an approximation on how long a survey will last
+    * Approx is 3 questions each minute.
+    * @return int
+    */
+    public function calculateEstimatedTime ()
+    {
+        //@TODO make the time_per_question variable user configureable
+        $time_per_question = 0.5;
+        $criteria = new CDbCriteria();
+        $criteria->addCondition('sid = ' . $this->sid);
+        $criteria->addCondition('parent_qid = 0');
+        $criteria->addCondition('language = \'' . $this->language . '\'');
+        $baseQuestions = Question::model()->count($criteria);
+        // Note: An array questions with one sub question is fetched as 1 base question + 1 sub question
+        $criteria = new CDbCriteria();
+        $criteria->addCondition('sid = ' . $this->sid);
+        $criteria->addCondition('parent_qid != 0');
+        $criteria->addCondition('language = \'' . $this->language . '\'');
+        $subQuestions = Question::model()->count($criteria);
+        // Subquestions are worth less "time" than base questions
+        $subQuestions = intval(($subQuestions - $baseQuestions) / 2);
+        $subQuestions = $subQuestions < 0 ? 0 : $subQuestions;
+        return ceil(($subQuestions + $baseQuestions)*$time_per_question);
+    }
 }

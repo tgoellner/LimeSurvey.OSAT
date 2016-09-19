@@ -1,6 +1,7 @@
 .settings
 .project
 /tmp/runtime/HTML
+/tmp/runtime/*.log*
 /application/controllers/admin/updater.php
 /tmp/*.html
 /tmp/*.lss
@@ -23,8 +24,12 @@ application/config/_config.php
 !readme.txt
 /tmp/runtime/URI/*.ser
 /tmp/runtime/CSS/*.ser
+<<<<<<< HEAD
 node_modules
 __deact
 plugins_backup
 ___
 /assessment_pdfs
+=======
+launch.json
+>>>>>>> 713761459f3c8e4f8a0eb193c4ea86324e89d129

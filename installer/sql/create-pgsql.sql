@@ -154,7 +154,7 @@ CREATE TABLE prefix_participant_attribute (
 --
 CREATE TABLE prefix_participant_attribute_names_lang (
   "attribute_id" integer NOT NULL,
-  "attribute_name" character varying( 30 ) NOT NULL,
+  "attribute_name" character varying( 255 ) NOT NULL,
   "lang" character varying( 20 ) NOT NULL,
   CONSTRAINT prefix_participant_attribute_names_lang_pkey PRIMARY KEY (attribute_id,lang)
 );
@@ -166,7 +166,7 @@ CREATE TABLE prefix_participant_attribute_names_lang (
 CREATE TABLE prefix_participant_attribute_names (
   "attribute_id" serial NOT NULL,
   "attribute_type" character varying( 4 ) NOT NULL,
-  "defaultname" character varying(50) NOT NULL,
+  "defaultname" character varying(255) NOT NULL,
   "visible" character varying( 5 ) NOT NULL,
   CONSTRAINT prefix_participant_attribute_names_pkey PRIMARY KEY (attribute_id, attribute_type)
 );
@@ -598,8 +598,25 @@ create index parent_qid_idx on prefix_questions (parent_qid);
 create index labels_code_idx on prefix_labels (code);
 create unique index permissions_idx2 ON prefix_permissions (entity_id, entity, uid, permission);
 
+--
+-- Notification table
+--
+CREATE TABLE prefix_notifications (
+    "id" SERIAL,
+    "entity" character varying(15) NOT NULL,
+    "entity_id" integer NOT NULL,
+    "title" character varying(255) NOT NULL,
+    "message" TEXT NOT NULL,
+    "status" character varying(15) NOT NULL DEFAULT 'new',
+    "importance" integer NOT NULL DEFAULT 1,
+    "display_class" character varying(31) DEFAULT 'default',
+    "created" timestamp NOT NULL,
+    "first_read" timestamp DEFAULT NULL,
+    CONSTRAINT prefix_notifications_pkey PRIMARY KEY (id)
+);
+CREATE INDEX prefix_index ON prefix_notifications USING btree (entity, entity_id, status);
 
 --
 -- Version Info
 --
-INSERT INTO prefix_settings_global VALUES ('DBVersion', '258');
+INSERT INTO prefix_settings_global VALUES ('DBVersion', '260');

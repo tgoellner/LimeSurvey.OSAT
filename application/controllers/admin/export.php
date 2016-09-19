@@ -888,18 +888,16 @@ class export extends Survey_Common_Action {
 
     /**
      * Export multiple surveys structure. Called via ajax from surveys list massive action
-     * @param string $sSurveys  :json string containing the list of survey to delete
      */
     public function exportMultipleStructureSurveys()
     {
         $sSurveys = $_POST['sItems'];
         $exportResult = $this->exportMultipleSurveys($sSurveys, 'structure');
-        Yii::app()->getController()->renderPartial('/admin/survey/massive_actions/_export_archive_results', array('aResults'=>$exportResult['aResults'], 'sZip'=>$exportResult['sZip'], 'bArchiveIsEmpty'=>$exportResult['bArchiveIsEmpty']));
+        Yii::app()->getController()->renderPartial('ext.admin.survey.ListSurveysWidget.views.massive_actions._export_archive_results', array('aResults'=>$exportResult['aResults'], 'sZip'=>$exportResult['sZip'], 'bArchiveIsEmpty'=>$exportResult['bArchiveIsEmpty']));
     }
 
     /**
      * Export multiple surveys archives. Called via ajax from surveys list massive action
-     * @param string $sSurveys  :json string containing the list of survey to delete
      */
     public function exportMultipleArchiveSurveys()
     {
@@ -1345,10 +1343,14 @@ class export extends Survey_Common_Action {
     }
 
     private function _xmlToJson($fileContents) {
-        $fileContents = str_replace(array("\n", "\r", "\t"), '', $fileContents);
-        $fileContents = trim(str_replace('"', "'", $fileContents));
-        $simpleXml = simplexml_load_string($fileContents,'SimpleXMLElement', LIBXML_NOCDATA);
-        $json = json_encode($simpleXml);
+        $bOldEntityLoaderState = libxml_disable_entity_loader(true);             // @see: http://phpsecurity.readthedocs.io/en/latest/Injection-Attacks.html#xml-external-entity-injection
+
+        $fileContents          = str_replace(array("\n", "\r", "\t"), '', $fileContents);
+        $fileContents          = trim(str_replace('"', "'", $fileContents));
+        $simpleXml             = simplexml_load_string($fileContents,'SimpleXMLElement', LIBXML_NOCDATA);
+        $json                  = json_encode($simpleXml);
+
+        libxml_disable_entity_loader($bOldEntityLoaderState);                   // Put back entity loader to its original state, to avoid contagion to other applications on the server
         return $json;
     }
 
