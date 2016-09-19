@@ -263,8 +263,6 @@ class RegisterController extends LSYii_Controller {
         $sBounce=getBounceEmail($iSurveyId);
         $sTo=$oToken->email;
         $sitename =  Yii::app()->getConfig('sitename');
-        $customHeaders = '';
-
         // Plugin event for email handling (Same than admin token but with register type)
         $event = new PluginEvent('beforeTokenEmail');
         $event->set('survey', $iSurveyId);
@@ -276,12 +274,9 @@ class RegisterController extends LSYii_Controller {
         $event->set('from', $sFrom);
         $event->set('bounce',$sBounce );
         $event->set('token', $oToken->attributes);
-        $event->set('customHeaders', $customHeaders);
         App()->getPluginManager()->dispatchEvent($event);
         $aMail['subject'] = $event->get('subject');
         $aMail['message'] = $event->get('body');
-        $customHeaders = $event->get('customHeaders');
-
         $sTo = $event->get('to');
         $sFrom = $event->get('from');
         $sBounce = $event->get('bounce');
@@ -317,7 +312,7 @@ class RegisterController extends LSYii_Controller {
                 $oToken->save();
             }
         }
-        elseif (SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename,$useHtmlEmail,$sBounce,$aRelevantAttachments, $customHeaders))
+        elseif (SendEmailMessage($aMail['message'], $aMail['subject'], $sTo, $sFrom, $sitename,$useHtmlEmail,$sBounce,$aRelevantAttachments))
         {
             // TLR change to put date into sent
             $today = dateShift(date("Y-m-d H:i:s"), "Y-m-d H:i", Yii::app()->getConfig('timeadjust'));
@@ -492,7 +487,7 @@ class RegisterController extends LSYii_Controller {
             Yii::app()->clientScript->registerPackage( 'survey-template' );
             App()->getClientScript()->registerPackage('jqueryui');
             App()->getClientScript()->registerPackage('jquery-touch-punch');
-            App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('generalscripts')."survey_runtime.js");
+            App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('generalscripts')."survey_runtime.js");            
             useFirebug();
             $this->render('/register/display',$aViewData);
         }else{
