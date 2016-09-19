@@ -5103,7 +5103,7 @@ tfoot .osatstats-table--cell.is--label {
 }
 .is--chart .osatstats-table--table tbody:nth-of-type(2) .osatstats-table--cell.is--average:after {
   background-color: #1fc55b;
-  color: #fff;
+  color: #154194;
 }
 .is--chart .osatstats-table--table tbody:nth-of-type(2) .osatstats-table--cell.is--average:before {
   width: 0;
@@ -5185,7 +5185,7 @@ tfoot .osatstats-table--cell.is--label {
 }
 .is--chart .osatstats-table--table tbody:nth-of-type(4) .osatstats-table--cell.is--total button:after {
   background-color: #ff6479;
-  color: #fff;
+  color: #154194;
 }
 .is--chart .osatstats-table--table tbody:nth-of-type(4) .osatstats-table--cell.is--total button:before {
   width: 0;

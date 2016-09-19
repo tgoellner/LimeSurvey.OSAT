@@ -1,0 +1,50 @@
+/* *********************************************
+ * Grid options.
+ * ****************************************** */
+/* *********************************************
+ * Other variables
+ * ****************************************** */
+/* The micro clearfix http://nicolasgallagher.com/micro-clearfix-hack */
+/* Floating elements */
+/* Text aligns */
+/* Vertical aligns */
+/* Ellipsiste... */
+*[id^="pluginsettings-Osat"] .setting.control-group {
+  display: none;
+}
+*[id^="pluginsettings-Osat"] .setting.control-group.is--open,
+*[id^="pluginsettings-Osat"] .setting.control-group.setting-info {
+  display: block;
+}
+*[id^="pluginsettings-Osat"] .setting.control-group.setting-text .controls,
+*[id^="pluginsettings-Osat"] .setting.control-group.setting-html .controls {
+  height: 10px;
+  overflow: hidden;
+  opacity: 0;
+}
+*[id^="pluginsettings-Osat"] .setting.control-group.setting-text .controls.is--open,
+*[id^="pluginsettings-Osat"] .setting.control-group.setting-html .controls.is--open {
+  opacity: 1;
+  overflow: visible;
+  height: auto;
+}
+*[id^="pluginsettings-Osat"] .setting-info {
+  *zoom: 1;
+  border: 1px solid #ccc;
+  border-radius: 3px 3px 3px 3px;
+  background-clip: border-box;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  position: relative;
+}
+*[id^="pluginsettings-Osat"] .setting-info:before,
+*[id^="pluginsettings-Osat"] .setting-info:after {
+  content: "";
+  display: table;
+}
+*[id^="pluginsettings-Osat"] .setting-info:after {
+  clear: both;
+}
+/*# sourceMappingURL=./styles.css.map */
