@@ -1198,7 +1198,7 @@ function renderRenderWayForm($renderWay, array $scenarios, $sTemplateViewPath, $
             $thissurvey['include_content']  = 'userforms';
 
             Yii::app()->clientScript->registerScriptFile(Yii::app()->getConfig("generalscripts").'nojs.js', CClientScript::POS_HEAD);
-            
+
             // Language selector
             if ($aSurveyInfo['alanguageChanger']['show']){
                 $aSurveyInfo['alanguageChanger']['datas']['targetUrl'] = $thissurvey['surveyUrl'];
@@ -1402,7 +1402,7 @@ function getNavigatorDatas()
         } elseif (getMove() != "movelast") {
             // Not on last page or submited survey
             $aNavigator['save']['show'] = true;
-        } 
+        }
     }
 
     return $aNavigator;
@@ -1551,6 +1551,7 @@ function doAssessment($surveyid, $onlyCurrent = true)
                         "name"    => $oAssessement->name,
                         "min"     => $oAssessement->minimum,
                         "max"     => $oAssessement->maximum,
+                        "relevance" => $oAssessement->relevance,
                         "message" => $oAssessement->message
                     );
                 }
@@ -1562,6 +1563,7 @@ function doAssessment($surveyid, $onlyCurrent = true)
                         "name"    => $oAssessement->name,
                         "min"     => $oAssessement->minimum,
                         "max"     => $oAssessement->maximum,
+                        "relevance" => $oAssessement->relevance,
                         "message" => $oAssessement->message
                     );
                 }
