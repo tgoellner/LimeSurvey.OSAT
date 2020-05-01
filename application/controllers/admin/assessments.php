@@ -46,7 +46,7 @@ class Assessments extends Survey_Common_Action
 
             Yii::app()->setConfig("baselang", $surveyLanguage);
             Yii::app()->setConfig("assessmentlangs", $languages);
-            
+
             if ($sAction == "assessmentadd") {
                 $this->_add($iSurveyID);
             }
@@ -105,7 +105,7 @@ class Assessments extends Survey_Common_Action
     {
         $iSurveyID = $aData['surveyid'];
         $oSurvey = $aData['survey'];
-        
+
         $aHeadings = array(gT("Scope"), gT("Question group"), gT("Minimum"), gT("Maximum"));
         $aData['headings'] = $aHeadings;
         $oAssessments = Assessment::model();
@@ -214,7 +214,7 @@ class Assessments extends Survey_Common_Action
         $aData['survey'] = $oSurvey;
         $aData['surveyid'] = $iSurveyID;
         $aData['action'] = $action;
-        
+
         Yii::app()->loadHelper('admin/htmleditor');
 
         $this->prepareDataArray($aData);
@@ -222,17 +222,17 @@ class Assessments extends Survey_Common_Action
         $aData['asessementNotActivated'] = false;
         if ($oSurvey->assessments != 'Y') {
             $aData['asessementNotActivated'] = array(
-                'title' => gT("Assessments mode not activated"), 
+                'title' => gT("Assessments mode not activated"),
                 'message' => gT("Assessment mode for this survey is not activated.").'<br/>'
                     . gt("If you want to activate it click here:").'<br/>'
                     . '<a type="submit" class="btn btn-primary" href="'
                     . App()->getController()->createUrl('admin/assessments', ['action'=> 'asessementactivate', 'surveyid'=> $iSurveyID])
-                    .'">'.gT('Activate assessements').'</a>', 
+                    .'">'.gT('Activate assessements').'</a>',
                 'class'=> 'warningheader col-sm-12 col-md-6 col-md-offset-3');
         }
         $urls = [];
         $urls['assessments']['assessments_view'][] = $aData;
-        
+
         $this->_renderWrappedTemplate('', 'assessments/assessments_view', $aData);
     }
 
@@ -371,6 +371,7 @@ class Assessments extends Survey_Common_Action
             'gid' => App()->request->getPost('gid'),
             'minimum' => (int) App()->request->getPost('minimum', 0),
             'maximum' => (int) App()->request->getPost('maximum', 0),
+            'relevance' => (string) App()->request->getPost('relevance', ''),
             'name' => App()->request->getPost('name_'.$language),
             'language' => $language,
             'message' => App()->request->getPost('assessmentmessage_'.$language)

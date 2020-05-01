@@ -73,7 +73,18 @@
                 </div>
                 <div class='col-sm-2 hide-xs'></div>
               </div>
-            </div>
+
+              <!-- Relevance -->
+              <div class='form-group col-md-12'>
+                <label class='control-label col-sm-2' for='relevance'>
+                  <?php eT("Relevance:");?>
+                </label>
+                <div class='col-sm-10'>
+                  <input class='form-control' type='text' id='relevance' name='relevance' />
+                </div>
+                <div class='col-sm-2 hide-xs'></div>
+              </div>
+              </div>
 
             <!-- Languages tabs -->
             <div id="languagetabs" class="row">
@@ -83,7 +94,7 @@
                 ?>
                 <li role="presentation" class="<?=($assessmentlang==$baselang ? 'active' : '')?>">
                     <a data-toggle="tab"  href="#tablang<?=$assessmentlang?>">
-                        <?php 
+                        <?php
                         echo getLanguageNameFromCode($assessmentlang, false);
                             if ($assessmentlang==$baselang) {
                                 echo ' ('.gT("Base language").')';
