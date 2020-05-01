@@ -5676,7 +5676,13 @@
                         $savedControl = SavedControl::model()->find($criteria);
 
                         if($savedControl){
-                            $savedControl->delete();
+                            if ($this->surveyOptions['allowsave'] && isset($_SESSION[$this->sessid]['scid']))
+                            {
+                                // save the current step
+                                SavedControl::model()->updateByPk($_SESSION[$this->sessid]['scid'], array('saved_thisstep'=>$thisstep));
+                            }
+							// prevent sessions from being deleted
+                            // $savedControl->delete();
                         }
                     }
                     elseif ($this->surveyOptions['allowsave'] && isset($_SESSION[$this->sessid]['scid']))
@@ -10622,6 +10628,23 @@ report~numKids > 0~message~{name}, you said you are {age} and that you have {num
          */
         public function setKnownVars($val) {
             $this->knownVars = $val;
+        }
+
+        /**
+         * Return knownVars from the singleton
+         * @param string $key
+         * @return mixed
+         */
+        public function getKnownVars($key = null) {
+            if( empty($key) ) {
+                return $this->knownVars;
+            }
+            
+            if( is_string($key) ) {
+                return $this->knownVars[ $key ];
+            }
+            
+            return;
         }
 
         /**
