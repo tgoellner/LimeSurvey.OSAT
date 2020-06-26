@@ -101,6 +101,8 @@ abstract class QuestionBaseDataSet extends StaticModel
      * @param string $sLanguage
      * @param string   $sQuestionTemplate
      *
+     * @deprecated use getPreformattedBlockOfAdvancedSettings() instead of this function
+     *
      * @return array
      * @throws CException
      */
@@ -109,44 +111,105 @@ abstract class QuestionBaseDataSet extends StaticModel
         if ($iQuestionID != null) {
             $this->oQuestion = Question::model()->findByPk($iQuestionID);
         } else {
-            $iSurveyId = App()->request->getParam('sid') ?? App()->request->getParam('surveyid');
+            $iSurveyId = App()->request->getParam('sid') ?? App()->request->getParam('surveyid'); //todo this should be done in controller ...
             $this->oQuestion = $oQuestion = QuestionCreate::getInstance($iSurveyId, $sQuestionType);
         }
         
         $this->sQuestionType = $sQuestionType == null ? $this->oQuestion->type : $sQuestionType;
         $this->sLanguage = $sLanguage == null ? $this->oQuestion->survey->language : $sLanguage;
-        $this->aQuestionAttributes = QuestionAttribute::model()->getQuestionAttributes($this->oQuestion->qid, $sLanguage);
-        
-        $sQuestionType = $this->sQuestionType;
-
-        if($this->aQuestionAttributes['question_template'] !== 'core' && $sQuestionTemplate === null) {
-            $sQuestionTemplate = $this->aQuestionAttributes['question_template'];
-        }
-
-        $sQuestionTemplate = $sQuestionTemplate == '' || $sQuestionTemplate == 'core' ? null : $sQuestionTemplate;
-        $aQuestionTypeAttributes = \LimeSurvey\Helpers\questionHelper::getQuestionThemeAttributeValues($sQuestionType, $sQuestionTemplate);
 
         $aAdvancedOptionsArray = [];
-        if ($iQuestionID == null) {
+        if ($iQuestionID == null) { //this is only the case if question is new and has not been saved
             $userSetting = SettingsUser::getUserSettingValue('question_default_values_' . $this->oQuestion->type);
             if ($userSetting !== null){
                 $aAdvancedOptionsArray = (array) json_decode($userSetting);
             }
         }
 
-        // this is how the sorting should work but is overwritten by returning the json to the ajax result, sorting is done in _settingstab.vue for now
-        uasort($aQuestionTypeAttributes, 'categorySort');
         if (empty($aAdvancedOptionsArray)) {
+            //this function call must be here, because $this->aQuestionAttributes is used in function below (parseFromAttributeHelper)
+            $this->aQuestionAttributes = QuestionAttribute::model()->getQuestionAttributes($this->oQuestion->qid, $sLanguage);
+            if( $sQuestionTemplate === null && $this->aQuestionAttributes['question_template'] !== 'core') {
+                $sQuestionTemplate = $this->aQuestionAttributes['question_template'];
+            }
+            $sQuestionTemplate = $sQuestionTemplate == '' || $sQuestionTemplate == 'core' ? null : $sQuestionTemplate;
+
+            $aQuestionTypeAttributes = QuestionTheme::getQuestionThemeAttributeValues($this->sQuestionType, $sQuestionTemplate);
+            uasort($aQuestionTypeAttributes, 'categorySort');
+
             foreach ($aQuestionTypeAttributes as $sAttributeName => $aQuestionAttributeArray) {
                 if ($sAttributeName == 'question_template') {
-                    continue;
-                } // Avoid double displaying
-
-                $aAdvancedOptionsArray[$aQuestionAttributeArray['category']][$sAttributeName] = $this->parseFromAttributeHelper($sAttributeName, $aQuestionAttributeArray);
+                    continue; // Avoid double displaying
+                }
+                $formElementValue = isset($this->aQuestionAttributes[$sAttributeName]) ? $this->aQuestionAttributes[$sAttributeName] : '';
+                $aAdvancedOptionsArray[$aQuestionAttributeArray['category']][$sAttributeName] = $this->parseFromAttributeHelper($sAttributeName, $aQuestionAttributeArray, $formElementValue);
             }
         }
         
         return $aAdvancedOptionsArray;
+    }
+
+    /**
+     * Returns a preformatted block of the advanced settings for the question editor (qe).
+     * The advanced settings are the part at the bottom of the qe. They depend on the question type and the
+     * question theme.
+     * Result should look like:
+     * Display  --> category
+     *      repeat_headings   --> attributename
+     *          name
+     *          title
+     *          inputtpye
+     *          formElementId
+     *          formElementName
+     *          formElementHelp
+     *          formElementValue
+     *          aFormElementOptions
+     *      answer_width
+     *          name
+     *          ...
+     * Logic
+     *      min_answers
+     *          name
+     *          ...
+     * @param Question|QuestionCreate $oQuestion
+     * @param string $sQuestionTheme
+     *
+     * @throws Exception when question type attributes are not available
+     * @return array
+     */
+    public function getPreformattedBlockOfAdvancedSettings($oQuestion,  $sQuestionTheme = null){
+        $advancedOptionsArray = array();
+        $this->oQuestion = $oQuestion;
+        $this->sQuestionType = $this->oQuestion->type;
+        $this->sLanguage = $this->oQuestion->survey->language;
+
+        //get all attributes for advanced settings (e.g. Subquestions, Attribute, Display, Display Theme options, Logic, Other, Statistics)
+        if ($this->oQuestion->qid == null) { //this is only the case if question is new and has not been saved
+            $userSetting = SettingsUser::getUserSettingValue('question_default_values_' . $this->oQuestion->type);
+            if ($userSetting !== null){
+                $advancedOptionsArray = (array) json_decode($userSetting);
+            }
+        }
+        if (empty($advancedOptionsArray)) {
+            $questionThemeFromDB = QuestionAttribute::model()->find("qid=:qid AND attribute=:attribute", array('qid'=>$this->oQuestion->qid, 'attribute' => "question_template"));
+            if( $sQuestionTheme === null && $questionThemeFromDB->value !== 'core') {
+                $sQuestionTheme = $questionThemeFromDB->value;
+            }
+            $sQuestionTheme = $sQuestionTheme == '' || $sQuestionTheme == 'core' ? null : $sQuestionTheme;
+
+            $aQuestionTypeAttributes = QuestionTheme::getQuestionThemeAttributeValues($this->sQuestionType, $sQuestionTheme);
+            uasort($aQuestionTypeAttributes, 'categorySort');
+            $questionAttributesValuesFromDB = QuestionAttribute::model()->findAll("qid=:qid", array('qid'=>$this->oQuestion->qid));
+
+            foreach ($aQuestionTypeAttributes as $sAttributeName => $aQuestionAttributeArray) {
+                if ($sAttributeName == 'question_template') {
+                    continue; // Avoid double displaying
+                }
+                $formElementValue = isset($questionAttributesValuesFromDB[$sAttributeName]) ? $questionAttributesValuesFromDB[$sAttributeName]->value : '';
+                $advancedOptionsArray[$aQuestionAttributeArray['category']][$sAttributeName] = $this->parseFromAttributeHelper($sAttributeName, $aQuestionAttributeArray, $formElementValue);
+            }
+        }
+        return $advancedOptionsArray;
     }
 
     //Question theme
@@ -410,7 +473,13 @@ abstract class QuestionBaseDataSet extends StaticModel
             ];
     }
 
-    protected function parseFromAttributeHelper($sAttributeKey, $aAttributeArray)
+    /**
+     * @param $sAttributeKey
+     * @param $aAttributeArray
+     * @param $formElementValue
+     * @return array
+     */
+    protected function parseFromAttributeHelper($sAttributeKey, $aAttributeArray, $formElementValue)
     {
         $aAttributeArray = array_merge(QuestionAttribute::getDefaultSettings(),$aAttributeArray);
         $aAdvancedAttributeArray = [
@@ -420,7 +489,7 @@ abstract class QuestionBaseDataSet extends StaticModel
             'formElementId' => $sAttributeKey,
             'formElementName' => false,
             'formElementHelp' => $aAttributeArray['help'],
-            'formElementValue' => isset($this->aQuestionAttributes[$sAttributeKey]) ? $this->aQuestionAttributes[$sAttributeKey] : ''
+            'formElementValue' => $formElementValue
         ];
         unset($aAttributeArray['caption']);
         unset($aAttributeArray['help']);
@@ -435,9 +504,6 @@ abstract class QuestionBaseDataSet extends StaticModel
                 'suffix' => '}',
                 ];
         }
-
-        
-
         $aAdvancedAttributeArray['aFormElementOptions'] = $aFormElementOptions;
         
         return $aAdvancedAttributeArray;

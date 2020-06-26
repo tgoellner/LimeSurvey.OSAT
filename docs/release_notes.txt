@@ -34,6 +34,80 @@ Thank you to everyone who helped with this new release!
 
 CHANGE LOG
 ------------------------------------------------------
+Changes from 4.3.0 (build 200616) to 4.3.1 (build 200623) June 22, 2020
+-Fixed issue: Various SQL errors when running on MySQL 8 (Olle Harstedt)
+-Fixed issue [security] #16396: Multiple self-stored XSS in printanswer (Denis Chenu)
+-Fixed issue [security] #15452: (self) reflecting XSS in print answer view : Array/text (Denis Chenu)
+#Updated translation: Portuguese (Brazil) by jbfloripa
+#Updated translation: Italian by lfanfoni, ritapas
+#Updated translation: Italian (Informal) by lfanfoni, ritapas
+#Updated translation: French (France) by jayce
+#Updated translation: Finnish by Jmantysalo
+#Updated translation: Chinese (Taiwan) (Traditional) by sylsylsylvie, CTFang
+#Updated translation: Chinese (Simplified) by NSRCRUC
+#Updated translation: Catalan by qualitatuvic
+
+
+Changes from 4.2.8 (build 200608) to 4.3.0 (build 200616) June 16, 2020
++New feature #15999: Extend list_participants to allow compare conditions (Olle Harstedt)
++New feature #16263: New config setting for date format and question code in queXML (Olle Haerstedt)
+-Fixed issue #16215: no import button in page Import responses from a deactivated survey table (Eddy Lackmann)
+-Fixed issue #16082: Drop semi live preview mode from question editor (Jessica Höck)
+-Fixed issue #15063: Left sidebar is not shown with console error Local Storage QuotaExceededError: The quota has been exceeded. (Carsten Schmitz)
+#Updated translation: Polish by elissa
+#Updated translation: Polish (Informal) by elissa
+#Updated translation: Japanese by nomoto
+#Updated translation: French (France) by arnaud21, b00z00, DenisChenu, GuillaumeZ6, jayce
+#Updated translation: Finnish by Jmantysalo
+#Updated translation: Dutch by Han
+#Updated translation: Dutch (Informal) by Han
+#Updated translation: Czech by c_schmitz, slansky, jelen1
+#Updated translation: Croatian by rovinj
+#Updated translation: Catalan by qualitatuvic
+
+
+Changes from 4.2.7 (build 200604) to 4.2.8 (build 200608) June 8, 2020
+-Fixed issue #16210: Time limit not working LimeSurvey CE 4.2.1(Jelle-S)
+-Fixed issue #16364: validator assigned to non existent field (Michał Frankiewicz)
+-Fixed issue #16214: date picker question didn't work with specific language (Denis Chenu)
+
+
+Changes from 4.2.6 (build 200602) to 4.2.7 (build 200604) June 4, 2020
+-Fixed issue #16356: Update jquery to fix XSS vulnerability (rhtenhove)
+-Fixed issue #16352: missing directory separator in uploaded file path (Michał Frankiewicz)
+-Fixed issue #16340: File Upload showing blank page in latest Chromium 83.0.4103.61 (Patrick Teichmann)
+-Fixed issue #16334: Group list menu under Survey menu: Titles of the page are not proper (Jessica Höck)
+
+
+Changes from 4.2.5 (build 200526) to 4.2.6 (build 200602) June 2, 2020
+-Fixed issue: JPEG is now allowed in questions with fileupload type. (Jessica Höck)
+-Fixed issue #15924: Can not send invitations to imported participants where emailstatus IS NULL (#1395) (Roman Anasal)
+
+
+Changes from 4.2.4 (build 200520) to 4.2.5 (build 200526) May 26, 2020
+-Fixed issue #16315: Undefined variable $sSeparator (DrunkenPoney_Qc)
+-Fixed issue #16247: Launch console can create new security.php file (Denis Chenu)
+-Fixed issue #16142: Deleting a participant after he/she started the survey keeps the survey available (Denis Chenu)
+-Fixed issue #15856: Removed get_magic_quotes_gpc (Carsten Schmitz)
+
+
+Changes from 4.2.3 (build 200511) to 4.2.4 (build 200520) May 19, 2020
+-Fixed issue #16289: File Upload not working for iOS 13.2 (Jessica Höck)
+-Fixed issue #16153: Random order question attribute - if enabled, no changes can be saved anymore (Olle Harstedt)
+-Fixed issue #16152: Subquestion texts missing when exporting questions to lsq (Patricia Stelling)
+-Fixed issue #16032: Randomize also randomized answer options not only subquestions (Olle Harstedt)
+
+
+Changes from 4.2.2 (build 200504) to 4.2.3 (build 200511) May 11, 2020
+-Fixed issue: JsonEditor to not encode the value if it is already a valid json  (Tõnis Ormisson)
+-Fixed issue #16241: Only one tip are shown (Denis Chenu)
+-Fixed issue #16226: Invalid count on multi with exclude : broke logic and php vs js diff (Denis Chenu)
+-Fixed issue #16225: Unable to VV export if no token table (Denis Chenu)
+-Fixed issue #16208: escape in Multiple choice with comments (Denis Chenu)
+-Fixed issue #16203: Multiple choice questions with "other" with "exclusive" unable to submit (Denis Chenu)
+-Fixed issue #16175: statCountIf returns nothing for first participant (Denis Chenu)
+
+
 Changes from 4.2.1 (build 200428) to 4.2.2 (build 200504) May 4, 2020
 -Fixed issue: Uppercase file extensions were not allowed (Carsten Schmitz)
 -Fixed issue: Make html email default to Y (Olle Harstedt)

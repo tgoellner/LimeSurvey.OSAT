@@ -1,4 +1,8 @@
 <?php
+
+/* @deprecated moved to layouts/sidemenu */
+//todo should be removed when all controllers have been refactored
+
    /**
     * This view displays the sidemenu on the left side, containing the question explorer
     *
@@ -18,7 +22,7 @@
     $getQuestionsUrl = $this->createUrl("/admin/survey/sa/getAjaxQuestionGroupArray/", ["surveyid" => $surveyid]);
     $getMenuUrl = $this->createUrl("/admin/survey/sa/getAjaxMenuArray/", ["surveyid" => $surveyid]);
     $createQuestionGroupLink = $this->createUrl("admin/questiongroups/sa/add/", ["surveyid" =>  $surveyid]);
-    $createQuestionLink = "admin/questioneditor/sa/view/surveyid/".$surveyid;
+    $createQuestionLink = "questionEditor/view/surveyid/".$surveyid;
     $unlockLockOrganizerUrl = $this->createUrl("admin/user/sa/togglesetting/", ['surveyid' => $surveyid]);
 
     $updateOrderLink =  $this->createUrl("admin/questiongroups/sa/updateOrder/", ["surveyid" =>  $surveyid]);

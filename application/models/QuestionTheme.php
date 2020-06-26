@@ -807,7 +807,6 @@ class QuestionTheme extends LSActiveRecord
         $configXMLPath = App()->getConfig('rootdir') . '/' . $aQuestionTheme['xml_path'] . '/config.xml';
 
         return $configXMLPath;
-
     }
 
     /**
@@ -898,5 +897,78 @@ class QuestionTheme extends LSActiveRecord
             'message' => gT('Question Theme has been sucessfully converted to LimeSurvey 4'),
             'success' => true
         ];
+    }
+
+    /**
+     * Return the question theme custom attributes values
+     * -- gets coreAttributes from xml-file
+     * -- gets additional attributes from extended theme (if theme is extended)
+     * -- gets "own" attributes via plugin
+     *
+     * @param string  $type question type (this is the attribute 'question_type' in table question_theme)
+     * @param string  $sQuestionThemeName : question theme name
+     *
+     * @return array : the attribute settings for this question type
+     * @throws Exception when question type attributes are not available
+     */
+    public static function getQuestionThemeAttributeValues($type, $sQuestionThemeName = null)
+    {
+        $aQuestionAttributes = array();
+        $xmlConfigPath = self::getQuestionXMLPathForBaseType($type);
+
+        libxml_disable_entity_loader(false);
+        $oCoreConfig = simplexml_load_file($xmlConfigPath);
+        $aCoreAttributes = json_decode(json_encode((array)$oCoreConfig), true);
+        libxml_disable_entity_loader(true);
+        if (!isset($aCoreAttributes['attributes']['attribute'])) {
+            throw new Exception("Question type attributes not available!");
+        }
+        foreach ($aCoreAttributes['attributes']['attribute'] as $aCoreAttribute) {
+            $aQuestionAttributes[$aCoreAttribute['name']] = $aCoreAttribute;
+        }
+
+        $additionalAttributes = array();
+        if($sQuestionThemeName !== null) {
+            $additionalAttributes = self::getAdditionalAttrFromExtendedTheme($sQuestionThemeName, $type);
+        }
+
+        return array_merge($aQuestionAttributes,
+            $additionalAttributes,
+            QuestionAttribute::getOwnQuestionAttributesViaPlugin());
+    }
+
+    /**
+     * Gets the additional attributes for an extended theme from xml file.
+     * If there are no attributes, an empty array is returned
+     *
+     * @param string $sQuestionThemeName the question theme name (see table question theme "name")
+     * @param string $type   the extended typ (see table question_themes "extends")
+     * @return array additional attributes for an extended theme or empty array
+     */
+    public static function getAdditionalAttrFromExtendedTheme($sQuestionThemeName, $type){
+        $additionalAttributes = array();
+        libxml_disable_entity_loader(false);
+            $questionTheme = QuestionTheme::model()->findByAttributes([], 'name = :name AND extends = :extends', ['name' => $sQuestionThemeName, 'extends' => $type]);
+            if ($questionTheme !== null) {
+                $xml_config = simplexml_load_file(App()->getConfig('rootdir') . '/' . $questionTheme['xml_path'] . '/config.xml');
+                $attributes = json_decode(json_encode((array)$xml_config->attributes), true);
+            }
+        libxml_disable_entity_loader(true);
+
+        if (!empty($attributes)) {
+            if (!empty($attributes['attribute']['name'])) {
+                // Only one attribute set in config: need an array of attributes
+                $attributes['attribute'] = array($attributes['attribute']);
+            }
+            // Create array of attribute with name as key
+            $defaultQuestionAttributeValues = QuestionAttribute::getDefaultSettings();
+            foreach ($attributes['attribute'] as $attribute) {
+                if (!empty($attribute['name'])) {
+                    // inputtype is text by default
+                    $additionalAttributes[$attribute['name']] = array_merge($defaultQuestionAttributeValues, $attribute);
+                }
+            }
+        }
+        return $additionalAttributes;
     }
 }

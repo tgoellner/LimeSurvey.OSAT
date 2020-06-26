@@ -68,9 +68,8 @@ export default {
         return Promise.all([
             new Promise((resolve, reject) => {
                 const postUrl = LS.createUrl(
-                    window.QuestionEditData.connectorBaseUrl,
+                    "questionEditor/getQuestionData",
                     {
-                        sa: "getQuestionData",
                         sid: context.getters.surveyid
                     }
                 );
@@ -142,9 +141,8 @@ export default {
             }),
             new Promise((resolve, reject) => {
                 const postUrl = LS.createUrl(
-                    window.QuestionEditData.connectorBaseUrl,
+                    "questionEditor/getQuestionPermissions",
                     {
-                        sa: "getQuestionPermissions",
                         sid: context.getters.surveyid
                     }
                 );
@@ -170,9 +168,8 @@ export default {
     getQuestionGeneralSettings: (context, questionTheme = "core") => {
         return new Promise((resolve, reject) => {
             const postUrl = LS.createUrl(
-                window.QuestionEditData.connectorBaseUrl,
+                "questionEditor/getGeneralOptions",
                 {
-                    sa: "getGeneralOptions",
                     sid: context.getters.surveyid
                 }
             );
@@ -222,9 +219,8 @@ export default {
     getQuestionAdvancedSettings: context => {
         return new Promise((resolve, reject) => {
             const postUrl = LS.createUrl(
-                window.QuestionEditData.connectorBaseUrl,
+                "questionEditor/getAdvancedOptions",
                 {
-                    sa: "getAdvancedOptions",
                     sid: context.getters.surveyid
                 }
             );
@@ -274,10 +270,12 @@ export default {
         });
     },
     getQuestionTypes: context => {
-        const postUrl = LS.createUrl(window.QuestionEditData.connectorBaseUrl, {
-            sa: "getQuestionTypeList",
-            sid: context.getters.surveyid
-        });
+        const postUrl = LS.createUrl(
+            "questionEditor/getQuestionTypeList",
+            {
+                sid: context.getters.surveyid
+            }
+            );
 
         ajax.methods
             .$_get(postUrl)
@@ -292,9 +290,8 @@ export default {
     reloadQuestion: context => {
         return new Promise((resolve, reject) => {
             const postUrl = LS.createUrl(
-                window.QuestionEditData.connectorBaseUrl,
+                "questionEditor/reloadQuestionData",
                 {
-                    sa: "reloadQuestionData",
                     sid: context.getters.surveyid
                 }
             );
@@ -374,7 +371,7 @@ export default {
                             context.state.currentQuestionAdvancedSettings
                     }
                 },
-                window.LS.data.csrfTokenData
+              window.LS.data.csrfTokenData
             );
 
             if (context.state.initCopy == true) {
@@ -392,9 +389,8 @@ export default {
             });
 
             const postUrl = LS.createUrl(
-                window.QuestionEditData.connectorBaseUrl,
+                "questionEditor/saveQuestionData",
                 {
-                    sa: "saveQuestionData",
                     gid: context.state.currentQuestion.gid,
                     sid: context.getters.surveyid
                 }

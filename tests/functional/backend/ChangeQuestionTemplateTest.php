@@ -62,8 +62,8 @@ class ChangeQuestionTemplateTest extends TestBaseClassWeb
             $urlMan = \Yii::app()->urlManager;
             $urlMan->setBaseUrl('http://' . self::$domain . '/index.php');
             $url = $urlMan->createUrl(
-                'admin/questioneditor',
-                array('sa'=>'view', 'surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid)
+                'questionEditor/view',
+                array( 'surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid)
             );
             $web = self::$webDriver;
             $web->get($url);
@@ -85,15 +85,16 @@ class ChangeQuestionTemplateTest extends TestBaseClassWeb
             
             
             //// Old way, by useing the html elements
-            // sleep(1);
+            sleep(1);
             // // Select bootstrap_buttons on Question theme dropdown
-            // $option = $web->findElement(WebDriverBy::cssSelector('#question_template option[value=bootstrap_buttons]'));
-            // $option->click();
+            $option = $web->findElement(WebDriverBy::cssSelector('#question_template option[value=bootstrap_buttons]'));
+            $option->click();
+            sleep(5);
 
             //// New way by triggering a vuejs function
-            $web->executeScript('LS.EventBus.$emit("questionTypeChange", {type: "L", name: "bootstrap_buttons"})');
+            //$web->executeScript('LS.EventBus.$emit("questionTypeChange", {type: "L", name: "bootstrap_buttons"})');
             $web->wait(20)->until(WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::id('advanced-options-container')));
-            sleep(1);
+            sleep(3);
 
             // Select "Display theme options" tab
             $displayLink = $web->findElement(WebDriverBy::linkText('Display theme options'));
@@ -147,7 +148,7 @@ class ChangeQuestionTemplateTest extends TestBaseClassWeb
             // Go to edit question page.
             $urlMan = \Yii::app()->urlManager;
             $urlMan->setBaseUrl('http://' . self::$domain . '/index.php');
-            $url = $urlMan->createUrl('admin/questioneditor', array('sa'=>'view', 'surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid));
+            $url = $urlMan->createUrl('questionEditor/view', array('surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid));
             $actualWebDriver = self::$webDriver->get($url);
 
             $this->assertNotNull($actualWebDriver, 'The WebDriver is null');
@@ -175,8 +176,8 @@ class ChangeQuestionTemplateTest extends TestBaseClassWeb
             $urlMan = \Yii::app()->urlManager;
             $urlMan->setBaseUrl('http://' . self::$domain . '/index.php');
             $url = $urlMan->createUrl(
-                'admin/questioneditor',
-                array('sa'=>'view', 'surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid)
+                'questionEditor/view',
+                array('surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid)
             );
             $web = self::$webDriver;
             $web->get($url);
@@ -227,13 +228,13 @@ class ChangeQuestionTemplateTest extends TestBaseClassWeb
             $urlMan = \Yii::app()->urlManager;
             $urlMan->setBaseUrl('http://' . self::$domain . '/index.php');
             $url = $urlMan->createUrl(
-                'admin/questioneditor',
-                array('sa'=>'view', 'surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid)
+                'questionEditor/view',
+                array('surveyid'=>self::$testSurvey->sid, 'gid'=>$gid, 'qid'=>$qid)
             );
             $web = self::$webDriver;
             $web->get($url);
 
-            sleep(3);
+            sleep(5);
 
             // Select Question Editor View
             try {
@@ -264,7 +265,7 @@ class ChangeQuestionTemplateTest extends TestBaseClassWeb
             $option = $web->findByCss('#question_template option[value=bootstrap_buttons]');
             $option->click();
             
-            sleep(2);
+            sleep(3);
 
             // Save Question
             $saveButton = $web->findElement(WebDriverBy::cssSelector('#save-button'));
@@ -290,7 +291,7 @@ class ChangeQuestionTemplateTest extends TestBaseClassWeb
             );
             $this->assertNotNull($scopeApplyBaseStyleContainer);
 
-            sleep(1);
+            sleep(3);
 
             // Check if Display theme options link exists
             try {
